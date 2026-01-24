@@ -26,6 +26,7 @@ function Sidebar({ isMobile }) {
   // Hardcoded company info
   const companyName = "HR Services";
   const role = employeeData?.role; // Hardcoded role
+  const permissionArray = employeeData?.permissionArray
 
   // Hardcoded role label mapping
   const roleLabels = {
@@ -33,24 +34,50 @@ function Sidebar({ isMobile }) {
     Manager: "Manager",
     Employee: "Employee",
   };
-
+  console.log(permissionArray)
   // Hardcoded menu items
   const menu = [
     { label: "Dashboard", path: "/company/dashboard", icon: Home },
-    { label: "Employees", path: "/company/employe/view", icon: Users, },
-    // 
-    { label: "Payroll", path: "/company/payroll", icon: Briefcase },
-    { label: "Attendance", path: "/company/attendance", icon: Briefcase },
-    // { label: "Leaves", path: "/company/leadall", icon: Briefcase },
 
-    { label: "Event", path: "/company/event", icon: Briefcase },
 
-    { label: "Leads", path: "/company/leadall", icon: Briefcase },
-    { label: "Lead-form Configure", path: "/company/form-configure", icon: FileText },
-    { label: "Role Configure", path: "/company/role-configure", icon: Briefcase },
-    { label: "Permission Configure", path: "/company/permission-configure", icon: Settings },
-     { label: "Leave Configure", path: "/company/leave-configure", icon: Settings },
+    ...(permissionArray.includes("etView") ? [
+      { label: "Event", path: "/company/event", icon: Briefcase },
+    ] : []),
+
+
+    ...(permissionArray.includes("atnView") ? [
+      { label: "Attendance", path: "/company/attendance", icon: Briefcase },
+    ] : []),
+
+
+    ...(permissionArray.includes("PayView") ? [
+      { label: "Payroll", path: "/company/payroll", icon: Briefcase },
+    ] : []),
+
+    ...(permissionArray.includes("empView") ? [
+      { label: "Employees", path: "/company/employe/view", icon: Users },
+    ] : []),
+
+    // ...(permissionArray.includes("ldView") ? [
+    //   { label: "Leads", path: "/company/leadall", icon: Briefcase }
+    // ] : []),
+
+
+    ...(permissionArray.includes("ldView") ? [
+      { label: "Leads", path: "/company/leadall", icon: Briefcase },
+    ] : []),
+
+    // Conditionally add "Lead-form Configure" only if role is Admin
+    ...(role === "Admin" ? [
+      { label: "Lead-form Configure", path: "/company/form-configure", icon: FileText },
+      { label: "Role Configure", path: "/company/role-configure", icon: Briefcase },
+      { label: "Permission Configure", path: "/company/permission-configure", icon: Settings },
+      { label: "Leave Configure", path: "/company/leave-configure", icon: Settings },
+    ] : []),
+
+
   ];
+
 
   return (
     <aside

@@ -5,6 +5,7 @@ import { Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { companyConfiguresView } from "../../redux/slice/companySlice";
 import { fetchLeads } from "../../redux/slice/leadSlice";
+import { employeeDetails } from "../../redux/slice/employee/loginSlice";
 
 function LeadAll() {
   const navigate = useNavigate();
@@ -17,6 +18,24 @@ function LeadAll() {
   const { leadAll = [], loading, error } = useSelector(
     (state) => state.reducer.lead
   );
+
+
+
+
+
+  // Grab state
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+
+  // Fetch employee details only if not initialized
+  useEffect(() => {
+    if (!initialized) {
+      dispatch(employeeDetails());
+    }
+  }, [dispatch, initialized]);
+
+  const permissionArray = employeeData?.permissionArray
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -62,7 +81,7 @@ function LeadAll() {
 
     return matchesSearch && matchesStatus && matchesDate;
   });
-
+  // console.log(leadSchema,"ppy")
   // UI
   return (
     <CompanyLayout>
@@ -71,13 +90,20 @@ function LeadAll() {
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">All Leads</h2>
-
-          <button
+          {permissionArray.includes("ldCreate") ? [
+            <button
+              onClick={() => navigate("/company/lead-form")}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
+            >
+              <Plus size={16} /> Create New Lead
+            </button>
+          ] : []}
+          {/* <button
             onClick={() => navigate("/company/lead-form")}
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
           >
             <Plus size={16} /> Create New Lead
-          </button>
+          </button> */}
         </div>
 
         {/* FILTERS */}
@@ -164,17 +190,20 @@ function LeadAll() {
                       {/* ACTIONS */}
                       <td className="px-4 py-3 text-center">
                         <div className="flex justify-center gap-2">
-                          <button className="text-blue-600 hover:text-blue-700">
+                          {permissionArray.includes("ldView") ? [<button className="text-blue-600 hover:text-blue-700">
                             <Eye size={16} />
-                          </button>
-                          <button className="text-green-600 hover:text-green-700">
+                          </button>] : []}
+
+                          {permissionArray.includes("ldEdit") ? [<button className="text-green-600 hover:text-green-700">
                             <Link to={`/company/lead/update/${lead._id}`}>
-                            <Edit size={16} />
+                              <Edit size={16} />
                             </Link>
-                          </button>
-                          <button className="text-red-600 hover:text-red-700">
+                          </button>] : []}
+
+                          {permissionArray.includes("ldDelete") ? [<button className="text-red-600 hover:text-red-700">
                             <Trash2 size={16} />
-                          </button>
+                          </button>] : []}
+
                         </div>
                       </td>
                     </tr>

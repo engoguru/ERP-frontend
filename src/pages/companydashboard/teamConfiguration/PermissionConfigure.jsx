@@ -67,6 +67,8 @@ const ACCESS_OPTIONS = [
       "ldCreate",
       "ldEdit",
       "ldDelete",
+      "ldassign",
+      "ldfollowUp"
     ],
   },
 ];
@@ -189,7 +191,7 @@ function PermissionConfigure() {
   }
 };
 
-  console.log(companyConfigureViewData?.data?.roles)
+  console.log(companyConfigureViewData)
 
   return (
     <CompanyLayout>

@@ -107,17 +107,20 @@ function PayrollAll() {
                     <td className="px-4 py-3">{pay.abs}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center gap-2">
-                        <button className="text-blue-600 hover:text-blue-700">
+                        {permissionArray.includes("payView")?[    <button className="text-blue-600 hover:text-blue-700">
                             <Link to={"/company/payroll/history"}>
                           <Eye size={16} />
                           </Link>
-                        </button>
-                        <button className="text-green-600 hover:text-green-700">
+                        </button>]:[]}
+                    
+                            {permissionArray.includes("payEdit")?[ <button className="text-green-600 hover:text-green-700">
                           <Edit size={16} />
-                        </button>
-                        <button className="text-red-600 hover:text-red-700">
+                        </button>]:[]}
+                       
+                            {permissionArray.includes("payDelete")?[<button className="text-red-600 hover:text-red-700">
                           <Trash2 size={16} />
-                        </button>
+                        </button>]:[]}
+                        
                       </div>
                     </td>
                   </tr>

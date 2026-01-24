@@ -44,12 +44,13 @@ function EmployeeAll() {
           <h2 className="text-2xl font-bold"></h2>
 
           {/* Add Employee Button */}
-          <button
+          {permissionArray.includes("empCreate") ? [<button
             onClick={() => navigate("/company/employe/create")}
             className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             <Plus size={18} /> Add Employee
-          </button>
+          </button>] : []}
+
         </div>
 
         {/* Search & Filters */}
@@ -120,16 +121,18 @@ function EmployeeAll() {
                       <td className="px-4 py-2">{emp.employeeContact?.contact}</td>
                       <td className="px-4 py-2 capitalize">{emp.status}</td>
                       <td className="px-4 py-2 flex gap-2">
-                        <button className="p-2 bg-green-500 text-white rounded hover:bg-green-600">
-                           <Link to={`/company/employe/profile/${emp._id}`}>
-                          <Eye size={18} />
-                                   </Link>
-                        </button>
-                        <button className="p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                         
-                            <Edit size={18} />
-                 
-                        </button>
+                        {permissionArray.includes("empView" ? [<button className="p-2 bg-green-500 text-white rounded hover:bg-green-600">
+                          <Link to={`/company/employe/profile/${emp._id}`}>
+                            <Eye size={18} />
+                          </Link>
+                        </button>] : [])}
+
+                        {permissionArray.includes("empEdit" ? [<button className="p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+
+                          <Edit size={18} />
+
+                        </button>] : [])}
+
                       </td>
                     </tr>
                   ))

@@ -30,6 +30,7 @@ export const companyDetails = createAsyncThunk(
         `${base_URL}license/get`,
         { withCredentials: true }
       );
+      console.log(response,"pp")
       return response.data;
     } catch (error) {
       return rejectWithValue(

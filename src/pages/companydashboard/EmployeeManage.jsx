@@ -627,7 +627,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
       await dispatch(employeeCreate(data)).unwrap();
       // toast.success("Employee created successfully 🎉");
 
-      setTimeout(() => navigate("/login"), 1500);
+      setTimeout(() => navigate("/company/employe/view"), 1500);
     } catch (err) {
       console.error(err);
       // toast.error(err?.message || "Failed to create employee");

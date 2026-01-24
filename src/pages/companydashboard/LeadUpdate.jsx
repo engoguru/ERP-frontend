@@ -25,6 +25,21 @@ function LeadUpdate() {
   const { employeeList = [] } = useSelector((state) => state.reducer.employee);
   const { initialized } = useSelector((state) => state.reducer.login);
 
+// Grab state
+  const { employeeData, } = useSelector(
+    (state) => state.reducer.login
+  );
+
+  // Fetch employee details only if not initialized
+  useEffect(() => {
+    if (!initialized) {
+      dispatch(employeeDetails());
+    }
+  }, [dispatch, initialized]);
+
+  const permissionArray = employeeData?.permissionArray
+
+
   const [formData, setFormData] = useState({});
   const [assignments, setAssignments] = useState([]);
   const [followUps, setFollowUps] = useState([]);
@@ -60,7 +75,7 @@ function LeadUpdate() {
     setAssignments((prev) => [
       ...prev,
       {
-        assignedBy: employeeList[0]?._id || "",
+        assignedBy:employeeData.id || "",
         assignedTo: "",
         assignedAt: new Date().toISOString(),
       },
@@ -81,6 +96,7 @@ function LeadUpdate() {
       ...prev,
       {
         addedBy: employeeList[0]?._id || "",
+
         date: new Date().toISOString(),
         contentType: "string",
         messageContent: "",
@@ -180,7 +196,7 @@ function LeadUpdate() {
           })}
 
           {/* Assignments */}
-          <div>
+          {permissionArray.includes("ldassign") ? [  <div>
             <div className="flex items-center gap-2 mb-2">
               <UserPlus size={20} />
               <h3 className="text-lg font-semibold">Assignments</h3>
@@ -237,10 +253,11 @@ function LeadUpdate() {
             >
               + Add Assignment
             </button>
-          </div>
+          </div>]:[]}
+         
 
           {/* Follow-Ups */}
-          <div>
+            {permissionArray.includes("ldfollowUp") ? [  <div>
             <div className="flex items-center gap-2 mb-2">
               <MessageSquare size={20} />
               <h3 className="text-lg font-semibold">Follow Ups</h3>
@@ -294,7 +311,8 @@ function LeadUpdate() {
               + Add Follow-Up
             </button>
           </div>
-
+] : []}
+        
           <button
             type="submit"
             className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition"
