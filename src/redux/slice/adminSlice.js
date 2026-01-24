@@ -45,7 +45,8 @@ const adminSlice = createSlice({
   initialState: {
     loading: false,
     company: null,        // result of verifyCompany
-    companyDetail: null,  // logged-in company data
+    companyDetail: null,
+    initialized:false,  // logged-in company data
     error: null,
   },
   reducers: {
@@ -77,11 +78,15 @@ const adminSlice = createSlice({
       })
       .addCase(companyDetails.fulfilled, (state, action) => {
         state.loading = false;
+        state.initialized=true;
         state.companyDetail = action.payload;
+        
       })
       .addCase(companyDetails.rejected, (state, action) => {
         state.loading = false;
+         state.initialized=true;
         state.error = action.payload;
+        
       });
   },
 });

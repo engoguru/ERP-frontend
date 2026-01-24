@@ -1,0 +1,107 @@
+# name: Deploy Sport-Client
+
+# # Trigger only on push to master
+# on:
+#   push:
+#     branches:
+#       - master
+
+# jobs:
+#   build:
+#     name: Build and Push Docker Image
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       # Step 1: Checkout code
+#       - name: Checkout Source
+#         uses: actions/checkout@v4
+
+#       # Step 2: Log in to Docker Hub
+#       - name: Login to Docker Hub
+#         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+#       # Step 3: Build Docker Image
+#       - name: Build Docker Image
+#         run: docker build -t snsports14/sport-client:latest .
+
+#       # Step 4: Push Docker Image to Docker Hub
+#       - name: Push Docker Image to Docker Hub
+#         run: docker push snsports14/sport-client:latest
+
+#   deploy:
+#     name: Deploy to EC2 / Self-hosted Server
+#     needs: build
+#     runs-on: self-hosted
+
+#     steps:
+#       # Step 1: Pull latest Docker image
+#       - name: Pull Docker Image
+#         run: docker pull snsports14/sport-client:latest
+
+#       # Step 2: Stop and remove old container
+#       - name: Stop and Remove Old Container
+#         run: |
+#           if [ "$(docker ps -aq -f name=sport-client)" ]; then
+#             docker rm -f sport-client
+#           fi
+
+#       # Step 3: Run new container
+#       - name: Run New Container
+#         run: |
+#           docker run -d -p 5173:80 \
+#             --name sport-client \
+#             --restart unless-stopped \
+#             snsports14/sport-client:latest
+
+
+name: Frontend-ERP
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  build:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/erp-frontend:${{ github.sha }} .
+
+      - name: Push Docker Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/erp-frontend:${{ github.sha }}
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Pull Latest Docker Image
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/erp-frontend:${{ github.sha }}
+
+      - name: Remove Old Container
+        run: |
+          if [ "$(docker ps -aq -f name=erp-frontend-service)" ]; then
+            docker rm -f erp-frontend-service
+          fi
+
+      - name: Run New Docker Container
+        run: |
+          docker run -d -p 5173:5173 \
+          --name erp-frontend-service \
+          --restart unless-stopped \
+          -e PORT=5173 \
+          ${{ secrets.DOCKER_USERNAME }}/erp-frontend:${{ github.sha }}
+

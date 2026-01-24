@@ -73,7 +73,7 @@ const dispatch = useDispatch();
 
 
 
-        <Route element={<ProtectRoute />}>
+        {/* <Route element={<ProtectRoute />}> */}
           {/* ---------------- Company Dashboard Routes ---------------- */}
           <Route path="/company/dashboard" element={<Dashboard />} />
           <Route path="/company/form-configure" element={<LeadFormConfigure />} />
@@ -101,16 +101,16 @@ const dispatch = useDispatch();
 
           <Route path="/company/event" element={<EventMain />} />
 
-        </Route>
+        {/* </Route> */}
 
 
 
 
         {/* protected company routes */}
         <Route path='/company/verify' element={<Admin />} />
-        <Route element={<ProtectedCompany />}>
+        {/* <Route element={<ProtectedCompany />}> */}
           <Route path="/company/Admin" element={<AdminCreation />} />
-        </Route>
+        {/* </Route> */}
 
 
 

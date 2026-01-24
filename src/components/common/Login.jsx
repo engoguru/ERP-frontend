@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Footer from "../layout/Footer";
-import { employeeLogin } from "../../redux/slice/employee/loginSlice";
+import { employeeDetails, employeeLogin } from "../../redux/slice/employee/loginSlice";
 
 function Login() {
   const navigate = useNavigate();
@@ -41,7 +41,8 @@ function Login() {
 
     try {
       const response = await dispatch(employeeLogin(formData));
-console.log(response,"ress")
+      console.log(response, "ress")
+      
       if (response.payload.success) {
         setTestOtp({ email: response.payload.testOtp, phone: response.payload.testOtp });
         setShowOtpModal(true);
@@ -54,15 +55,22 @@ console.log(response,"ress")
     }
   };
 
-  const handleVerifyOtp = () => {
-    if (otp.emailOtp === testOtp.email || otp.phoneOtp === testOtp.phone) {
-      alert("OTP verified successfully!");
-      setShowOtpModal(false);
-      navigate("/company/dashboard");
-    } else {
-      alert("Invalid OTP. Please try again.");
-    }
-  };
+const handleVerifyOtp =async (e) => {
+  e.preventDefault();
+
+  if (
+    otp.emailOtp === testOtp.email ||
+    otp.phoneOtp === testOtp.phone
+  ) {
+
+    alert("OTP verified successfully!");
+          await dispatch(employeeDetails());
+    navigate("/company/dashboard", { replace: true });
+  } else {
+    alert("Invalid OTP. Please try again.");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -188,7 +196,7 @@ console.log(response,"ress")
           </div>
         </div>
       )}
-      <Footer/>
+      <Footer />
     </div>
   );
 }

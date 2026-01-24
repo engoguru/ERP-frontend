@@ -542,7 +542,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
     role: role || "",
     status: "ACTIVE",
     shiftDetail: { shiftName: "", startTime: "", endTime: "" },
-    reportingManager: "",
+    reportingManager: "696b7bf0360a9259fb1248e7",
     licenseId: "",
 
     // STEP 3
@@ -627,7 +627,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
       await dispatch(employeeCreate(data)).unwrap();
       // toast.success("Employee created successfully 🎉");
 
-      setTimeout(() => navigate("/company/employees"), 1500);
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       console.error(err);
       // toast.error(err?.message || "Failed to create employee");

@@ -7,18 +7,19 @@ import { companyDetails } from "../redux/slice/adminSlice";
 function ProtectedCompany() {
   const dispatch = useDispatch();
 
-  const { companyDetail, loading } = useSelector(
-    (state) => state.company
+  const { companyDetail, loading, initialized } = useSelector(
+    (state) => state.reducer.company
   );
 
   useEffect(() => {
-    if (!companyDetail) {
+    if (!initialized) {
       dispatch(companyDetails());
     }
-  }, [dispatch, companyDetail]);
+  }, [dispatch, initialized]);
 
   // Loader while checking auth
-  if (loading) {
+  if (loading || !initialized) {
+  
     return <div>Loading...</div>;
   }
 

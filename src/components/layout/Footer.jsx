@@ -38,7 +38,7 @@ const Footer = () => {
             <h4 className="font-semibold text-lg mb-4 text-white">Features</h4>
             <ul className="space-y-3 text-sm text-gray-300">
               {[
-                "Employee Management",
+                "Verify YOurSelf",
                 "Attendance & Leaves",
                 "Payroll Automation",
                 "Task Management",
@@ -46,7 +46,7 @@ const Footer = () => {
               ].map((feature) => (
                 <li key={feature}>
                   <Link
-                    to="/features"
+                    to="/company/verify"
                     className="hover:text-green-400 transition-colors"
                   >
                     {feature}

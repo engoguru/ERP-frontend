@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Menu, Bell, User, ChevronDown, Settings, LogOut, Search } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
+import axios from "axios";
+import { base_URL } from "../../../utils/BaseUrl";
 
 
 function Topbar({pageTitle}) {
   const [openMenu, setOpenMenu] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
  const dispatch = useDispatch();
-
+const navigate = useNavigate();
   // Grab state
   const { employeeData, loading, initialized } = useSelector(
     (state) => state.reducer.login
@@ -38,6 +40,23 @@ function Topbar({pageTitle}) {
   };
 
   const getDashboardLink = () => "/";
+
+const HandleLogout = async (e) => {
+  e?.preventDefault();
+
+  try {
+    await axios.post(
+      `${base_URL}employee/logout`,
+      {},
+      { withCredentials: true } 
+    );
+
+    navigate("/login");
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
 
   return (
     <>
@@ -101,8 +120,9 @@ function Topbar({pageTitle}) {
                     Settings
                   </div>
                   <Link
-                    to="/login"
+                  
                     className="flex items-center gap-2 px-4 py-2 hover:bg-secondary text-white"
+                    onClick={HandleLogout}
                   >
                     <LogOut className="w-4 h-4 text-white" />
                     Sign Out
