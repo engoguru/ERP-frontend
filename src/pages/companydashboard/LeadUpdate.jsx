@@ -128,7 +128,7 @@ function LeadUpdate() {
       console.error(err);
     }
   };
-
+const isAdmin =employeeData?.role === "Admin";
   if (loading || !leadDetail) {
     return (
       <CompanyLayout>
@@ -196,7 +196,7 @@ function LeadUpdate() {
           })}
 
           {/* Assignments */}
-          {permissionArray.includes("ldassign") ? [  <div>
+        {(isAdmin || permissionArray.includes("ldEdit")) && ( <div>
             <div className="flex items-center gap-2 mb-2">
               <UserPlus size={20} />
               <h3 className="text-lg font-semibold">Assignments</h3>
@@ -253,11 +253,11 @@ function LeadUpdate() {
             >
               + Add Assignment
             </button>
-          </div>]:[]}
+          </div>)}
          
 
           {/* Follow-Ups */}
-            {permissionArray.includes("ldfollowUp") ? [  <div>
+           {(isAdmin || permissionArray.includes("ldEdit")) && (  <div>
             <div className="flex items-center gap-2 mb-2">
               <MessageSquare size={20} />
               <h3 className="text-lg font-semibold">Follow Ups</h3>
@@ -311,7 +311,7 @@ function LeadUpdate() {
               + Add Follow-Up
             </button>
           </div>
-] : []}
+           )}
         
           <button
             type="submit"

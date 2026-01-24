@@ -83,6 +83,7 @@ function LeadAll() {
   });
   // console.log(leadSchema,"ppy")
   // UI
+  const isAdmin =employeeData?.role === "Admin";
   return (
     <CompanyLayout>
       <div className="mx-auto max-w-6xl p-6 space-y-6">
@@ -90,14 +91,15 @@ function LeadAll() {
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">All Leads</h2>
-          {permissionArray.includes("ldCreate") ? [
+          {(isAdmin || permissionArray.includes("ldCreate")) && (
             <button
               onClick={() => navigate("/company/lead-form")}
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
             >
               <Plus size={16} /> Create New Lead
             </button>
-          ] : []}
+          )}
+
           {/* <button
             onClick={() => navigate("/company/lead-form")}
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
@@ -190,19 +192,26 @@ function LeadAll() {
                       {/* ACTIONS */}
                       <td className="px-4 py-3 text-center">
                         <div className="flex justify-center gap-2">
-                          {permissionArray.includes("ldView") ? [<button className="text-blue-600 hover:text-blue-700">
-                            <Eye size={16} />
-                          </button>] : []}
+                          {(isAdmin || permissionArray.includes("ldView")) && (
+                            <button className="text-blue-600 hover:text-blue-700">
+                              <Eye size={16} />
+                            </button>
+                          )}
 
-                          {permissionArray.includes("ldEdit") ? [<button className="text-green-600 hover:text-green-700">
-                            <Link to={`/company/lead/update/${lead._id}`}>
-                              <Edit size={16} />
-                            </Link>
-                          </button>] : []}
+                          {(isAdmin || permissionArray.includes("ldEdit")) && (
+                            <button className="text-green-600 hover:text-green-700">
+                              <Link to={`/company/lead/update/${lead._id}`}>
+                                <Edit size={16} />
+                              </Link>
+                            </button>
+                          )}
 
-                          {permissionArray.includes("ldDelete") ? [<button className="text-red-600 hover:text-red-700">
-                            <Trash2 size={16} />
-                          </button>] : []}
+                          {(isAdmin || permissionArray.includes("ldDelete")) && (
+                            <button className="text-red-600 hover:text-red-700">
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+
 
                         </div>
                       </td>
