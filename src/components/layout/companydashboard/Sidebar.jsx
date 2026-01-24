@@ -36,47 +36,42 @@ function Sidebar({ isMobile }) {
   };
   console.log(permissionArray)
   // Hardcoded menu items
-  const menu = [
-    { label: "Dashboard", path: "/company/dashboard", icon: Home },
+ const isAdmin = role === "Admin";
 
+const menu = [
+  { label: "Dashboard", path: "/company/dashboard", icon: Home },
 
-    ...(permissionArray.includes("etView") ? [
-      { label: "Event", path: "/company/event", icon: Briefcase },
-    ] : []),
+  // Visible to Admin OR users with permission
+  ...(isAdmin || permissionArray.includes("etView")
+    ? [{ label: "Event", path: "/company/event", icon: Briefcase }]
+    : []),
 
+  ...(isAdmin || permissionArray.includes("atnView")
+    ? [{ label: "Attendance", path: "/company/attendance", icon: Briefcase }]
+    : []),
 
-    ...(permissionArray.includes("atnView") ? [
-      { label: "Attendance", path: "/company/attendance", icon: Briefcase },
-    ] : []),
+  ...(isAdmin || permissionArray.includes("PayView")
+    ? [{ label: "Payroll", path: "/company/payroll", icon: Briefcase }]
+    : []),
 
+  ...(isAdmin || permissionArray.includes("empView")
+    ? [{ label: "Employees", path: "/company/employe/view", icon: Users }]
+    : []),
 
-    ...(permissionArray.includes("PayView") ? [
-      { label: "Payroll", path: "/company/payroll", icon: Briefcase },
-    ] : []),
+  ...(isAdmin || permissionArray.includes("ldView")
+    ? [{ label: "Leads", path: "/company/leadall", icon: Briefcase }]
+    : []),
 
-    ...(permissionArray.includes("empView") ? [
-      { label: "Employees", path: "/company/employe/view", icon: Users },
-    ] : []),
-
-    // ...(permissionArray.includes("ldView") ? [
-    //   { label: "Leads", path: "/company/leadall", icon: Briefcase }
-    // ] : []),
-
-
-    ...(permissionArray.includes("ldView") ? [
-      { label: "Leads", path: "/company/leadall", icon: Briefcase },
-    ] : []),
-
-    // Conditionally add "Lead-form Configure" only if role is Admin
-    ...(role === "Admin" ? [
-      { label: "Lead-form Configure", path: "/company/form-configure", icon: FileText },
-      { label: "Role Configure", path: "/company/role-configure", icon: Briefcase },
-      { label: "Permission Configure", path: "/company/permission-configure", icon: Settings },
-      { label: "Leave Configure", path: "/company/leave-configure", icon: Settings },
-    ] : []),
-
-
-  ];
+  // 🔒 Admin-only menus
+  ...(isAdmin
+    ? [
+        { label: "Lead-form Configure", path: "/company/form-configure", icon: FileText },
+        { label: "Role Configure", path: "/company/role-configure", icon: Briefcase },
+        { label: "Permission Configure", path: "/company/permission-configure", icon: Settings },
+        { label: "Leave Configure", path: "/company/leave-configure", icon: Settings },
+      ]
+    : []),
+];
 
 
   return (
