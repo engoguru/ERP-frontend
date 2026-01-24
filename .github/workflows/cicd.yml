@@ -99,9 +99,9 @@ jobs:
 
       - name: Run New Docker Container
         run: |
-          docker run -d -p 5173:5173 \
+          docker run -d -p 80:80  \
           --name erp-frontend-service \
           --restart unless-stopped \
-          -e PORT=5173 \
+          -e PORT=80  \
           ${{ secrets.DOCKER_USERNAME }}/erp-frontend:${{ github.sha }}
 
