@@ -3,7 +3,9 @@ import companyReducer from '../slice/companySlice'; // import the slice reducer
 import employeeReducer from '../slice/employee/employeeCreateSlice';
 import adminReducer from "../slice/adminSlice";
 import loginReducer from "../slice/employee/loginSlice";
-import leadReducer from "../slice/leadSlice"
+import leadReducer from "../slice/leadSlice";
+import eventReducer from "../slice/employee/eventSlice";
+import attendanceReducer from "../slice/employee/attendanceSlice"
 
 
 const rootReducer = combineReducers({
@@ -11,7 +13,9 @@ const rootReducer = combineReducers({
   employee:employeeReducer,
   admin:adminReducer,
   login:loginReducer,
-  lead:leadReducer
+  lead:leadReducer,
+  event:eventReducer,
+  attendance:attendanceReducer
 });
 
 export default rootReducer;

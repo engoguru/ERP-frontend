@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
-import { Plus, CalendarDays, Filter, X } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { createEvent } from "../../../redux/slice/employee/eventSlice";
+import { Plus, CalendarDays, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { createEvent, viewEvent } from "../../../redux/slice/employee/eventSlice";
 import { toast } from "react-toastify";
+import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 
 function EventMain() {
   const dispatch = useDispatch();
@@ -12,27 +13,6 @@ function EventMain() {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState(new Date().getFullYear());
 
-  /* ---------------- EVENTS (STATIC for now) ---------------- */
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      eventName: "New Year",
-      startDate: "2026-01-01",
-      endDate: "2026-01-01",
-      totaldays: 1,
-      description: "New Year Holiday",
-    },
-    {
-      id: 2,
-      eventName: "Holi",
-      startDate: "2026-03-25",
-      endDate: "2026-03-26",
-      totaldays: 2,
-      description: "Festival Holiday",
-    },
-  ]);
-
-  /* ---------------- FORM STATE ---------------- */
   const [form, setForm] = useState({
     eventName: "",
     startDate: "",
@@ -41,7 +21,16 @@ function EventMain() {
     description: "",
   });
 
-  /* ---------------- AUTO DAY CALC ---------------- */
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const { eventAll, loading, error } = useSelector((state) => state.reducer.event);
+  console.log(eventAll)
+   // Grab state
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+  // ---------------- CALCULATE TOTAL DAYS ----------------
   const calculateDays = (start, end) => {
     if (!start || !end) return 0;
     const s = new Date(start);
@@ -55,15 +44,32 @@ function EventMain() {
     setForm((prev) => ({ ...prev, totaldays: days }));
   }, [form.startDate, form.endDate]);
 
-  /* ---------------- FILTER ---------------- */
-  const filteredEvents = events.filter((event) => {
+  // ---------------- FETCH EVENTS ----------------
+  const fetchEvents = () => {
+    dispatch(viewEvent({ page, limit }));
+  };
+
+    useEffect(() => {
+      if (!initialized) {
+        dispatch(employeeDetails());
+      }
+    }, [dispatch, initialized]);
+  
+    const permissionArray = employeeData?.permissionArray
+    const isAdmin = employeeData?.role === "Admin";
+  useEffect(() => {
+    fetchEvents();
+  }, [page, limit]);
+
+  // ---------------- FILTER EVENTS BY MONTH/YEAR ----------------
+  const filteredEvents = eventAll?.filter((event) => {
     const d = new Date(event.startDate);
     const m = month ? d.getMonth() + 1 === Number(month) : true;
     const y = year ? d.getFullYear() === Number(year) : true;
     return m && y;
-  });
+  }) || [];
 
-  /* ---------------- FORM HANDLERS ---------------- */
+  // ---------------- FORM HANDLERS ----------------
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -81,12 +87,6 @@ function EventMain() {
       return;
     }
 
-    // Local preview (until API fetch added)
-    setEvents((prev) => [
-      ...prev,
-      { id: Date.now(), ...form },
-    ]);
-
     try {
       await dispatch(createEvent(form)).unwrap();
       toast.success("Event created successfully");
@@ -98,9 +98,19 @@ function EventMain() {
         totaldays: 0,
         description: "",
       });
+      fetchEvents(); // refresh events
     } catch (err) {
       toast.error(err || "Failed to create event");
     }
+  };
+
+  // ---------------- PAGINATION HANDLERS ----------------
+  const handlePrevPage = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (eventAll && eventAll.data && page < eventAll.data.totalPages) setPage(page + 1);
   };
 
   return (
@@ -113,7 +123,7 @@ function EventMain() {
             <CalendarDays className="text-emerald-600" />
             Company Events
           </h2>
-
+             {(isAdmin || permissionArray.includes("etCreate")) && (
           <button
             onClick={() => setOpenModal(true)}
             className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700"
@@ -121,6 +131,7 @@ function EventMain() {
             <Plus size={16} />
             Create Event
           </button>
+             )}
         </div>
 
         {/* FILTER */}
@@ -150,7 +161,7 @@ function EventMain() {
           />
         </div>
 
-        {/* TABLE */}
+        {/* EVENTS TABLE */}
         <div className="overflow-x-auto bg-white rounded-xl shadow">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
@@ -163,18 +174,20 @@ function EventMain() {
               </tr>
             </thead>
             <tbody>
-              {filteredEvents.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan="5" className="py-6 text-center text-gray-400">
-                    No events found
-                  </td>
+                  <td colSpan="5" className="py-6 text-center text-gray-400">Loading...</td>
+                </tr>
+              ) : filteredEvents.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="py-6 text-center text-gray-400">No events found</td>
                 </tr>
               ) : (
                 filteredEvents.map((event) => (
-                  <tr key={event.id} className="border-t hover:bg-gray-50">
+                  <tr key={event._id || event.id} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium">{event.eventName}</td>
-                    <td className="px-4 py-3">{event.startDate}</td>
-                    <td className="px-4 py-3">{event.endDate}</td>
+                    <td className="px-4 py-3">{new Date(event.startDate).toISOString().split("T")[0]}</td>
+                    <td className="px-4 py-3">{new Date(event.endDate).toISOString().split("T")[0]}</td>
                     <td className="px-4 py-3 text-center">{event.totaldays}</td>
                     <td className="px-4 py-3">{event.description}</td>
                   </tr>
@@ -184,15 +197,36 @@ function EventMain() {
           </table>
         </div>
 
-        {/* MODAL */}
+        {/* PAGINATION CONTROLS */}
+        {eventAll?.data?.totalPages > 1 && (
+          <div className="flex justify-center gap-3 mt-4">
+            <button
+              onClick={handlePrevPage}
+              disabled={page === 1}
+              className="px-4 py-2 border rounded-lg disabled:opacity-50"
+            >
+              <ChevronLeft /> Prev
+            </button>
+            <span className="px-4 py-2 border rounded-lg">
+              Page {page} of {eventAll.data.totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === eventAll.data.totalPages}
+              className="px-4 py-2 border rounded-lg disabled:opacity-50"
+            >
+              Next <ChevronRight />
+            </button>
+          </div>
+        )}
+
+        {/* CREATE EVENT MODAL */}
         {openModal && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
             <div className="bg-white w-full max-w-lg rounded-xl p-6 shadow-lg">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Create Event</h3>
-                <button onClick={() => setOpenModal(false)}>
-                  <X />
-                </button>
+                <button onClick={() => setOpenModal(false)}><X /></button>
               </div>
 
               <form onSubmit={handleCreateEvent} className="space-y-4">
@@ -203,18 +237,27 @@ function EventMain() {
                   placeholder="Event Name *"
                   className="w-full border rounded-lg px-3 py-2"
                 />
-
                 <div className="grid grid-cols-2 gap-4">
-                  <input type="date" name="startDate" value={form.startDate} onChange={handleChange} className="border rounded-lg px-3 py-2" />
-                  <input type="date" name="endDate" value={form.endDate} onChange={handleChange} className="border rounded-lg px-3 py-2" />
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={form.startDate}
+                    onChange={handleChange}
+                    className="border rounded-lg px-3 py-2"
+                  />
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={form.endDate}
+                    onChange={handleChange}
+                    className="border rounded-lg px-3 py-2"
+                  />
                 </div>
-
                 <input
                   value={`Total Days: ${form.totaldays}`}
                   disabled
                   className="w-full border rounded-lg px-3 py-2 bg-gray-50"
                 />
-
                 <textarea
                   name="description"
                   value={form.description}
@@ -222,12 +265,18 @@ function EventMain() {
                   placeholder="Description"
                   className="w-full border rounded-lg px-3 py-2"
                 />
-
                 <div className="flex justify-end gap-3">
-                  <button type="button" onClick={() => setOpenModal(false)} className="px-4 py-2 border rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setOpenModal(false)}
+                    className="px-4 py-2 border rounded-lg"
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded-lg">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
+                  >
                     Create
                   </button>
                 </div>
@@ -235,7 +284,6 @@ function EventMain() {
             </div>
           </div>
         )}
-
       </div>
     </CompanyLayout>
   );

@@ -34,6 +34,8 @@ import { employeeDetails } from './redux/slice/employee/loginSlice';
 import { useEffect } from 'react';
 import MonthlyLeaveConfigure from './pages/companydashboard/MonthlyLeaveConfigure';
 import LeadUpdate from './pages/companydashboard/LeadUpdate';
+import LeavesApply from './pages/companydashboard/leaves/LeavesApply';
+import RaisedIssues from './pages/companydashboard/leaves/RaisedIssues';
 
 
 function App() {
@@ -91,13 +93,16 @@ const dispatch = useDispatch();
           <Route path="/company/employe/create" element={<EmployeeManage />} />
           <Route path="/company/employe/profile/:id" element={<EmployeeProfile />} />
 
+          <Route path="/company/applyLeave" element={<LeavesApply/>}/>
+          <Route path="/company/raised" element={<RaisedIssues/>}/>
+
 
           {/* payroll */}
           <Route path="/company/payroll" element={<PayrollAll />} />
-          <Route path="/company/payroll/history" element={<PayrollHistory />} />
+          <Route path="/company/payroll/history/:id" element={<PayrollHistory />} />
 
           <Route path="/company/attendance" element={<AttendanceAll />} />
-          <Route path="/company/attendance/history" element={<AttendanceHistory />} />
+          <Route path="/company/attendance/history/:id" element={<AttendanceHistory />} />
 
           <Route path="/company/event" element={<EventMain />} />
 

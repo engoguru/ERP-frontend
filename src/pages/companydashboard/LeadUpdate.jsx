@@ -4,7 +4,6 @@ import CompanyLayout from "../../components/layout/companydashboard/CompanyLayou
 import { useDispatch, useSelector } from "react-redux";
 import { companyConfiguresView } from "../../redux/slice/companySlice";
 import { fetchOneLead, updateLead } from "../../redux/slice/leadSlice";
-import { Save, UserPlus, MessageSquare } from "lucide-react";
 import { viewEmployees } from "../../redux/slice/employee/employeeCreateSlice";
 import { employeeDetails } from "../../redux/slice/employee/loginSlice";
 
@@ -21,29 +20,20 @@ function LeadUpdate() {
   const { leadDetail, loading, error } = useSelector(
     (state) => state.reducer.lead
   );
-
   const { employeeList = [] } = useSelector((state) => state.reducer.employee);
-  const { initialized } = useSelector((state) => state.reducer.login);
-
-// Grab state
-  const { employeeData, } = useSelector(
+  const { initialized, employeeData } = useSelector(
     (state) => state.reducer.login
   );
-
-  // Fetch employee details only if not initialized
   useEffect(() => {
-    if (!initialized) {
-      dispatch(employeeDetails());
-    }
-  }, [dispatch, initialized]);
-
-  const permissionArray = employeeData?.permissionArray
-
-
+    if (!initialized) dispatch(employeeDetails());
+  }, [initialized, dispatch]);
   const [formData, setFormData] = useState({});
-  const [assignments, setAssignments] = useState([]);
   const [followUps, setFollowUps] = useState([]);
-  const [showStatus, setShowStatus] = useState(true);
+  const [assignments, setAssignments] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [followUpMessage, setFollowUpMessage] = useState("");
+
+
 
   useEffect(() => {
     dispatch(companyConfiguresView());
@@ -52,83 +42,76 @@ function LeadUpdate() {
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (!initialized) {
-      dispatch(employeeDetails());
-    }
-  }, [dispatch, initialized]);
-
-  useEffect(() => {
     if (leadDetail) {
       setFormData(leadDetail.fields || {});
-      setAssignments(leadDetail.whoAssignedwho || []);
       setFollowUps(leadDetail.followUp || []);
-      setShowStatus(Boolean(leadDetail.fields?.status ?? true));
+      setAssignments(leadDetail.whoAssignedwho || []);
     }
   }, [leadDetail]);
 
-  const handleChange = (key, value) => {
+  const handleFieldChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Assignment handlers
-  const addAssignment = () => {
-    setAssignments((prev) => [
-      ...prev,
-      {
-        assignedBy:employeeData.id || "",
-        assignedTo: "",
-        assignedAt: new Date().toISOString(),
-      },
-    ]);
-  };
-  const updateAssignment = (idx, field, value) => {
-    setAssignments((prev) =>
-      prev.map((a, i) => (i === idx ? { ...a, [field]: value } : a))
-    );
-  };
-  const removeAssignment = (idx) => {
-    setAssignments((prev) => prev.filter((_, i) => i !== idx));
-  };
+  const handleAddFollowUp = () => {
+    if (!followUpMessage) return alert("Enter follow-up message!");
 
-  // Follow-Up handlers
-  const addFollowUp = () => {
     setFollowUps((prev) => [
       ...prev,
       {
-        addedBy: employeeList[0]?._id || "",
-
+        addedBy: {
+          _id: employeeData?.id,
+          name: employeeData?.name,
+          employeeCode: employeeData?.employeeCode,
+        },
         date: new Date().toISOString(),
-        contentType: "string",
-        messageContent: "",
+        messageContent: followUpMessage,
       },
     ]);
-  };
-  const updateFollowUp = (idx, field, value) => {
-    setFollowUps((prev) =>
-      prev.map((f, i) => (i === idx ? { ...f, [field]: value } : f))
-    );
-  };
-  const removeFollowUp = (idx) => {
-    setFollowUps((prev) => prev.filter((_, i) => i !== idx));
+
+    setFollowUpMessage("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  const handleAddAssignment = () => {
+    if (!selectedEmployee) return alert("Select an employee!");
+    const employee = employeeList.find((e) => e._id === selectedEmployee);
+    setAssignments((prev) => [
+      ...prev,
+      {
+        assignedBy: employeeData?.id,
+        assignedTo: employee,
+        assignedAt: new Date().toISOString(),
+      },
+    ]);
+    setSelectedEmployee("");
+  };
+  console.log(followUps, "j")
+  const handleSubmit = async () => {
     try {
+      // const payload = {
+      //   fields: formData,
+      //   followUp: followUps,
+      //   whoAssignedwho: assignments,
+      // };
       const payload = {
         fields: formData,
+        followUp: followUps.map(fu => ({
+          ...fu,
+          addedBy: employeeData?.id // keep ObjectId
+        })),
         whoAssignedwho: assignments,
-        followUp: followUps,
       };
+
       await dispatch(updateLead({ id, data: payload })).unwrap();
-      alert("Lead updated!");
+      alert("Lead updated successfully!");
       navigate(-1);
     } catch (err) {
-      alert("Update failed");
       console.error(err);
+      alert("Update failed");
     }
   };
-const isAdmin =employeeData?.role === "Admin";
+
   if (loading || !leadDetail) {
     return (
       <CompanyLayout>
@@ -141,188 +124,122 @@ const isAdmin =employeeData?.role === "Admin";
 
   return (
     <CompanyLayout>
-      <div className="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow space-y-6">
-        <h2 className="text-2xl font-bold text-center text-gray-800">
-          Update Lead
-        </h2>
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <h2 className="text-2xl font-bold">Update Lead</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Status Toggle */}
-          {leadSchema.some((f) => f.fieldKey.toLowerCase() === "status") && (
-            <div className="flex items-center gap-2">
-              <label className="font-medium">Show Status Field?</label>
-              <input
-                type="checkbox"
-                checked={showStatus}
-                onChange={() => setShowStatus((prev) => !prev)}
-                className="accent-blue-600"
-              />
-            </div>
-          )}
-
-          {/* Schema Fields */}
+        {/* Dynamic Lead Fields */}
+        <div className="grid grid-cols-2 gap-4">
           {leadSchema.map((field) => {
-            if (field.fieldKey.toLowerCase() === "status" && !showStatus)
-              return null;
-            const value = formData[field.fieldKey] ?? "";
-            return (
-              <div key={field.fieldKey}>
-                <label className="block font-medium mb-1">
-                  {field.label} {field.required && <span className="text-red-500">*</span>}
-                </label>
-                {field.type === "select" ? (
+            const key = field.fieldKey;
+            const value = formData[key] || "";
+
+            // If field has options, render as select
+            if (field.options && field.options.length > 0) {
+              return (
+                <div key={key}>
+                  <label className="block font-medium">{field.label || key}</label>
                   <select
                     value={value}
-                    onChange={(e) => handleChange(field.fieldKey, e.target.value)}
-                    className="w-full border px-3 py-2 rounded"
+                    onChange={(e) => handleFieldChange(key, e.target.value)}
+                    className="w-full border rounded px-2 py-1"
                   >
-                    <option value="">Select</option>
-                    {field.options?.map((opt) => (
+                    <option value="">Select {field.label || key}</option>
+                    {field.options.map((opt) => (
                       <option key={opt} value={opt}>
                         {opt}
                       </option>
                     ))}
                   </select>
-                ) : (
-                  <input
-                    type={field.type || "text"}
-                    value={value}
-                    onChange={(e) => handleChange(field.fieldKey, e.target.value)}
-                    className="w-full border px-3 py-2 rounded"
-                  />
-                )}
+                </div>
+              );
+            }
+
+            // Default text input
+            return (
+              <div key={key}>
+                <label className="block font-medium">{field.label || key}</label>
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => handleFieldChange(key, e.target.value)}
+                  className="w-full border rounded px-2 py-1"
+                />
               </div>
             );
           })}
+        </div>
 
-          {/* Assignments */}
-        {(isAdmin || permissionArray.includes("ldEdit")) && ( <div>
-            <div className="flex items-center gap-2 mb-2">
-              <UserPlus size={20} />
-              <h3 className="text-lg font-semibold">Assignments</h3>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 font-semibold border-b pb-1">
-              <div>Assigned By</div>
-              <div>Assigned To</div>
-              <div>Date</div>
-            </div>
-
-            {assignments.map((a, i) => (
-              <div key={i} className="grid grid-cols-3 gap-2 mt-2">
-                <input
-                  type="text"
-                  value={a.assignedBy || ""}
-                  onChange={(e) => updateAssignment(i, "assignedBy", e.target.value)}
-                  className="border px-2 py-1 rounded"
-                />
-                <select
-                  value={a.assignedTo || ""}
-                  onChange={(e) => updateAssignment(i, "assignedTo", e.target.value)}
-                  className="border px-2 py-1 rounded"
-                >
-                  <option value="">Select Employee</option>
-                  {employeeList?.map((emp) => (
-                    <option key={emp._id} value={emp._id}>
-                      {emp.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="flex gap-2">
-                  <input
-                    type="datetime-local"
-                    value={a.assignedAt ? a.assignedAt.slice(0, 16) : ""}
-                    onChange={(e) => updateAssignment(i, "assignedAt", e.target.value)}
-                    className="border px-2 py-1 rounded flex-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeAssignment(i)}
-                    className="text-red-600"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={addAssignment}
-              className="mt-2 text-green-600 font-medium"
+        {/* Assignments */}
+        <div>
+          <h3 className="font-semibold">Lead Assigned By You</h3>
+          <div className="flex items-center gap-2 my-2">
+            <select
+              value={selectedEmployee}
+              onChange={(e) => setSelectedEmployee(e.target.value)}
+              className="border rounded px-2 py-1"
             >
-              + Add Assignment
-            </button>
-          </div>)}
-         
-
-          {/* Follow-Ups */}
-           {(isAdmin || permissionArray.includes("ldEdit")) && (  <div>
-            <div className="flex items-center gap-2 mb-2">
-              <MessageSquare size={20} />
-              <h3 className="text-lg font-semibold">Follow Ups</h3>
-            </div>
-
-            <div className="grid grid-cols-4 gap-2 font-semibold border-b pb-1">
-              <div>Employee ID</div>
-              <div>Name</div>
-              <div>Date</div>
-              <div>Message</div>
-            </div>
-
-            {followUps.map((fu, i) => {
-              // const emp = employeeList.find((e) => e._id === fu.addedBy) || {};
-              return (
-                <div key={i} className="grid grid-cols-4 gap-2 mt-2">
-                  <div className="border-b">{fu.addedBy.employeeCode}</div>
-                  <div className="border-b">{fu.addedBy.name || "Unknown"}</div>
-                  <input
-                    type="datetime-local"
-                    value={fu.date ? fu.date.slice(0, 16) : ""}
-                    onChange={(e) => updateFollowUp(i, "date", e.target.value)}
-                    className="border-b px-2 py-1"
-                  />
-                  <div className="flex gap-2">
-                   
-                      <input
-                        type="text"
-                        value={fu.messageContent || ""}
-                        onChange={(e) => updateFollowUp(i, "messageContent", e.target.value)}
-                        className="border-b px-2 py-1 flex-1"
-                      />
-                 
-                    <button
-                      type="button"
-                      onClick={() => removeFollowUp(i)}
-                      className=" border-b text-red-600"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-
+              <option value="">Select Employee</option>
+              {employeeList.map((emp) => (
+                <option key={emp._id} value={emp._id}>
+                  {emp.name} ({emp.employeeCode})
+                </option>
+              ))}
+            </select>
             <button
-              type="button"
-              onClick={addFollowUp}
-              className="mt-2 text-green-600 font-medium"
+              onClick={handleAddAssignment}
+              className="bg-blue-600 text-white px-3 py-1 rounded"
             >
-              + Add Follow-Up
+              Assign
             </button>
           </div>
-           )}
-        
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition"
-          >
-            <Save size={18} className="inline-block mr-1" />
-            Update Lead
-          </button>
+          {assignments.length === 0 && <p className="text-gray-500">No assignments yet.</p>}
+          {assignments.map((a, i) => (
+            <div key={i} className="flex gap-4 border-b py-1">
 
-          {error && <p className="text-red-600 text-center">Error: {error}</p>}
-        </form>
+              <p className="px-4 text-sm font-medium">To: {a.assignedTo?.name} ({a.assignedTo?.employeeCode})</p>
+              <p className="px-4 text-sm font-medium">{new Date(a.assignedAt).toLocaleString()}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Follow-Ups */}
+        <div>
+          <h3 className="font-semibold">Follow-Ups</h3>
+          <div className="flex items-center gap-2 my-2">
+            <input
+              type="text"
+              value={followUpMessage}
+              onChange={(e) => setFollowUpMessage(e.target.value)}
+              placeholder="Add follow-up message"
+              className="border rounded px-2 py-1 flex-1"
+            />
+            <button
+              onClick={handleAddFollowUp}
+              className="bg-green-600 text-white px-3 py-1 rounded"
+            >
+              Add
+            </button>
+          </div>
+          {followUps.length === 0 && <p className="text-gray-500">No follow-ups yet.</p>}
+          {followUps.map((fu, i) => (
+            <div key={i} className="flex gap-4 border-b py-1">
+              <p className="text-sm font-medium">
+                {fu.addedBy?.name || "Unknown"}  - {fu.addedBy?.employeeCode || ""}
+              </p>
+              <p className="px-4 text-sm font-medium">{fu.messageContent}</p>
+              <p className="px-4 text-sm font-medium">{new Date(fu.date).toLocaleString()}</p>
+            </div>
+          ))}
+
+        </div>
+
+        {/* Save Button */}
+        <button
+          onClick={handleSubmit}
+          className="bg-purple-600 text-white px-4 py-2 rounded"
+        >
+          Save Changes
+        </button>
       </div>
     </CompanyLayout>
   );

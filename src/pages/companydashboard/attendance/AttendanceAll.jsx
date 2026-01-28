@@ -1,61 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
 import { Eye, Edit, Trash2, Search } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { viewEmployees } from "../../../redux/slice/employee/employeeCreateSlice";
+import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 
 function AttendanceAll() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // Sample static employee data
-  const [employees] = useState([
-    {
-      id: "696b8040d55b7f619f918bf6",
-      employeeCode: "EMP001",
-      name: "John Doe",
-      status: "Active",
-      department: "Finance",
-      role: "Accountant",
-    },
-    {
-      id: "796b8040d55b7f619f918bf7",
-      employeeCode: "EMP002",
-      name: "Jane Smith",
-      status: "Inactive",
-      department: "HR",
-      role: "Manager",
-    },
-    {
-      id: "896b8040d55b7f619f918bf8",
-      employeeCode: "EMP003",
-      name: "Alice Johnson",
-      status: "Active",
-      department: "IT",
-      role: "Developer",
-    },
-  ]);
 
   const [search, setSearch] = useState("");
 
-  // Filter employees based on search input
-  const filteredEmployees = employees.filter((emp) =>
-    emp.name.toLowerCase().includes(search.toLowerCase()) ||
-    emp.employeeCode.toLowerCase().includes(search.toLowerCase()) ||
-    emp.status.toLowerCase().includes(search.toLowerCase()) ||
-    emp.department.toLowerCase().includes(search.toLowerCase()) ||
-    emp.role.toLowerCase().includes(search.toLowerCase())
+  // Redux state
+  const { employeeList, loading } = useSelector(
+    (state) => state.reducer.employee
   );
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+
+  useEffect(() => {
+    if (!initialized) dispatch(employeeDetails());
+  }, [dispatch, initialized]);
+
+  useEffect(() => {
+    dispatch(viewEmployees());
+  }, [dispatch]);
+
+  const permissionArray = employeeData?.permissionArray || [];
+  const isAdmin = employeeData?.role === "Admin";
+
+  // Filter employees based on search input
+  const filteredEmployees = employeeList?.filter((emp) =>
+    [emp.name, emp.employeeCode, emp.status, emp.department, emp.role]
+      .some((field) =>
+        field?.toLowerCase().includes(search.toLowerCase())
+      )
+  ) || [];
 
   return (
     <CompanyLayout pageTitle="Attendance Records">
-      <div className="mx-auto max-w-6xl p-6">
+      <div className="mx-auto max-w-6xl p-6 space-y-6">
 
-        {/* ===== Header & Create Button ===== */}
-        <div className="mb-6 flex items-center justify-between">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">All Employees Attendance</h2>
         </div>
 
-        {/* ===== Filter/Search ===== */}
-        <div className="mb-6 grid grid-cols-1 gap-4 rounded-xl bg-white p-4 shadow md:grid-cols-2">
+        {/* Search */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xl shadow">
           <div className="relative">
             <Search
               size={16}
@@ -71,10 +65,10 @@ function AttendanceAll() {
           </div>
         </div>
 
-        {/* ===== Employees Table ===== */}
+        {/* Employees Table */}
         <div className="overflow-x-auto bg-white rounded-xl shadow">
-          <table className="w-full border-collapse text-sm text-gray-700">
-            <thead className="bg-gray-50 text-left text-gray-600">
+          <table className="w-full text-sm text-gray-700 border-collapse">
+            <thead className="bg-gray-50 text-gray-600 text-left">
               <tr>
                 <th className="px-4 py-3">Emp Code</th>
                 <th className="px-4 py-3">Name</th>
@@ -85,9 +79,15 @@ function AttendanceAll() {
               </tr>
             </thead>
             <tbody>
-              {filteredEmployees.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan="6" className="px-4 py-6 text-center text-gray-400">
+                  <td colSpan="6" className="py-6 text-center text-gray-400">
+                    Loading...
+                  </td>
+                </tr>
+              ) : filteredEmployees.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="py-6 text-center text-gray-400">
                     No employees found
                   </td>
                 </tr>
@@ -111,19 +111,24 @@ function AttendanceAll() {
                     <td className="px-4 py-3">{emp.role}</td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex justify-center gap-2">
-                        <Link
-                        //   to={`/company/employe/profile/${emp.id}`}
-                        to={`/company/attendance/history`}
-                          className="text-emerald-600 hover:text-emerald-700"
-                        >
-                          <Eye size={16} />
-                        </Link>
-                        <button className="text-blue-600 hover:text-blue-700">
-                          <Edit size={16} />
-                        </button>
-                        <button className="text-red-600 hover:text-red-700">
-                          <Trash2 size={16} />
-                        </button>
+                        {(isAdmin || permissionArray.includes("atnView")) && (
+                          <Link
+                            to={`/company/attendance/history/${emp._id}`}
+                            className="text-emerald-600 hover:text-emerald-700"
+                          >
+                            <Eye size={16} />
+                          </Link>
+                        )}
+                        {(isAdmin || permissionArray.includes("atnEdit")) && (
+                          <button className="text-blue-600 hover:text-blue-700">
+                            <Edit size={16} />
+                          </button>
+                        )}
+                        {(isAdmin || permissionArray.includes("atnDelete")) && (
+                          <button className="text-red-600 hover:text-red-700">
+                            <Trash2 size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

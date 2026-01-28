@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
 import { Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
+import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { viewEmployees } from "../../../redux/slice/employee/employeeCreateSlice";
 
 function PayrollAll() {
+  const dispatch=useDispatch()
   const navigate = useNavigate();
 
   // Sample static payroll data
@@ -37,15 +41,36 @@ function PayrollAll() {
     },
   ]);
 
+   // Grab state
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+
+    const { employeeList, loading, error } = useSelector(
+      (state) => state.reducer.employee
+    );
+  
+    useEffect(() => {
+      dispatch(viewEmployees())
+    }, []);
+  // Fetch employee details only if not initialized
+  useEffect(() => {
+    if (!initialized) {
+      dispatch(employeeDetails());
+    }
+  }, [dispatch, initialized]);
+
+  const permissionArray = employeeData?.permissionArray
+  const isAdmin = employeeData?.role === "Admin";
   const [search, setSearch] = useState("");
 
   // Filtered data
-  const filteredPayrolls = payrolls.filter(
+  const filteredPayrolls = employeeList.filter(
     (p) =>
-      p.empCode.toLowerCase().includes(search.toLowerCase()) ||
+      p.employeeCode.toLowerCase().includes(search.toLowerCase()) ||
       p.name.toLowerCase().includes(search.toLowerCase())
   );
-
+console.log(employeeList,"pp")
   return (
     <CompanyLayout pageTitle={"Payroll Details"}>
       <div className="mx-auto max-w-6xl p-6">
@@ -84,7 +109,7 @@ function PayrollAll() {
                 <th className="px-4 py-3">Net Salary</th>
                 <th className="px-4 py-3">CTC</th>
                 <th className="px-4 py-3">Gross Salary</th>
-                <th className="px-4 py-3">Abs</th>
+                <th className="px-4 py-3">Effective From</th>
                 <th className="px-4 py-3 text-center">Action</th>
               </tr>
             </thead>
@@ -97,27 +122,30 @@ function PayrollAll() {
                   </td>
                 </tr>
               ) : (
-                filteredPayrolls.map((pay) => (
+                filteredPayrolls?.map((pay) => (
                   <tr key={pay.id} className="border-t text-sm hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-800">{pay.empCode}</td>
-                    <td className="px-4 py-3">{pay.name}</td>
-                    <td className="px-4 py-3">{pay.netSalary}</td>
-                    <td className="px-4 py-3">{pay.ctc}</td>
-                    <td className="px-4 py-3">{pay.grossSalary}</td>
-                    <td className="px-4 py-3">{pay.abs}</td>
+                    <td className="px-4 py-3 font-medium text-gray-800">{pay?.employeeCode}</td>
+                    <td className="px-4 py-3">{pay?.name}</td>
+                    <td className="px-4 py-3">{pay?.salaryStructure?.netSalary}</td>
+                    <td className="px-4 py-3">{pay?.salaryStructure?.ctc}</td>
+                    <td className="px-4 py-3">{pay?.salaryStructure?.grossSalary
+}</td>
+                    <td className="px-4 py-3">{new Date( pay?.salaryStructure?.effectiveFrom).toISOString().split("T")[0]
+
+}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center gap-2">
-                        {permissionArray.includes("payView")?[    <button className="text-blue-600 hover:text-blue-700">
-                            <Link to={"/company/payroll/history"}>
+                        {isAdmin||permissionArray.includes("payView")?[    <button className="text-blue-600 hover:text-blue-700">
+                            <Link to={`/company/payroll/history/${pay._id}`}>
                           <Eye size={16} />
                           </Link>
                         </button>]:[]}
                     
-                            {permissionArray.includes("payEdit")?[ <button className="text-green-600 hover:text-green-700">
+                            {isAdmin||permissionArray.includes("payEdit")?[ <button className="text-green-600 hover:text-green-700">
                           <Edit size={16} />
                         </button>]:[]}
                        
-                            {permissionArray.includes("payDelete")?[<button className="text-red-600 hover:text-red-700">
+                            {isAdmin||permissionArray.includes("payDelete")?[<button className="text-red-600 hover:text-red-700">
                           <Trash2 size={16} />
                         </button>]:[]}
                         

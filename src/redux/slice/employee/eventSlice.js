@@ -8,17 +8,43 @@ export const createEvent = createAsyncThunk(
   "event/create",
   async (formData, { rejectWithValue }) => {
     try {
-        console.log('sdac')
-      const res = await axios.post(`${base_URL}event/create`, formData, {
-  headers: { "Content-Type": "application/json" },
-
-      }  
+      const res = await axios.post(
+        `${base_URL}event/create`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
       );
 
       return res.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Event creation failed"
+      );
+    }
+  }
+);
+
+/* ================= VIEW EVENTS ================= */
+
+export const viewEvent = createAsyncThunk(
+  "event/view",
+ async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+    
+    try {
+   
+      const res = await axios.get(`${base_URL}event/view`, {
+        params: { page, limit },
+        withCredentials: true,
+      });
+
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Fetching events failed"
       );
     }
   }
@@ -32,8 +58,12 @@ const eventSlice = createSlice({
     loading: false,
     error: null,
     success: false,
-    event: null,
+
+    event: null,      // single created event
+    eventAll: [],       // event list
+    total: 0,
   },
+
   reducers: {
     resetEventState: (state) => {
       state.loading = false;
@@ -42,10 +72,11 @@ const eventSlice = createSlice({
       state.event = null;
     },
   },
+
   extraReducers: (builder) => {
     builder
 
-      /* CREATE EVENT */
+      /* ===== CREATE EVENT ===== */
       .addCase(createEvent.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -62,6 +93,23 @@ const eventSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.success = false;
+      })
+
+      /* ===== VIEW EVENTS ===== */
+      .addCase(viewEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(viewEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.eventAll = action.payload.data;
+        state.total = action.payload.total || 0;
+      })
+
+      .addCase(viewEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
