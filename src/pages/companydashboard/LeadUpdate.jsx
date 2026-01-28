@@ -86,7 +86,7 @@ function LeadUpdate() {
     ]);
     setSelectedEmployee("");
   };
-  console.log(followUps, "j")
+  // console.log(followUps, "j")
   const handleSubmit = async () => {
     try {
       // const payload = {
@@ -111,6 +111,8 @@ function LeadUpdate() {
       alert("Update failed");
     }
   };
+  const permissionArray = employeeData?.permissionArray;
+   const isAdmin =employeeData?.role === "Admin";
 
   if (loading || !leadDetail) {
     return (
@@ -134,23 +136,30 @@ function LeadUpdate() {
             const value = formData[key] || "";
 
             // If field has options, render as select
+
             if (field.options && field.options.length > 0) {
+
               return (
+
                 <div key={key}>
                   <label className="block font-medium">{field.label || key}</label>
+
                   <select
                     value={value}
                     onChange={(e) => handleFieldChange(key, e.target.value)}
                     className="w-full border rounded px-2 py-1"
                   >
                     <option value="">Select {field.label || key}</option>
-                    {field.options.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
+
+                    {(isAdmin || permissionArray.includes("ldEdit")) &&
+                      field.options.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
                   </select>
                 </div>
+
               );
             }
 
@@ -170,28 +179,31 @@ function LeadUpdate() {
         </div>
 
         {/* Assignments */}
+
         <div>
           <h3 className="font-semibold">Lead Assigned By You</h3>
-          <div className="flex items-center gap-2 my-2">
-            <select
-              value={selectedEmployee}
-              onChange={(e) => setSelectedEmployee(e.target.value)}
-              className="border rounded px-2 py-1"
-            >
-              <option value="">Select Employee</option>
-              {employeeList.map((emp) => (
-                <option key={emp._id} value={emp._id}>
-                  {emp.name} ({emp.employeeCode})
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleAddAssignment}
-              className="bg-blue-600 text-white px-3 py-1 rounded"
-            >
-              Assign
-            </button>
-          </div>
+          {(isAdmin || permissionArray.includes("ldEdit")) && (
+            <div className="flex items-center gap-2 my-2">
+              <select
+                value={selectedEmployee}
+                onChange={(e) => setSelectedEmployee(e.target.value)}
+                className="border rounded px-2 py-1"
+              >
+                <option value="">Select Employee</option>
+                {employeeList.map((emp) => (
+                  <option key={emp._id} value={emp._id}>
+                    {emp.name} ({emp.employeeCode})
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleAddAssignment}
+                className="bg-blue-600 text-white px-3 py-1 rounded"
+              >
+                Assign
+              </button>
+            </div>
+          )}
           {assignments.length === 0 && <p className="text-gray-500">No assignments yet.</p>}
           {assignments.map((a, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
@@ -203,23 +215,26 @@ function LeadUpdate() {
         </div>
 
         {/* Follow-Ups */}
+
         <div>
           <h3 className="font-semibold">Follow-Ups</h3>
-          <div className="flex items-center gap-2 my-2">
-            <input
-              type="text"
-              value={followUpMessage}
-              onChange={(e) => setFollowUpMessage(e.target.value)}
-              placeholder="Add follow-up message"
-              className="border rounded px-2 py-1 flex-1"
-            />
-            <button
-              onClick={handleAddFollowUp}
-              className="bg-green-600 text-white px-3 py-1 rounded"
-            >
-              Add
-            </button>
-          </div>
+          {(isAdmin || permissionArray.includes("ldEdit")) && (
+            <div className="flex items-center gap-2 my-2">
+              <input
+                type="text"
+                value={followUpMessage}
+                onChange={(e) => setFollowUpMessage(e.target.value)}
+                placeholder="Add follow-up message"
+                className="border rounded px-2 py-1 flex-1"
+              />
+              <button
+                onClick={handleAddFollowUp}
+                className="bg-green-600 text-white px-3 py-1 rounded"
+              >
+                Add
+              </button>
+            </div>
+          )}
           {followUps.length === 0 && <p className="text-gray-500">No follow-ups yet.</p>}
           {followUps.map((fu, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
