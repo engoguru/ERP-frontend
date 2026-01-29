@@ -13,6 +13,8 @@ import {
   Briefcase,
   Image,
   FileText,
+  CheckCircle,
+  GraduationCap, Home, MapPin, Droplet,
 } from "lucide-react";
 import { companyConfiguresView } from "../../redux/slice/companySlice";
 
@@ -48,6 +50,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
     motherName: "",
     employeeEmail: { email: "", isVerified: false },
     employeeContact: { contact: "", isVerified: false },
+    emgContact: { name: "", contact: "", relation: "", isVerified: false },
     dateOfJoining: "",
     qualification: "",
     permanentAddress: "",
@@ -56,6 +59,8 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
     employeeDescription: "",
     stationaryAlloted: [],
     stationaryAllotedString: "",
+    dob: new Date().toISOString().split("T")[0],
+    bloodGroup: "",
     // STEP 2
     employeeCode: "EMP0001",
     department: "",
@@ -72,7 +77,9 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
       hra: "",
       otherAllowance: "",
       pf: "",
+      pfCode: "",
       esi: "",
+      esiCode: "",
       professionalTax: "",
       gratuity: "",
       grossSalary: 0,
@@ -98,11 +105,24 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
     dispatch(companyConfiguresView());
 
   }, [dispatch,]);
-  console.log(companyConfigureViewData, "opo")
+  // console.log(companyConfigureViewData, "opo")
   // Generic handler for simple and nested fields
+  // const handleChange = (e, nestedPath) => {
+  //   const { name, value, files } = e.target;
+  //   const val = files ? files[0] : value;
+  //   if (nestedPath) {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       [nestedPath]: { ...prev[nestedPath], [name]: val },
+  //     }));
+  //   } else {
+  //     setFormData((prev) => ({ ...prev, [name]: val }));
+  //   }
+  // };
   const handleChange = (e, nestedPath) => {
     const { name, value, files } = e.target;
-    const val = files ? files[0] : value;
+    const val = files ? Array.from(files).map((file) => ({ file })) : value;
+
     if (nestedPath) {
       setFormData((prev) => ({
         ...prev,
@@ -112,6 +132,75 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
       setFormData((prev) => ({ ...prev, [name]: val }));
     }
   };
+
+
+  const fields = [
+    { key: "employeeEmail", label: "Email", name: "email" },
+    { key: "emgContact", label: "Emergency Contact", name: "contact" },
+    { key: "employeeContact", label: "Contact", name: "contact" },
+  ];
+
+  const [otpSent, setOtpSent] = useState({
+    emgContact: false,
+    employeeContact: false,
+    employeeEmail: false,
+  });
+
+  const [verified, setVerified] = useState({
+    emgContact: false,
+    employeeContact: false,
+    employeeEmail: false,
+  });
+
+  const [otp, setOtp] = useState(""); // can also track per field if needed
+  const [loading, setLoading] = useState(false);
+
+  const sendOtp = async (key) => {
+    try {
+      setLoading(true);
+      console.log("Sending OTP for:", key);
+
+      // Call your backend API here
+      // await api.post("/send-otp", { mobile: formData[key][fields.find(f => f.key === key).name] });
+
+      setOtpSent(prev => ({ ...prev, [key]: true })); // show OTP input for this field
+    } catch (err) {
+      alert("Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+ const verifyOtp = async (key) => {
+  try {
+    setLoading(true);
+    console.log("Verifying OTP for:", key);
+
+    // Call API to verify OTP
+    // await api.post("/verify-otp", { mobile: formData[key][fields.find(f => f.key === key).name], otp });
+
+    // Update formData to mark verified
+    setFormData(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        isVerified: true
+      }
+    }));
+
+    // Update verified UI state
+    setVerified(prev => ({ ...prev, [key]: true }));
+    setOtpSent(prev => ({ ...prev, [key]: false }));
+    setOtp(""); // reset OTP input
+  } catch (err) {
+    alert("Invalid OTP");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
   // Bank fields
   const handleBankChange = (index, e) => {
@@ -152,18 +241,18 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
   const validateStep = () => {
     const newErrors = {};
     if (currentStep === 0) {
-      ["name", "fatherName", "motherName","dateOfJoining","qualification","permanentAddress","localAddress","profilePic"].forEach((field) => {
+      ["name", "fatherName", "motherName", "dateOfJoining", "qualification", "permanentAddress", "localAddress", "profilePic"].forEach((field) => {
         if (!formData[field]) newErrors[field] = true;
       });
-if (!formData.employeeEmail?.email?.trim()) {
-  newErrors.email = true;
-}
-if (!formData.employeeContact?.contact?.trim()) {
-  newErrors.contact = true;
-}
-  if (!formData.profilePic) {
-    newErrors.profilePic = true;
-  }
+      if (!formData.employeeEmail?.email?.trim()) {
+        newErrors.email = true;
+      }
+      if (!formData.employeeContact?.contact?.trim()) {
+        newErrors.contact = true;
+      }
+      if (!formData.profilePic) {
+        newErrors.profilePic = true;
+      }
     }
     if (currentStep === 1) {
       ["employeeCode", "department", "role", "status", "reportingManager"].forEach((field) => {
@@ -194,8 +283,22 @@ if (!formData.employeeContact?.contact?.trim()) {
       }
 
       if (formData.profilePic) data.append("profilePic", formData.profilePic);
-      if (formData.pan) data.append("pan", formData.pan);
-      if (formData.aadhar) data.append("aadhar", formData.aadhar);
+      // if (formData.pan) data.append("pan", formData.pan);
+      // if (formData.aadhar) data.append("aadhar", formData.aadhar);
+
+      // Append multiple files for pan
+      if (formData.pan && formData.pan.length) {
+        formData.pan.forEach((obj) => {
+          if (obj.file) data.append("pan", obj.file);
+        });
+      }
+
+      // Append multiple files for aadhar
+      if (formData.aadhar && formData.aadhar.length) {
+        formData.aadhar.forEach((obj) => {
+          if (obj.file) data.append("aadhar", obj.file);
+        });
+      }
 
       await dispatch(employeeCreate(data)).unwrap();
       // toast.success("Employee created successfully 🎉");
@@ -259,34 +362,146 @@ if (!formData.employeeContact?.contact?.trim()) {
       {currentStep === 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label="Full Name" icon={<User size={16} />}>
-            <input name="name" onChange={handleChange}     className={`input ${errors.name ? "error shake" : ""}`}/>
+            <input name="name" onChange={handleChange} className={`input ${errors.name ? "error shake" : ""}`} />
           </Field>
-          <Field label="Father Name" icon={<User size={16} />}>
-            <input name="fatherName" onChange={handleChange}  className={`input ${errors.fatherName ? "error shake" : ""}`} />
+
+
+          <Field label="Emergency Contact Person Name" icon={<User size={16} />}>
+            <input
+              name="name"
+              value={formData.emgContact.name}
+              onChange={(e) => handleChange(e, "emgContact")}
+              className={`input ${errors?.emgContact?.name ? "error shake" : ""}`}
+            />
+          </Field>
+
+
+          {fields?.map(({ key, label, name }) => (
+            <div key={key} className="flex flex-col mb-4 text-start">
+              {label === "Email" ? (
+                <label className="flex items-center text-sm text-gray-600 font-medium gap-2">
+                  <Mail size={16} />
+                  {label}
+                </label>
+              ) : (
+                <label className="flex items-center text-sm text-gray-600 font-medium gap-2">
+                  <Phone size={16} />
+                  {label}
+                </label>
+              )}
+
+              <div className="flex gap-2">
+                <input
+                  className="input flex-1 border"
+                  value={formData[key][name]} // dynamic property
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      [key]: { ...prev[key], [name]: e.target.value } // dynamic update
+                    }))
+                  }
+                  disabled={verified[key]} // disable if verified
+                />
+                {!verified[key] && (
+                  <button
+                    className="btn-outline "
+                    onClick={() => sendOtp(key)}
+                    disabled={!formData[key][name] || loading} // dynamic check
+                  >
+                    <span className="flex flex-1  px-1.5 py-0.5 my-1.5 border-2 border-green-500 text-xs rounded-lg" >   <Phone size={16} /> OTP</span>
+                  </button>
+                )}
+              </div>
+
+              {otpSent[key] && !verified[key] && (
+                <div className="flex gap-2 mt-1">
+                  <input
+                    className="input flex-1 border"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value)}
+                    maxLength={6}
+                  />
+                  <button
+                    className="btn-primary  px-1.5 py-0.2 my-2 border-2 border-green-500 text-xs rounded-lg"
+                    onClick={() => verifyOtp(key)}
+                    disabled={otp.length !== 6 || loading}
+                  >
+                    Verify
+                  </button>
+                </div>
+              )}
+
+              {verified[key] && (
+                <p className="text-green-600 text-sm flex items-center gap-1 mt-1">
+                  <CheckCircle size={14} /> Verified
+                </p>
+              )}
+            </div>
+          ))}
+
+          <Field label="Relationship with Emergency Contact" icon={<User size={16} />}>
+            <select
+              name="relation"
+              value={formData.emgContact.relation}
+              onChange={(e) => handleChange(e, "emgContact")}
+              className={`input ${errors?.emgContact?.relation ? "error shake" : ""}`}
+            >
+              <option value="">Select Relationship</option>
+              <option value="Father">Father</option>
+              <option value="Mother">Mother</option>
+              <option value="Spouse">Spouse</option>
+              <option value="Sibling">Sibling</option>
+              <option value="Friend">Friend</option>
+              <option value="Guardian">Guardian</option>
+              <option value="Other">Other</option>
+            </select>
+          </Field>
+
+
+
+
+          <Field label="Qualification" icon={<GraduationCap size={16} />}>
+            <input name="qualification" onChange={handleChange} className={`input ${errors.qualification ? "error shake" : ""}`} />
           </Field>
           <Field label="Mother Name" icon={<User size={16} />}>
-            <input name="motherName" onChange={handleChange}  className={`input ${errors.motherName ? "error shake" : ""}`} />
+            <input name="motherName" onChange={handleChange} className={`input ${errors.motherName ? "error shake" : ""}`} />
           </Field>
-          <Field label="Email" icon={<Mail size={16} />}>
-            <input name="email" onChange={(e) => handleChange(e, "employeeEmail")}  className={`input ${errors.email ? "error shake" : ""}`} />
-          </Field>
-          <Field label="Contact" icon={<Phone size={16} />}>
-            <input name="contact" onChange={(e) => handleChange(e, "employeeContact")}  className={`input ${errors.contact ? "error shake" : ""}`} />
-          </Field>
+
+
+
           <Field label="Date of Joining" icon={<Calendar size={16} />}>
-            <input type="date" name="dateOfJoining" onChange={handleChange}  className={`input ${errors.dateOfJoining ? "error shake" : ""}`} />
+            <input type="date" name="dateOfJoining" onChange={handleChange} className={`input ${errors.dateOfJoining ? "error shake" : ""}`} />
           </Field>
-          <Field label="Qualification">
-            <input name="qualification" onChange={handleChange}  className={`input ${errors.qualification ? "error shake" : ""}`} />
+          <Field label="Father Name" icon={<User size={16} />}>
+            <input name="fatherName" onChange={handleChange} className={`input ${errors.fatherName ? "error shake" : ""}`} />
           </Field>
-          <Field label="Permanent Address">
-            <input name="permanentAddress" onChange={handleChange}  className={`input ${errors.permanentAddress ? "error shake" : ""}`} />
+          <Field label="Permanent Address" icon={<Home size={16} />}>
+            <input name="permanentAddress" onChange={handleChange} className={`input ${errors.permanentAddress ? "error shake" : ""}`} />
           </Field>
-          <Field label="Local Address">
-            <input name="localAddress" onChange={handleChange}  className={`input ${errors.localAddress ? "error shake" : ""}`} />
+          <Field label="Local Address" icon={<MapPin size={16} />}>
+            <input name="localAddress" onChange={handleChange} className={`input ${errors.localAddress ? "error shake" : ""}`} />
+          </Field>
+          <Field label="Blood Group" icon={<Droplet size={16} />}>
+            <select
+              name="bloodGroup"
+              onChange={handleChange}
+              className={`input ${errors.bloodGroup ? "error shake" : ""}`}
+              value={formData.bloodGroup} // assuming you have a state object for form values
+            >
+              <option value="">Select Blood Group</option>
+              {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((group) => (
+                <option key={group} value={group}>
+                  {group}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Date Of Birth" icon={<Calendar size={16} />}>
+            <input type="date" name="dob" onChange={handleChange} className={`input ${errors.dob ? "error shake" : ""}`} />
           </Field>
           <Field label="Profile Picture" icon={<Image size={16} />}>
-            <input type="file" name="profilePic" onChange={handleChange}  className={`input ${errors.profilePic ? "error shake" : ""}`} />
+            <input type="file" name="profilePic" onChange={handleChange} className={`input ${errors.profilePic ? "error shake" : ""}`} />
           </Field>
         </div>
       )}
@@ -319,19 +534,19 @@ if (!formData.employeeContact?.contact?.trim()) {
           </Field>
 
           <Field label="Status">
-            <select name="status" onChange={handleChange}  className={`input ${errors.status ? "error shake" : ""}`}>
+            <select name="status" onChange={handleChange} className={`input ${errors.status ? "error shake" : ""}`}>
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
             </select>
           </Field>
           <Field label="Shift Name">
-            <input name="shiftName" onChange={(e) => handleChange(e, "shiftDetail")}  className={`input ${errors.shiftName ? "error shake" : ""}`} />
+            <input name="shiftName" onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.shiftName ? "error shake" : ""}`} />
           </Field>
           <Field label="Shift Start">
-            <input type="time" name="startTime" onChange={(e) => handleChange(e, "shiftDetail")}  className={`input ${errors.startTime ? "error shake" : ""}`} />
+            <input type="time" name="startTime" onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.startTime ? "error shake" : ""}`} />
           </Field>
           <Field label="Shift End">
-            <input type="time" name="endTime" onChange={(e) => handleChange(e, "shiftDetail")}  className={`input ${errors.endTime ? "error shake" : ""}`} />
+            <input type="time" name="endTime" onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.endTime ? "error shake" : ""}`} />
           </Field>
           <Field label="Stationary Allotted">
             <input
@@ -339,7 +554,7 @@ if (!formData.employeeContact?.contact?.trim()) {
               placeholder="Laptop, ID Card"
               value={stationaryAllotedString}
               onChange={(e) => setStationaryAllotedString(e.target.value)}
-               className={`input ${errors.stationaryAlloted ? "error shake" : ""}`}
+              className={`input ${errors.stationaryAlloted ? "error shake" : ""}`}
             />
           </Field>
 
@@ -393,7 +608,7 @@ if (!formData.employeeContact?.contact?.trim()) {
           <h3 className="font-semibold text-lg">Salary Structure</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.keys(formData.salaryStructure)
-              .filter((f) => f !== "grossSalary" && f !== "totalDeduction" && f !== "netSalary" && f !== "effectiveFrom")
+              .filter((f) => f !== "grossSalary" && f !== "totalDeduction" && f !== "netSalary" && f !== "effectiveFrom" && f !== "esiCode" && f !== "pfCode")
               .map((field) => (
                 <Field key={field} label={field}>
                   <input
@@ -405,7 +620,7 @@ if (!formData.employeeContact?.contact?.trim()) {
                         salaryStructure: { ...prev.salaryStructure, [field]: e.target.value },
                       }))
                     }
-                     className={`input ${errors.name ? "error shake" : ""}`}
+                    className={`input ${errors.name ? "error shake" : ""}`}
                   />
                 </Field>
               ))}
@@ -419,7 +634,33 @@ if (!formData.employeeContact?.contact?.trim()) {
                     salaryStructure: { ...prev.salaryStructure, effectiveFrom: e.target.value },
                   }))
                 }
-                 className={`input ${errors.name ? "error shake" : ""}`}
+                className={`input ${errors.pfCode ? "error shake" : ""}`}
+              />
+            </Field>
+            <Field label="PF Number">
+              <input
+                type="text"
+                value={formData.salaryStructure.pfCode}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    salaryStructure: { ...prev.salaryStructure, pfCode: e.target.value },
+                  }))
+                }
+                className={`input ${errors.name ? "error shake" : ""}`}
+              />
+            </Field>
+            <Field label="ESI Number">
+              <input
+                type="text"
+                value={formData.salaryStructure.esiCode}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    salaryStructure: { ...prev.salaryStructure, esiCode: e.target.value },
+                  }))
+                }
+                className={`input ${errors.esiCode ? "error shake" : ""}`}
               />
             </Field>
           </div>
@@ -434,10 +675,10 @@ if (!formData.employeeContact?.contact?.trim()) {
 
           <h3 className="font-semibold text-lg">Documents</h3>
           <Field label="Aadhar">
-            <input type="file" name="aadhar" onChange={handleChange} />
+            <input type="file" name="aadhar" onChange={handleChange} multiple />
           </Field>
           <Field label="PAN">
-            <input type="file" name="pan" onChange={handleChange} />
+            <input type="file" name="pan" onChange={handleChange} multiple />
           </Field>
 
           <h3 className="font-semibold text-lg">Bank Details</h3>
@@ -445,11 +686,11 @@ if (!formData.employeeContact?.contact?.trim()) {
             <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-2 rounded">
               {["bankName", "bankIfscCode", "branchName", "accountNumber"].map((field) => (
                 <Field key={field} label={field}>
-                  <input name={field} value={bank[field]} onChange={(e) => handleBankChange(index, e)}  className={`input ${errors.field ? "error shake" : ""}`} />
+                  <input name={field} value={bank[field]} onChange={(e) => handleBankChange(index, e)} className={`input ${errors.field ? "error shake" : ""}`} />
                 </Field>
               ))}
               <Field label="Account Type">
-                <select name="accountType" value={bank.accountType} onChange={(e) => handleBankChange(index, e)}  className={`input ${errors.accountType ? "error shake" : ""}`}>
+                <select name="accountType" value={bank.accountType} onChange={(e) => handleBankChange(index, e)} className={`input ${errors.accountType ? "error shake" : ""}`}>
                   <option value="SAVINGS">SAVINGS</option>
                   <option value="CURRENT">CURRENT</option>
                   <option value="SALARY">SALARY</option>
@@ -464,22 +705,7 @@ if (!formData.employeeContact?.contact?.trim()) {
       )}
 
       {/* Navigation Buttons */}
-      {/* <div className="flex justify-between mt-8">
-        {currentStep > 0 && (
-          <button onClick={() => setCurrentStep(currentStep - 1)} className="px-5 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
-            Previous
-          </button>
-        )}
-        {currentStep < steps.length - 1 ? (
-          <button onClick={() => setCurrentStep(currentStep + 1)} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            Next
-          </button>
-        ) : (
-          <button onClick={handleSubmit} className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-            Submit
-          </button>
-        )}
-      </div> */}
+
       <div className="flex justify-between mt-8">
         {currentStep > 0 && <button onClick={() => setCurrentStep(currentStep - 1)} className="px-5 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Previous</button>}
         {currentStep < steps.length - 1

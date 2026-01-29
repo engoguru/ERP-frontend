@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { employeeDetails } from "../../redux/slice/employee/loginSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 function Navbar() {
+  const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
   const isHome = location.pathname === "/";
 
+
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+
+  // Fetch employee details only if not initialized
+  useEffect(() => {
+    if (!initialized) {
+      dispatch(employeeDetails());
+    }
+  }, [dispatch, initialized]);
   // Detect scroll for background change
   useEffect(() => {
     const handleScroll = () => {
@@ -64,16 +78,18 @@ function Navbar() {
           {/* Desktop Buttons */}
           <div className="hidden lg:flex items-center gap-4">
             <Link
-              to="/login"
+              to={employeeData?.id ? "/company/dashboard" : "/login"}
               className={`px-4 py-2 border rounded font-medium transition
-                ${isHome && !scrolled
+    ${isHome && !scrolled
                   ? "border-white text-white hover:bg-white hover:text-green-500"
                   : "border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
                 }`}
             >
-              Sign In
+              {employeeData?.id ? "Go to Dashboard" : "Sign In"}
             </Link>
-            <Link
+
+            {employeeData?.id ?null
+              :  <Link
               to="/register"
               className={`px-4 py-2 rounded font-medium transition
                 ${isHome && !scrolled
@@ -82,7 +98,7 @@ function Navbar() {
                 }`}
             >
               Request Demo
-            </Link>
+            </Link>}
           </div>
 
           {/* Mobile Menu Button */}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
@@ -8,6 +8,8 @@ import FeatureCard from "../../components/ui/FeatureCard";
 import Chatbot from "../../components/common/Chatbot";
 import { motion } from "framer-motion";
 import { Users, CalendarCheck, ClipboardList, Clock, Briefcase, BarChart2, Star } from "lucide-react";
+import { useSelector } from "react-redux";
+import { employeeDetails } from "../../redux/slice/employee/loginSlice";
 
 const features = [
   {
@@ -74,6 +76,13 @@ const testimonials = [
 ];
 
 function Home() {
+  // Grab state
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+
+  // Fetch employee details only if not initialized
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -104,17 +113,20 @@ function Home() {
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Link
-                to="/login"
+                to={employeeData?.id ? "/company/dashboard" : "/login"}
                 className="px-6 py-3 bg-green-400 hover:bg-green-500 rounded text-white font-semibold transition"
               >
-                Sign In
+                {employeeData?.id ? "Go to Dashboard" : "Sign In"}
               </Link>
-              <Link
-                to="/register"
-                className="px-6 py-3 border border-green-400 rounded text-white hover:bg-green-400 hover:text-white transition"
-              >
-                Request Demo
-              </Link>
+              {employeeData?.id ? null
+                : <Link
+                  to="/register"
+                  className={`px-4 py-2 rounded font-medium transition
+                             
+                    }`}
+                >
+                  Request Demo
+                </Link>}
             </div>
           </motion.div>
 
