@@ -107,22 +107,9 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
   }, [dispatch,]);
   // console.log(companyConfigureViewData, "opo")
   // Generic handler for simple and nested fields
-  // const handleChange = (e, nestedPath) => {
-  //   const { name, value, files } = e.target;
-  //   const val = files ? files[0] : value;
-  //   if (nestedPath) {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       [nestedPath]: { ...prev[nestedPath], [name]: val },
-  //     }));
-  //   } else {
-  //     setFormData((prev) => ({ ...prev, [name]: val }));
-  //   }
-  // };
   const handleChange = (e, nestedPath) => {
     const { name, value, files } = e.target;
-    const val = files ? Array.from(files).map((file) => ({ file })) : value;
-
+    const val = files ? files[0] : value;
     if (nestedPath) {
       setFormData((prev) => ({
         ...prev,
@@ -132,6 +119,25 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
       setFormData((prev) => ({ ...prev, [name]: val }));
     }
   };
+
+const handleMultipleFiles = (e, nestedPath) => {
+  const { name, files } = e.target;
+  const selectedFiles = Array.from(files);
+
+  setFormData((prev) => {
+    if (nestedPath) {
+      return {
+        ...prev,
+        [nestedPath]: {
+          ...prev[nestedPath],
+          [name]: selectedFiles,
+        },
+      };
+    }
+    return { ...prev, [name]: selectedFiles };
+  });
+};
+
 
 
   const fields = [
@@ -268,49 +274,65 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
   };
 
 
-  const handleSubmit = async () => {
-    try {
-      if (!validateStep()) return;
-      const data = new FormData();
+ 
 
-      for (const key in formData) {
-        if (["profilePic", "pan", "aadhar"].includes(key)) continue;
-        if (typeof formData[key] === "object") {
-          data.append(key, JSON.stringify(formData[key]));
-        } else {
-          data.append(key, formData[key]);
-        }
+
+const jsonFields = [
+  "salaryStructure",
+  "shiftDetail",
+  "employeeEmail",
+  "employeeContact",
+  "emgContact",
+  "bankDetail",
+];
+
+const handleSubmit = async () => {
+  try {
+    if (!validateStep()) return;
+
+    const data = new FormData();
+
+    for (const key in formData) {
+      if (["profilePic", "pan", "aadhar"].includes(key)) continue;
+
+      const value = formData[key];
+      if (value === undefined || value === null) continue;
+
+      if (jsonFields.includes(key)) {
+        data.append(key, JSON.stringify(value));
+      } else {
+        data.append(key, value);
       }
-
-      if (formData.profilePic) data.append("profilePic", formData.profilePic);
-      // if (formData.pan) data.append("pan", formData.pan);
-      // if (formData.aadhar) data.append("aadhar", formData.aadhar);
-
-      // Append multiple files for pan
-      if (formData.pan && formData.pan.length) {
-        formData.pan.forEach((obj) => {
-          if (obj.file) data.append("pan", obj.file);
-        });
-      }
-
-      // Append multiple files for aadhar
-      if (formData.aadhar && formData.aadhar.length) {
-        formData.aadhar.forEach((obj) => {
-          if (obj.file) data.append("aadhar", obj.file);
-        });
-      }
-
-      await dispatch(employeeCreate(data)).unwrap();
-      // toast.success("Employee created successfully 🎉");
-
-      setTimeout(() => navigate("/company/employe/view"), 1500);
-    } catch (err) {
-      console.error(err);
-      // toast.error(err?.message || "Failed to create employee");
     }
-  };
 
-  // Manager search suggestions
+    // profilePic (single file)
+    if (formData.profilePic) {
+      data.append("profilePic", formData.profilePic);
+    }
+
+    // pan (multiple files)
+    if (Array.isArray(formData.pan)) {
+      formData.pan.forEach((file) => {
+        data.append("pan", file);
+      });
+    }
+
+    // aadhar (multiple files)
+    if (Array.isArray(formData.aadhar)) {
+      formData.aadhar.forEach((file) => {
+        data.append("aadhar", file);
+      });
+    }
+
+    await dispatch(employeeCreate(data)).unwrap();
+    setTimeout(() => navigate("/company/employe/view"), 1500);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+
   useEffect(() => {
     if (!search.trim()) {
       setShowSuggestions(false);
@@ -675,10 +697,10 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
 
           <h3 className="font-semibold text-lg">Documents</h3>
           <Field label="Aadhar">
-            <input type="file" name="aadhar" onChange={handleChange} multiple />
+            <input type="file" name="aadhar" onChange={handleMultipleFiles} multiple />
           </Field>
           <Field label="PAN">
-            <input type="file" name="pan" onChange={handleChange} multiple />
+            <input type="file" name="pan" onChange={handleMultipleFiles} multiple />
           </Field>
 
           <h3 className="font-semibold text-lg">Bank Details</h3>

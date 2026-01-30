@@ -49,6 +49,8 @@ function PayrollProfile({ salaryStructure, bankDetail }) {
       <Row label="HRA" value={salaryStructure?.hra} />
        <Row label="Other Allowance" value={salaryStructure?.otherAllowance} />
         <Row label="Professional Tax" value={salaryStructure?.professionalTax} />
+        <Row label="ESI Code" value={salaryStructure?.esiCode} />
+        <Row label="PF Code" value={salaryStructure?.pfCode} />
           </div>
   </div>
         //   <div className="grid md:grid-cols-3 gap-6">

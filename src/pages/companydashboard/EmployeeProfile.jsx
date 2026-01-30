@@ -161,28 +161,47 @@ function EmployeeProfile() {
 
                 <InfoItem icon={<Calendar size={18} className="text-[hsl(168,76%,42%)]" />} label="Joining Date" value={new Date(employee.dateOfJoining).toLocaleDateString()} />
                 <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="Qualification" value={employee.qualification} />
+                 <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="Blood Group" value={employee.bloodGroup} />
+                  <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="DOB" value={new Date(employee.dob).toLocaleDateString() }/>
 
               </CardSection>
 
               {/* Address */}
-              <CardSection title="Address">
+              <CardSection title="Other Detail">
                 <InfoItem icon={<User size={18} className="text-[hsl(168,76%,42%)]" />} label="Father Name" value={employee.fatherName} />
                 <InfoItem icon={<User size={18} className="text-[hsl(168,76%,42%)]" />} label="Mother Name" value={employee.motherName} />
                 <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Permanent Address" value={employee.permanentAddress} />
                 <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Local Address" value={employee.localAddress} />
+                 <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Emg. Contact Person Name" value={employee.localAddress} />
+                  <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Emg. contact" value={employee.emgContact.contact} />
+                  <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Relation-Ship" value={employee.emgContact.relation} />
               </CardSection>
 
               {/* Documents */}
               <CardSection title="Documents">
+                {/* Aadhar (multiple images) */}
+                {employee?.aadhar?.map((aadharDoc, index) => (
+                  <img
+                    key={`aadhar-${index}`}
+                    src={aadharDoc.url}
+                    alt={`Aadhar ${index + 1}`}
+                    className="w-full h-30 object-cover rounded-md shadow-sm mb-2"
+                    onClick={() => setIsModalOpen(true)}
+                  />
+                ))}
 
-                {employee.aadhar?.url && (
-
-                  <img src={employee.aadhar.url} alt="Aadhar" className="w-full h-50 object-cover rounded-md shadow-sm" onClick={() => setIsModalOpen(true)} />
-                )}
-                {employee.pan?.url && (
-                  <img src={employee.pan.url} alt="PAN" className="w-full h-50 object-cover rounded-md shadow-sm" onClick={() => setIsModalOpen(true)} />
-                )}
+                {/* PAN (multiple images) */}
+                {employee?.pan?.map((panDoc, index) => (
+                  <img
+                    key={`pan-${index}`}
+                    src={panDoc.url}
+                    alt={`PAN ${index + 1}`}
+                    className="w-full h-30 object-cover rounded-md shadow-sm mb-2"
+                    onClick={() => setIsModalOpen(true)}
+                  />
+                ))}
               </CardSection>
+
             </div>
           )}
 
