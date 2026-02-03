@@ -47,7 +47,7 @@ function AttendanceHistory() {
     setActiveMonth(data || null);
     setModalOpen(true);
   };
-
+console.log(attendanceSummary,"")
   return (
     <CompanyLayout pageTitle="Attendance History">
       <div className="mx-auto max-w-6xl p-6 space-y-6">
@@ -157,15 +157,15 @@ function AttendanceHistory() {
                           <td className="px-4 py-1">
                             {new Date(d.date).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-1">{d.inTime || "-"}</td>
-                          <td className="px-4 py-1">{d.outTime || "-"}</td>
+                          <td className="px-4 py-1">{new Date(d.inTime || "-").toLocaleString("en-IN")}</td>
+                          <td className="px-4 py-1">{ new Date(d.outTime || "-").toLocaleString("en-IN")}</td>
                           <td
-                            className={`px-4 py-1 font-medium ${hours !== "-" && hours < 8.5
+                            className={`px-4 py-1 font-medium ${d.workingHour !== "-" && d.workingHour < 8.5
                                 ? "text-red-600"
                                 : ""
                               }`}
                           >
-                            {hours}
+                            {d.workingHour}
                           </td>
                           <td className=" font-semibold "> <span className="bg-green-600  px-3 py-0.5 text-white">{d.status}</span></td>
                         </tr>

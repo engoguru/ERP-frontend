@@ -21,8 +21,8 @@ export const companyConfigures = createAsyncThunk(
   'company/Configure',
   async (companyData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${base_URL}companyConfigure/create`, companyData,{
-        withCredentials:true
+      const response = await axios.post(`${base_URL}companyConfigure/create`, companyData, {
+        withCredentials: true
       });
       return response.data;
     } catch (error) {
@@ -71,6 +71,25 @@ export const companyConfiguresView = createAsyncThunk(
 
 
 
+export const companyConfiguresAdmin = createAsyncThunk(
+  'company/ConfigureAdmin',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${base_URL}license/get`,
+        { withCredentials: true }
+      );
+
+      // console.log("RESPONSE:", response);
+      return response.data;
+    } catch (error) {
+      console.error("VIEW ERROR:", error);
+      return rejectWithValue(error.response?.data);
+    }
+  }
+)
+
+
 
 
 
@@ -91,8 +110,9 @@ const companySlice = createSlice({
   initialState: {
     company: null,
     companyConfigure: null,
-       companyConfigureUpdateData: null,
-         companyConfigureViewData: null,
+    companyConfigureUpdateData: null,
+    companyConfigureViewData: null,
+    companyConfigureAdmin:null,
     loading: false,
     error: null,
   },
@@ -128,16 +148,16 @@ const companySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
-      
-      
-       .addCase(companyConfiguresView.pending, (state) => {
+
+
+
+      .addCase(companyConfiguresView.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(companyConfiguresView.fulfilled, (state, action) => {
         state.loading = false;
-        state. companyConfigureViewData = action.payload;
+        state.companyConfigureViewData = action.payload;
       })
       .addCase(companyConfiguresView.rejected, (state, action) => {
         state.loading = false;
@@ -147,13 +167,28 @@ const companySlice = createSlice({
 
 
 
-             .addCase(companyConfiguresUpdate.pending, (state) => {
+      
+      .addCase(companyConfiguresAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(companyConfiguresAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.companyConfigureAdmin = action.payload;
+      })
+      .addCase(companyConfiguresAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+
+      .addCase(companyConfiguresUpdate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(companyConfiguresUpdate.fulfilled, (state, action) => {
         state.loading = false;
-        state. companyConfigureUpdateData = action.payload;
+        state.companyConfigureUpdateData = action.payload;
       })
       .addCase(companyConfiguresUpdate.rejected, (state, action) => {
         state.loading = false;

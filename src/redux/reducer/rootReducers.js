@@ -6,7 +6,8 @@ import loginReducer from "../slice/employee/loginSlice";
 import leadReducer from "../slice/leadSlice";
 import eventReducer from "../slice/employee/eventSlice";
 import attendanceReducer from "../slice/employee/attendanceSlice";
-import ipReducer from "../slice/employee/ipSlice"
+import ipReducer from "../slice/employee/ipSlice";
+import dashboardReducer from "../slice/dashbaordSlice"
 
 
 const rootReducer = combineReducers({
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
   lead:leadReducer,
   event:eventReducer,
   attendance:attendanceReducer,
-  ip:ipReducer
+  ip:ipReducer,
+  dashbaord:dashboardReducer
 });
 
 export default rootReducer;

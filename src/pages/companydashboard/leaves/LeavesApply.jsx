@@ -1,30 +1,18 @@
 import React, { useState } from 'react'
 import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
+import { toDate } from 'date-fns'
 
 function LeavesApply() {
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({
-    fromDate: '',
-    toDate: '',
-    reason: ''
+   fromDate:"",
+    toDate:"",  
+    reason:"",
+    totalDay:"",
+    leaveType:""
   })
 
-  const [leaves, setLeaves] = useState([
-    {
-      id: 1,
-      fromDate: '2025-01-10',
-      toDate: '2025-01-12',
-      reason: 'Medical',
-      status: 'Approved'
-    },
-    {
-      id: 2,
-      fromDate: '2025-01-20',
-      toDate: '2025-01-21',
-      reason: 'Personal',
-      status: 'Pending'
-    }
-  ])
+  const [leaves, setLeaves] = useState([])
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -59,6 +47,9 @@ function LeavesApply() {
               <tr>
                 <th className="p-3 text-left">From</th>
                 <th className="p-3 text-left">To</th>
+                <th className="p-3 text-left">Leave Type</th>
+                <th className="p-3 text-left">Approved By</th>
+                <th className="p-3 text-left">Total Day</th>
                 <th className="p-3 text-left">Reason</th>
                 <th className="p-3 text-left">Status</th>
               </tr>
@@ -71,11 +62,10 @@ function LeavesApply() {
                   <td className="p-3">{leave.reason}</td>
                   <td className="p-3">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        leave.status === 'Approved'
+                      className={`px-2 py-1 rounded text-xs font-medium ${leave.status === 'Approved'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-yellow-100 text-yellow-700'
-                      }`}
+                        }`}
                     >
                       {leave.status}
                     </span>
@@ -109,6 +99,12 @@ function LeavesApply() {
                   className="w-full border rounded px-3 py-2"
                   required
                 />
+                <select  >
+                  <option></option>
+                   <option></option>
+                    <option></option>
+                     <option></option>
+                </select>
                 <textarea
                   name="reason"
                   placeholder="Reason"

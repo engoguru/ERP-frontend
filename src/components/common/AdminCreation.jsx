@@ -20,6 +20,7 @@ function AdminCreation() {
       <div className="py-8 px-4">
         <EmployeeManage
           role="Admin"
+          department="Admin"
           hideCompanyLayout={hideCompanyLayout} // hide company layout inside component
         />
       </div>

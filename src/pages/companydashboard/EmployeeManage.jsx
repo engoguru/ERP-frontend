@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import CompanyLayout from "../../components/layout/companydashboard/CompanyLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { employeeCreate, employeesByManager } from "../../redux/slice/employee/employeeCreateSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   User,
   Mail,
@@ -16,7 +16,7 @@ import {
   CheckCircle,
   GraduationCap, Home, MapPin, Droplet,
 } from "lucide-react";
-import { companyConfiguresView } from "../../redux/slice/companySlice";
+import { companyConfiguresAdmin, companyConfiguresView } from "../../redux/slice/companySlice";
 
 const steps = ["Personal Info", "Employment Info", "Finance & Bank"];
 
@@ -30,13 +30,16 @@ const Field = ({ label, icon, children }) => (
   </div>
 );
 
-const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
+const EmployeeManage = ({ hideCompanyLayout = false, role = "" ,department=""}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log(location.pathname);
   // const { managerEmployees = [], loading = false } = useSelector((state) => state.employee || {});
-  const { companyConfigureViewData } = useSelector(
+  const { companyConfigureViewData, companyConfigureAdmin } = useSelector(
     (state) => state.reducer.company
   );
+
   const [currentStep, setCurrentStep] = useState(0);
   const [search, setSearch] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -63,12 +66,15 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
     bloodGroup: "",
     // STEP 2
     employeeCode: "EMP0001",
-    department: "",
+    department: department||"",
     role: role || "",
     status: "ACTIVE",
     shiftDetail: { shiftName: "", startTime: "", endTime: "" },
     reportingManager: "696b7bf0360a9259fb1248e7",
-    licenseId: companyConfigureViewData?.data?.licenseId,
+    licenseId:
+      location.pathname === "/company/Admin"
+        ? companyConfigureAdmin?.user?.licenseId
+        : companyConfigureViewData?.data?.licenseId,
 
     // STEP 3
     salaryStructure: {
@@ -103,9 +109,10 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
   // ================== Handlers ==================
   useEffect(() => {
     dispatch(companyConfiguresView());
+    dispatch(companyConfiguresAdmin())
 
   }, [dispatch,]);
-  // console.log(companyConfigureViewData, "opo")
+  // console.log(companyConfigureAdmin, "opo")
   // Generic handler for simple and nested fields
   const handleChange = (e, nestedPath) => {
     const { name, value, files } = e.target;
@@ -120,23 +127,23 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" }) => {
     }
   };
 
-const handleMultipleFiles = (e, nestedPath) => {
-  const { name, files } = e.target;
-  const selectedFiles = Array.from(files);
+  const handleMultipleFiles = (e, nestedPath) => {
+    const { name, files } = e.target;
+    const selectedFiles = Array.from(files);
 
-  setFormData((prev) => {
-    if (nestedPath) {
-      return {
-        ...prev,
-        [nestedPath]: {
-          ...prev[nestedPath],
-          [name]: selectedFiles,
-        },
-      };
-    }
-    return { ...prev, [name]: selectedFiles };
-  });
-};
+    setFormData((prev) => {
+      if (nestedPath) {
+        return {
+          ...prev,
+          [nestedPath]: {
+            ...prev[nestedPath],
+            [name]: selectedFiles,
+          },
+        };
+      }
+      return { ...prev, [name]: selectedFiles };
+    });
+  };
 
 
 
@@ -177,33 +184,33 @@ const handleMultipleFiles = (e, nestedPath) => {
     }
   };
 
- const verifyOtp = async (key) => {
-  try {
-    setLoading(true);
-    console.log("Verifying OTP for:", key);
+  const verifyOtp = async (key) => {
+    try {
+      setLoading(true);
+      console.log("Verifying OTP for:", key);
 
-    // Call API to verify OTP
-    // await api.post("/verify-otp", { mobile: formData[key][fields.find(f => f.key === key).name], otp });
+      // Call API to verify OTP
+      // await api.post("/verify-otp", { mobile: formData[key][fields.find(f => f.key === key).name], otp });
 
-    // Update formData to mark verified
-    setFormData(prev => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        isVerified: true
-      }
-    }));
+      // Update formData to mark verified
+      setFormData(prev => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          isVerified: true
+        }
+      }));
 
-    // Update verified UI state
-    setVerified(prev => ({ ...prev, [key]: true }));
-    setOtpSent(prev => ({ ...prev, [key]: false }));
-    setOtp(""); // reset OTP input
-  } catch (err) {
-    alert("Invalid OTP");
-  } finally {
-    setLoading(false);
-  }
-};
+      // Update verified UI state
+      setVerified(prev => ({ ...prev, [key]: true }));
+      setOtpSent(prev => ({ ...prev, [key]: false }));
+      setOtp(""); // reset OTP input
+    } catch (err) {
+      alert("Invalid OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -235,13 +242,23 @@ const handleMultipleFiles = (e, nestedPath) => {
   }, [stationaryAllotedString])
   formData.stationaryAlloted = stationaryAllotedArray
   useEffect(() => {
-    if (companyConfigureViewData?.data?.licenseId) {
-      setFormData((prev) => ({
+    const isAdminRoute = location.pathname.startsWith("/company/Admin");
+
+    const licenseId = isAdminRoute
+      ? companyConfigureAdmin?.user?.licenseId
+      : companyConfigureViewData?.data?.licenseId;
+
+    if (licenseId) {
+      setFormData(prev => ({
         ...prev,
-        licenseId: companyConfigureViewData.data.licenseId,
+        licenseId
       }));
     }
-  }, [companyConfigureViewData]);
+  }, [
+    location.pathname,
+    companyConfigureAdmin?.user?.licenseId,
+    companyConfigureViewData?.data?.licenseId
+  ]);
 
   // Validation
   const validateStep = () => {
@@ -261,7 +278,7 @@ const handleMultipleFiles = (e, nestedPath) => {
       }
     }
     if (currentStep === 1) {
-      ["employeeCode", "department", "role", "status", "reportingManager"].forEach((field) => {
+      ["employeeCode", "role", "status", "reportingManager"].forEach((field) => {
         if (!formData[field]) newErrors[field] = true;
       });
     }
@@ -274,62 +291,62 @@ const handleMultipleFiles = (e, nestedPath) => {
   };
 
 
- 
 
 
-const jsonFields = [
-  "salaryStructure",
-  "shiftDetail",
-  "employeeEmail",
-  "employeeContact",
-  "emgContact",
-  "bankDetail",
-];
 
-const handleSubmit = async () => {
-  try {
-    if (!validateStep()) return;
+  const jsonFields = [
+    "salaryStructure",
+    "shiftDetail",
+    "employeeEmail",
+    "employeeContact",
+    "emgContact",
+    "bankDetail",
+  ];
 
-    const data = new FormData();
+  const handleSubmit = async () => {
+    try {
+      if (!validateStep()) return;
 
-    for (const key in formData) {
-      if (["profilePic", "pan", "aadhar"].includes(key)) continue;
+      const data = new FormData();
 
-      const value = formData[key];
-      if (value === undefined || value === null) continue;
+      for (const key in formData) {
+        if (["profilePic", "pan", "aadhar"].includes(key)) continue;
 
-      if (jsonFields.includes(key)) {
-        data.append(key, JSON.stringify(value));
-      } else {
-        data.append(key, value);
+        const value = formData[key];
+        if (value === undefined || value === null) continue;
+
+        if (jsonFields.includes(key)) {
+          data.append(key, JSON.stringify(value));
+        } else {
+          data.append(key, value);
+        }
       }
-    }
 
-    // profilePic (single file)
-    if (formData.profilePic) {
-      data.append("profilePic", formData.profilePic);
-    }
+      // profilePic (single file)
+      if (formData.profilePic) {
+        data.append("profilePic", formData.profilePic);
+      }
 
-    // pan (multiple files)
-    if (Array.isArray(formData.pan)) {
-      formData.pan.forEach((file) => {
-        data.append("pan", file);
-      });
-    }
+      // pan (multiple files)
+      if (Array.isArray(formData.pan)) {
+        formData.pan.forEach((file) => {
+          data.append("pan", file);
+        });
+      }
 
-    // aadhar (multiple files)
-    if (Array.isArray(formData.aadhar)) {
-      formData.aadhar.forEach((file) => {
-        data.append("aadhar", file);
-      });
-    }
+      // aadhar (multiple files)
+      if (Array.isArray(formData.aadhar)) {
+        formData.aadhar.forEach((file) => {
+          data.append("aadhar", file);
+        });
+      }
 
-    await dispatch(employeeCreate(data)).unwrap();
-    setTimeout(() => navigate("/company/employe/view"), 1500);
-  } catch (err) {
-    console.error(err);
-  }
-};
+      await dispatch(employeeCreate(data)).unwrap();
+      setTimeout(() => navigate("/company/employe/view"), 1500);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
 
 
@@ -531,29 +548,60 @@ const handleSubmit = async () => {
       {/* STEP 2: Employment Info */}
       {currentStep === 1 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
           <Field label="Department" error={errors.department}>
-            <select name="department" onChange={handleChange} className={`input ${errors.department && "error"}`}>
-              <option value="">Select</option>
-              {companyConfigureViewData?.data.roles?.map((r) => (
-                <option key={r.department} value={r.department}>
-                  {r.department}
-                </option>
-              ))}
+            <select
+              name="department"
+              value={formData.department || ""}
+              onChange={handleChange}
+              className={`input ${errors.department && "error"}`}
+            >
+              {companyConfigureAdmin?.user?.licenseId ? (
+                <>
+                  <option value="Admin">Admin</option>
+                </>
+              ) : (
+                <>
+                  <option value="">Select</option>
+                  {companyConfigureViewData?.data?.roles?.map((r) => (
+                    <option key={r.department} value={r.department}>
+                      {r.department}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
           </Field>
+
 
 
 
           <Field label="Role" error={errors.role}>
-            <select name="role" onChange={handleChange} className={`input ${errors.role && "error"}`}>
-              <option value="">Select</option>
-              {companyConfigureViewData?.data.roles
-                ?.find((r) => r.department === formData.department)
-                ?.roles?.map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
+            <select
+              name="role"
+              value={formData.role || ""}
+              onChange={handleChange}
+              className={`input ${errors.role && "error"}`}
+            >
+              {companyConfigureAdmin?.user?.licenseId ? (
+                <>
+                  <option value="Admin">Admin</option>
+                </>
+              ) : (
+                <>
+                  <option value="">Select</option>
+                  {companyConfigureViewData?.data?.roles
+                    ?.find(r => r.department === formData.department)
+                    ?.roles?.map(role => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                </>
+              )}
             </select>
           </Field>
+
 
           <Field label="Status">
             <select name="status" onChange={handleChange} className={`input ${errors.status ? "error shake" : ""}`}>
@@ -583,7 +631,7 @@ const handleSubmit = async () => {
 
 
           {/* Reporting Manager */}
-          <div className="relative">
+          {/* <div className="relative">
             <label className="text-sm font-medium text-gray-600 mb-1 flex items-center gap-1">
               Reporting Manager
             </label>
@@ -615,7 +663,56 @@ const handleSubmit = async () => {
                 ))}
               </ul>
             )}
+          </div> */}
+          <div className="relative">
+            <label className="text-sm font-medium text-gray-600 mb-1 flex items-center gap-1">
+              Reporting Manager
+            </label>
+
+            <input
+              type="text"
+              value={
+                companyConfigureAdmin?.user?.licenseId
+                  ? companyConfigureAdmin.licenseId // <-- Admin uses licenseId
+                  : search // <-- normal user search
+              }
+              onChange={(e) => {
+                if (!companyConfigureAdmin?.user?.licenseId) {
+                  setSearch(e.target.value);
+                  setShowSuggestions(true); // Show suggestions while typing
+                }
+              }}
+              onFocus={() => {
+                if (!companyConfigureAdmin?.user?.licenseId) {
+                  setShowSuggestions(true); // Only show suggestions if not admin
+                }
+              }}
+              className="input text-black"
+              autoComplete="off"
+              readOnly={!!companyConfigureAdmin?.user?.licenseId} // make input readonly for admin
+            />
+
+            {showSuggestions &&
+              !companyConfigureAdmin?.user?.licenseId &&
+              managerSuggestions.length > 0 && (
+                <ul className="absolute z-10 bg-white border w-full max-h-40 overflow-y-auto mt-1 rounded shadow">
+                  {managerSuggestions.map((mgr) => (
+                    <li
+                      key={mgr._id}
+                      className="p-2 hover:bg-gray-200 cursor-pointer text-black"
+                      onClick={() => {
+                        handleSelectManager(mgr);
+                        setSearch(mgr.name); // Set input value to selected manager
+                        setShowSuggestions(false); // Hide suggestions
+                      }}
+                    >
+                      {mgr.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
           </div>
+
 
 
           {/* <Field label="License ID">
