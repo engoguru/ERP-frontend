@@ -116,6 +116,36 @@ export const companyDetailData=createAsyncThunk(
 
 
 
+export const companyDetailUpdate = createAsyncThunk(
+  "company/update",
+  async ({ id, payload }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${base_URL}companyRegister/update/${id}`,
+        payload,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || error.message
+      );
+    }
+  }
+);
+
+
+
+
+
+
+
 
 
 
@@ -131,6 +161,8 @@ const companySlice = createSlice({
     companyConfigureAdmin:null,
 
     companyDetailSpecific:null,
+
+    updateCompanyData:null,
     loading: false,
     error: null,
   },
@@ -227,6 +259,24 @@ const companySlice = createSlice({
         state.companyDetailSpecific = action.payload;
       })
       .addCase(companyDetailData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+
+
+
+
+
+       .addCase(companyDetailUpdate.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(companyDetailUpdate.fulfilled, (state, action) => {
+        state.loading = false;
+        state.updateCompanyData = action.payload;
+      })
+      .addCase(companyDetailUpdate.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

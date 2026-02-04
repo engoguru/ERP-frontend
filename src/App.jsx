@@ -37,6 +37,7 @@ import LeadUpdate from './pages/companydashboard/LeadUpdate';
 import LeavesApply from './pages/companydashboard/leaves/LeavesApply';
 import RaisedIssues from './pages/companydashboard/leaves/RaisedIssues';
 import LeavesProfile from './pages/companydashboard/leaves/LeavesProfile';
+import CompanyEdit from './pages/companydashboard/CompanyEdit';
 
 
 function App() {
@@ -108,6 +109,10 @@ const dispatch = useDispatch();
 
           <Route path="/company/event" element={<EventMain />} />
 
+
+
+          {/* used for company info edit  */}
+           <Route path='/company/edit' element={<CompanyEdit/>}/>
         </Route>
 
 

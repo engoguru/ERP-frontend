@@ -116,6 +116,15 @@ const HandleLogout = async (e) => {
                     <User className="w-4 h-4 text-white" />
                     Profile
                   </Link>
+                  {employeeData?.role==="Admin"?
+                    <Link
+                    to={`/company/edit`}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-secondary text-white"
+                  >
+                    <User className="w-4 h-4 text-white" />
+                    Edit Company
+                  </Link>
+                  :null}
                   <div className="flex items-center gap-2 px-4 py-2 hover:bg-secondary cursor-pointer text-white">
                     <Settings className="w-4 h-4 text-white" />
                     Settings
