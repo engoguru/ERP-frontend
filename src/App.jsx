@@ -36,6 +36,7 @@ import MonthlyLeaveConfigure from './pages/companydashboard/MonthlyLeaveConfigur
 import LeadUpdate from './pages/companydashboard/LeadUpdate';
 import LeavesApply from './pages/companydashboard/leaves/LeavesApply';
 import RaisedIssues from './pages/companydashboard/leaves/RaisedIssues';
+import LeavesProfile from './pages/companydashboard/leaves/LeavesProfile';
 
 
 function App() {
@@ -94,6 +95,7 @@ const dispatch = useDispatch();
           <Route path="/company/employe/profile/:id" element={<EmployeeProfile />} />
 
           <Route path="/company/applyLeave" element={<LeavesApply/>}/>
+           <Route path="/company/LeaveDetail/:id" element={<LeavesProfile/>}/>
           <Route path="/company/raised" element={<RaisedIssues/>}/>
 
 

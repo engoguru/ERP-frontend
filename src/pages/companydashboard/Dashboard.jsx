@@ -3,6 +3,7 @@ import CompanyLayout from "../../components/layout/companydashboard/CompanyLayou
 import IPConfigure from "./teamConfiguration/IPConfigure";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDashboardLeadData, fetchDashboardUserData } from "../../redux/slice/dashbaordSlice";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
     const dispatch = useDispatch();
@@ -14,10 +15,11 @@ function Dashboard() {
         dispatch(fetchDashboardUserData());
         dispatch(fetchDashboardLeadData());
     }, [dispatch]);
+    // console.log(leads)
 
     return (
         <CompanyLayout pageTitle="Dashboard">
-            <div className="p-6 space-y-10  min-h-screen bg-gradient-to-r from-yellow-100 via-orange-300 to-red-100">
+            <div className="p-6 space-y-10  min-h-screen bg-gradient-to-r from-yellow-100 via-orange-200 to-red-100">
                 {/* ====== SECTION 1: EMPLOYEES ====== */}
                 <section>
                     <h2 className="text-2xl font-bold text-gray-800 mb-6">Employee Overview</h2>
@@ -61,12 +63,19 @@ function Dashboard() {
 
                         {/* Latest Employees */}
                         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-                            <p className="text-gray-500 text-sm font-medium mb-3">Latest Joined Employees</p>
+                            <p className="text-gray-700 text-sm font-medium mb-3 border-b-2 ">Latest Joined Employees</p>
                             <ul className="space-y-2">
                                 {userData?.data?.monthlyEmployees?.map((emp, idx) => (
-                                    <li key={idx} className="flex justify-between text-sm text-gray-700">
-                                        <span>{emp.name}</span>
-                                        <span className="text-gray-400">{emp.joinedAgo}</span>
+                                    <li key={idx} className="flex justify-between text-sm  font-medium text-gray-700 hover:text-red-700 hover:border-b hover:border-red-700">
+                                     
+                                         <span className="">
+                                            {emp.name}
+                                        </span>
+                                   
+                                           <Link    to={`/company/employe/profile/${emp?._id}`}> 
+                                        <span>View</span>
+                                            </Link>
+                                        {/* <span className="text-gray-400">{emp.joinedAgo}</span> */}
                                     </li>
                                 )) || <li className="text-gray-400">No recent joins</li>}
                             </ul>
@@ -95,12 +104,12 @@ function Dashboard() {
 
                         {/* Latest Leads */}
                         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-                            <p className="text-gray-500 text-sm font-medium mb-3">Latest Leads</p>
+                            <p className="text-gray-800 text-md font-medium mb-3 border-b-2 border-red-700 ">Latest Leads</p>
                             <ul className="space-y-2">
                                 {leads?.data?.monthlyleads?.map((lead, idx) => (
-                                    <li key={idx} className="flex justify-between text-sm text-gray-700">
-                                        <span>{lead.company}</span>
-                                        <span className="text-gray-400">{lead.addedAgo}</span>
+                                    <li key={idx} className="flex justify-between font-medium text-sm text-gray-700">
+                                        <span>{lead.fields.Name}</span>
+                                        <span className="text-gray-700 font-medium">{lead.fields.OrganizationName}</span>
                                     </li>
                                 )) || <li className="text-gray-400">No new leads</li>}
                             </ul>

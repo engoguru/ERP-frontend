@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { Home, Users, FileText, Settings, Briefcase } from "lucide-react";
 import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { companyDetailData } from "../../../redux/slice/companySlice";
+
+
 
 function Sidebar({ isMobile }) {
   const location = useLocation();
@@ -14,7 +17,7 @@ function Sidebar({ isMobile }) {
   const { employeeData, loading, initialized } = useSelector(
     (state) => state.reducer.login
   );
-
+  const { companyDetailSpecific } = useSelector((state) => state?.reducer?.company)
   // Fetch employee details only if not initialized
   useEffect(() => {
     if (!initialized) {
@@ -22,9 +25,13 @@ function Sidebar({ isMobile }) {
     }
   }, [dispatch, initialized]);
 
+  useEffect(() => {
+    dispatch(companyDetailData())
+  }, [])
 
+  // console.log(companyDetailSpecific, "pp")
   // Hardcoded company info
-  const companyName = "HR Services";
+  const companyName =companyDetailSpecific?.data?.companyName;
   const role = employeeData?.role; // Hardcoded role
   const permissionArray = employeeData?.permissionArray
 
@@ -34,7 +41,7 @@ function Sidebar({ isMobile }) {
     Manager: "Manager",
     Employee: "Employee",
   };
-  console.log(permissionArray)
+  // console.log(permissionArray)
   // Hardcoded menu items
   const isAdmin = role === "Admin";
 
@@ -82,13 +89,20 @@ function Sidebar({ isMobile }) {
       `}
     >
       {/* Logo / Company Info */}
-      <div className="p-6 border-b border-white/60">
-        <Link to="/" className="flex items-center gap-3">
+      <div className="p-4 border-b border-white/60">
+        <Link to="/" className="flex items-center gap-1">
           <div className="w-10 h-10 rounded-xl bg-[hsl(168_76%_42%)] flex items-center justify-center">
-            <span className="text-lg font-bold text-white">CA</span>
+            <span className="text-lg font-bold text-white">
+              {companyDetailSpecific?.data?.companyLogo?.url ? (
+                <img src={companyDetailSpecific.data.companyLogo.url} alt="Company Logo" />
+              ) : (
+                "CA"
+              )}
+            </span>
+
           </div>
           <div className="px-2 rounded">
-            <p className="text-lg font-bold font-display text-white">{companyName}</p>
+            <p className="text-md font-bold font-display text-white">{companyName}</p>
             <p className="text-xs text-white">{employeeData?.role}</p>
           </div>
         </Link>

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, isRejectedWithValue } from '@reduxjs/toolkit';
 import { base_URL } from '../../utils/BaseUrl';
 import axios from 'axios';
 
@@ -93,7 +93,23 @@ export const companyConfiguresAdmin = createAsyncThunk(
 
 
 
+export const companyDetailData=createAsyncThunk(
+  "get/CompanyDetail",
+  async(_,{isRejectedWithValue})=>{
+    try {
+        const response = await axios.get(
+        `${base_URL}companyRegister/viewOne`,
+        { withCredentials: true }
+      );
 
+      // console.log("RESPONSE:", response);
+      return response.data;
+    } catch (error) {
+        console.error("VIEW ERROR:", error);
+      return isRejectedWithValue(error.response?.data);
+    }
+  }
+)
 
 
 
@@ -113,6 +129,8 @@ const companySlice = createSlice({
     companyConfigureUpdateData: null,
     companyConfigureViewData: null,
     companyConfigureAdmin:null,
+
+    companyDetailSpecific:null,
     loading: false,
     error: null,
   },
@@ -191,6 +209,24 @@ const companySlice = createSlice({
         state.companyConfigureUpdateData = action.payload;
       })
       .addCase(companyConfiguresUpdate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+
+
+
+
+      
+      .addCase(companyDetailData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(companyDetailData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.companyDetailSpecific = action.payload;
+      })
+      .addCase(companyDetailData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

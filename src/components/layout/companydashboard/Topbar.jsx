@@ -101,6 +101,7 @@ const HandleLogout = async (e) => {
               >
                 <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                   <User className="w-4 h-4 text-[hsl(168_76%_42%)]" />
+                  {/* <img src={employeeData?.profilePic?.url} alt={employeeData?.name} className="w-4 h-4 text-[hsl(168_76%_42%)]" /> */}
                 </div>
                 <span className="hidden sm:inline font-medium">{employeeData?.name}</span>
                 <ChevronDown className="w-4 h-4 text-[hsl(168_76%_42%)]" />
