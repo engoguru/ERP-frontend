@@ -57,7 +57,7 @@ function Sidebar({ isMobile }) {
       ? [{ label: "Attendance", path: "/company/attendance", icon: Briefcase }]
       : []),
 
-    ...(isAdmin || permissionArray.includes("PayView")
+    ...(isAdmin || permissionArray.includes("payView")
       ? [{ label: "Payroll", path: "/company/payroll", icon: Briefcase }]
       : []),
 

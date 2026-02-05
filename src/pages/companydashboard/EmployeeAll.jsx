@@ -61,7 +61,7 @@ function EmployeeAll() {
           {/* Add Employee Button */}
           {(isAdmin || permissionArray.includes("ldCreate")) && (<button
             onClick={() => navigate("/company/employe/create")}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="flex items-center text-lg gap-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             <Plus size={18} /> Add Employee
           </button>)}
@@ -79,17 +79,17 @@ function EmployeeAll() {
             className="p-2 border rounded w-full md:w-1/3"
           />
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 text-sm font-bold">
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
               className="p-2 border rounded"
             >
-              <option value="">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Developer">Developer</option>
-              <option value="HR">HR</option>
+              <option value="" className="font-bold">All Roles</option>
+              <option value="admin" className="font-bold">Admin</option>
+              <option value="Manager" className="font-bold">Manager</option>
+              <option value="Developer" className="font-bold">Developer</option>
+              <option value="HR" className="font-bold">HR</option>
             </select>
 
             <select
@@ -97,10 +97,10 @@ function EmployeeAll() {
               onChange={(e) => setDepartmentFilter(e.target.value)}
               className="p-2 border rounded"
             >
-              <option value="">All Departments</option>
-              <option value="IT">IT</option>
-              <option value="HR">HR</option>
-              <option value="Finance">Finance</option>
+              <option value="" className="font-bold">All Departments</option>
+              <option value="IT" className="font-bold">IT</option>
+              <option value="HR" className="font-bold">HR</option>
+              <option value="Finance" className="font-bold">Finance</option>
             </select>
           </div>
         </div>
@@ -129,13 +129,13 @@ function EmployeeAll() {
                 {filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp) => (
                     <tr key={emp._id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-2">{emp.name}</td>
-                      <td className="px-4 py-2">{emp.employeeCode}</td>
-                      <td className="px-4 py-2">{emp.department}</td>
-                      <td className="px-4 py-2">{emp.role}</td>
-                      <td className="px-4 py-2">{emp.employeeEmail?.email}</td>
-                      <td className="px-4 py-2">{emp.employeeContact?.contact}</td>
-                      <td className="px-4 py-2 capitalize">{emp.status}</td>
+                      <td className="px-4 py-2 text-sm font-semibold">{emp.name}</td>
+                      <td className="px-4 py-2 text-sm font-semibold">{emp.employeeCode}</td>
+                      <td className="px-4 py-2 text-sm font-semibold">{emp.department}</td>
+                      <td className="px-4 py-2 text-sm font-semibold" >{emp.role}</td>
+                      <td className="px-4 py-2 text-sm font-semibold">{emp.employeeEmail?.email}</td>
+                      <td className="px-4 py-2 text-sm font-semibold">{emp.employeeContact?.contact}</td>
+                      <td className="px-4 py-2 capitalize text-sm font-semibold">{emp.status}</td>
                       <td className="px-4 py-2 flex gap-2">
                         {(isAdmin || permissionArray.includes("empCreate")) && (<button className="p-2 bg-green-500 text-white rounded hover:bg-green-600">
                           <Link to={`/company/employe/profile/${emp._id}`}>

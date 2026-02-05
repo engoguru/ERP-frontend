@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createLeave, viewLeave } from "../../../redux/slice/employee/leaveSlice";
 import { Trash2, Edit, Eye } from "lucide-react"; // Import icons
 import { Link } from "react-router-dom";
+import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 
 function LeavesApply() {
   const dispatch = useDispatch();
@@ -24,6 +25,18 @@ function LeavesApply() {
     reason: "",
   });
 
+
+   // Grab state
+      const { employeeData, initialized } = useSelector(
+          (state) => state.reducer.login
+      );
+  
+      // Fetch employee details only if not initialized
+      useEffect(() => {
+          if (!initialized) {
+              dispatch(employeeDetails());
+          }
+      }, [dispatch, initialized]);
   useEffect(() => {
     dispatch(viewLeave({ page, limit }));
   }, [dispatch, page, limit]);
@@ -84,7 +97,7 @@ function LeavesApply() {
                 <th className="p-3 text-left">Total Day</th>
                 <th className="p-3 text-left">Reason</th>
                 <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Actions</th>
+              {employeeData?.role==="Admin" ||employeeData?.role==="HR" &&(<th className="p-3 text-left">Actions</th>)}  
               </tr>
             </thead>
             <tbody>
@@ -126,6 +139,7 @@ function LeavesApply() {
                         {leave.status}
                       </span>
                     </td>
+                     {employeeData?.role==="Admin" ||employeeData?.role==="HR" &&(
                     <td className="p-3 flex gap-2">
                       <button
                         onClick={() => handleView(leave._id)}
@@ -148,7 +162,7 @@ function LeavesApply() {
                       >
                         <Trash2 size={16} />
                       </button>
-                    </td>
+                    </td>)}
                   </tr>
                 ))
               )}

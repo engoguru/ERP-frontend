@@ -25,7 +25,7 @@ function EventMain() {
   const [limit, setLimit] = useState(10);
 
   const { eventAll, loading, error } = useSelector((state) => state.reducer.event);
-  console.log(eventAll)
+  // console.log(eventAll)
    // Grab state
   const { employeeData, initialized } = useSelector(
     (state) => state.reducer.login

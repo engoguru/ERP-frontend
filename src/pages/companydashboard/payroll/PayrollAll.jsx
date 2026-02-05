@@ -70,7 +70,7 @@ function PayrollAll() {
       p.employeeCode.toLowerCase().includes(search.toLowerCase()) ||
       p.name.toLowerCase().includes(search.toLowerCase())
   );
-console.log(employeeList,"pp")
+// console.log(employeeList,"pp")
   return (
     <CompanyLayout pageTitle={"Payroll Details"}>
       <div className="mx-auto max-w-6xl p-6">

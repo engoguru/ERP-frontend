@@ -165,7 +165,7 @@ function PermissionConfigure() {
       permissions: permissionList,
     };
 
-    console.log("Submitting Permissions:", data);
+    // console.log("Submitting Permissions:", data);
 
     // Dispatch the update async thunk
     const resultAction = await dispatch(companyConfiguresUpdate(data)).unwrap();;
@@ -191,7 +191,7 @@ function PermissionConfigure() {
   }
 };
 
-  console.log(companyConfigureViewData)
+  // console.log(companyConfigureViewData)
 
   return (
     <CompanyLayout>
