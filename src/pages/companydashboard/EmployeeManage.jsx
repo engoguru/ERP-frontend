@@ -17,6 +17,8 @@ import {
   GraduationCap, Home, MapPin, Droplet,
 } from "lucide-react";
 import { companyConfiguresAdmin, companyConfiguresView } from "../../redux/slice/companySlice";
+import { toast } from "react-toastify";
+
 
 const steps = ["Personal Info", "Employment Info", "Finance & Bank"];
 
@@ -30,11 +32,11 @@ const Field = ({ label, icon, children }) => (
   </div>
 );
 
-const EmployeeManage = ({ hideCompanyLayout = false, role = "" ,department=""}) => {
+const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location.pathname);
+  // console.log(location.pathname);
   // const { managerEmployees = [], loading = false } = useSelector((state) => state.employee || {});
   const { companyConfigureViewData, companyConfigureAdmin } = useSelector(
     (state) => state.reducer.company
@@ -66,7 +68,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" ,department=""}) 
     bloodGroup: "",
     // STEP 2
     employeeCode: "EMP0001",
-    department: department||"",
+    department: department || "",
     role: role || "",
     status: "ACTIVE",
     shiftDetail: { shiftName: "", startTime: "", endTime: "" },
@@ -302,9 +304,10 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" ,department=""}) 
     "emgContact",
     "bankDetail",
   ];
-
+  const[submitStart,setsubmitStart]=useState(false)
   const handleSubmit = async () => {
     try {
+      setsubmitStart(true)
       if (!validateStep()) return;
 
       const data = new FormData();
@@ -341,11 +344,21 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" ,department=""}) 
         });
       }
 
-      await dispatch(employeeCreate(data)).unwrap();
-      setTimeout(() => navigate("/company/employe/view"), 1500);
+      const res = await dispatch(employeeCreate(data)).unwrap();
+      if (res.success) {
+        toast.success( "Profile Created !");
+        // console.log(res, "uigerfgewruf")
+         navigate("/company/employe/view")
+        // setTimeout(() =>, 1500);
+        setsubmitStart(false)
+      }
+
     } catch (err) {
+      toast.error(err?.error || "Something went wrong");
       console.error(err);
-    }
+    }finally {
+  setsubmitStart(false);
+}
   };
 
 
@@ -829,7 +842,15 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "" ,department=""}) 
         {currentStep > 0 && <button onClick={() => setCurrentStep(currentStep - 1)} className="px-5 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Previous</button>}
         {currentStep < steps.length - 1
           ? <button onClick={() => { if (validateStep()) setCurrentStep(currentStep + 1) }} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Next</button>
-          : <button onClick={handleSubmit} className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Submit</button>
+          : <button
+            onClick={handleSubmit}
+            disabled={submitStart}
+            className={`px-5 py-2 rounded-lg text-white 
+    ${submitStart ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+          >
+            {submitStart ? "Submitting..." : "Submit"}
+          </button>
+
         }
       </div>
 
