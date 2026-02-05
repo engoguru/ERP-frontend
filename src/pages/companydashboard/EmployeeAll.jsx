@@ -59,7 +59,7 @@ function EmployeeAll() {
           <h2 className="text-2xl font-bold"></h2>
 
           {/* Add Employee Button */}
-          {(isAdmin || permissionArray.includes("ldCreate")) && (<button
+          {(isAdmin || permissionArray.includes("empCreate")) && (<button
             onClick={() => navigate("/company/employe/create")}
             className="flex items-center text-lg gap-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
