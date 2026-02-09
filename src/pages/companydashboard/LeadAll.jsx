@@ -189,7 +189,7 @@ function LeadAll() {
                         {new Date(lead.createdAt).toLocaleDateString()}
                       </td>
 
-                      {/* ACTIONS */}
+                      {/*ACTION*/}
                       <td className="px-4 py-3 text-center">
                         <div className="flex justify-center gap-2">
                           {(isAdmin || permissionArray.includes("ldView")) && (

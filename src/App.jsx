@@ -38,6 +38,7 @@ import LeavesApply from './pages/companydashboard/leaves/LeavesApply';
 import RaisedIssues from './pages/companydashboard/leaves/RaisedIssues';
 import LeavesProfile from './pages/companydashboard/leaves/LeavesProfile';
 import CompanyEdit from './pages/companydashboard/CompanyEdit';
+import EmployeeEdit from './pages/companydashboard/EmployeeEdit';
 
 
 function App() {
@@ -93,6 +94,8 @@ const dispatch = useDispatch();
 
           <Route path="/company/employe/view" element={<EmployeeAll />} />
           <Route path="/company/employe/create" element={<EmployeeManage />} />
+           <Route path="/company/employe/edit/:id" element={<EmployeeEdit/>} />
+
           <Route path="/company/employe/profile/:id" element={<EmployeeProfile />} />
 
           <Route path="/company/applyLeave" element={<LeavesApply/>}/>

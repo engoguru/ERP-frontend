@@ -35,7 +35,7 @@ function EmployeeProfile() {
   }, [dispatch, employeeId]);
 
 
-  console.log()
+  console.log(employee)
   const tabs = ["Profile", "Leaves", "Attendance", "Payroll"];
 
   if (loading)

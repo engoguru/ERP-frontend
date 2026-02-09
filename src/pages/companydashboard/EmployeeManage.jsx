@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { companyConfiguresAdmin, companyConfiguresView } from "../../redux/slice/companySlice";
 import { toast } from "react-toastify";
-
+const STORAGE_KEY = "employee_create_form";
 
 const steps = ["Personal Info", "Employment Info", "Finance & Bank"];
 
@@ -72,7 +72,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
     role: role || "",
     status: "ACTIVE",
     shiftDetail: { shiftName: "", startTime: "", endTime: "" },
-    reportingManager: "696b7bf0360a9259fb1248e7",
+    reportingManager: "696f1e5e6d7894b715a338e3",
     licenseId:
       location.pathname === "/company/Admin"
         ? companyConfigureAdmin?.user?.licenseId
@@ -114,8 +114,8 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
     dispatch(companyConfiguresAdmin())
 
   }, [dispatch,]);
-  // console.log(companyConfigureAdmin, "opo")
-  // Generic handler for simple and nested fields
+
+
   const handleChange = (e, nestedPath) => {
     const { name, value, files } = e.target;
     const val = files ? files[0] : value;
@@ -128,6 +128,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
       setFormData((prev) => ({ ...prev, [name]: val }));
     }
   };
+
 
   const handleMultipleFiles = (e, nestedPath) => {
     const { name, files } = e.target;
@@ -214,6 +215,20 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
     }
   };
 
+  const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    if (!formData.profilePic || !(formData.profilePic instanceof File)) {
+      setPreview(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(formData.profilePic);
+    setPreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl); // cleanup
+  }, [formData.profilePic]);
+
 
 
 
@@ -225,15 +240,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
     setFormData((prev) => ({ ...prev, bankDetail: updatedBanks }));
   };
 
-  const addBank = () => {
-    setFormData((prev) => ({
-      ...prev,
-      bankDetail: [
-        ...prev.bankDetail,
-        { bankName: "", bankIfscCode: "", branchName: "", accountNumber: "", accountType: "SAVINGS" },
-      ],
-    }));
-  };
+
 
   const [stationaryAllotedString, setStationaryAllotedString] = useState("");
   const stationaryAllotedArray = stationaryAllotedString
@@ -242,6 +249,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
   useEffect(() => {
 
   }, [stationaryAllotedString])
+
   formData.stationaryAlloted = stationaryAllotedArray
   useEffect(() => {
     const isAdminRoute = location.pathname.startsWith("/company/Admin");
@@ -275,9 +283,11 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
       if (!formData.employeeContact?.contact?.trim()) {
         newErrors.contact = true;
       }
-      if (!formData.profilePic) {
+      if (!formData.profilePic || !(formData.profilePic instanceof File)) {
         newErrors.profilePic = true;
       }
+
+
     }
     if (currentStep === 1) {
       ["employeeCode", "role", "status", "reportingManager"].forEach((field) => {
@@ -287,6 +297,17 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
     if (currentStep === 2) {
       if (!formData.salaryStructure.ctc) newErrors.salaryStructure_ctc = true;
       if (!formData.bankDetail[0].accountNumber) newErrors.bankDetail0_accountNumber = true;
+      // if (formData.stationaryAlloted.length === 0) {
+      //   newErrors.stationaryAlloted = true;
+      // }
+
+    //   if (!formData.pan || formData.pan.length === 0){
+    //     newErrors.pan = "PAN document is required";
+
+    // }
+    // if (!formData.aadhar || formData.aadhar.length === 0) {
+    //   newErrors.aadhar = "Aadhar document is required";
+    // }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -304,7 +325,39 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
     "emgContact",
     "bankDetail",
   ];
-  const[submitStart,setsubmitStart]=useState(false)
+  const [submitStart, setsubmitStart] = useState(false)
+
+  // useEffect(() => {
+  //   const saved = localStorage.getItem(STORAGE_KEY);
+  //   if (saved) {
+  //     try {
+  //       const parsed = JSON.parse(saved);
+  //       setFormData(parsed);
+  //     } catch (err) {
+  //       console.error("Invalid localStorage form data");
+  //     }
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  // }, [formData]);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        setFormData(JSON.parse(saved));
+      } catch { }
+    }
+    setHasLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoaded) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  }, [formData, hasLoaded]);
+
   const handleSubmit = async () => {
     try {
       setsubmitStart(true)
@@ -346,23 +399,30 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
 
       const res = await dispatch(employeeCreate(data)).unwrap();
       if (res.success) {
-        toast.success( "Profile Created !");
+        toast.success("Profile Created !");
         // console.log(res, "uigerfgewruf")
-         navigate("/company/employe/view")
+        navigate("/company/employe/view")
         // setTimeout(() =>, 1500);
         setsubmitStart(false)
+
+
+
+        // toast.success("Profile Created !");
+        localStorage.removeItem(STORAGE_KEY);   // <-- clear saved draft
+        // navigate("/company/employe/view");
+
       }
 
     } catch (err) {
       toast.error(err?.error || "Something went wrong");
       console.error(err);
-    }finally {
-  setsubmitStart(false);
-}
+    } finally {
+      setsubmitStart(false);
+    }
   };
 
 
-
+  console.log(formData, "gh")
   useEffect(() => {
     if (!search.trim()) {
       setShowSuggestions(false);
@@ -414,7 +474,7 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
       {currentStep === 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label="Full Name" icon={<User size={16} />}>
-            <input name="name" onChange={handleChange} className={`input ${errors.name ? "error shake" : ""}`} />
+            <input name="name" value={formData?.name} onChange={handleChange} className={`input ${errors.name ? "error shake" : ""}`} />
           </Field>
 
 
@@ -513,30 +573,31 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
 
 
           <Field label="Qualification" icon={<GraduationCap size={16} />}>
-            <input name="qualification" onChange={handleChange} className={`input ${errors.qualification ? "error shake" : ""}`} />
+            <input name="qualification" value={formData?.qualification} onChange={handleChange} className={`input ${errors.qualification ? "error shake" : ""}`} />
           </Field>
           <Field label="Mother Name" icon={<User size={16} />}>
-            <input name="motherName" onChange={handleChange} className={`input ${errors.motherName ? "error shake" : ""}`} />
+            <input name="motherName" value={formData?.motherName} onChange={handleChange} className={`input ${errors.motherName ? "error shake" : ""}`} />
           </Field>
 
 
 
           <Field label="Date of Joining" icon={<Calendar size={16} />}>
-            <input type="date" name="dateOfJoining" onChange={handleChange} className={`input ${errors.dateOfJoining ? "error shake" : ""}`} />
+            <input type="date" name="dateOfJoining" value={formData?.dateOfJoining} onChange={handleChange} className={`input ${errors.dateOfJoining ? "error shake" : ""}`} />
           </Field>
           <Field label="Father Name" icon={<User size={16} />}>
-            <input name="fatherName" onChange={handleChange} className={`input ${errors.fatherName ? "error shake" : ""}`} />
+            <input name="fatherName" onChange={handleChange} value={formData?.fatherName} className={`input ${errors.fatherName ? "error shake" : ""}`} />
           </Field>
           <Field label="Permanent Address" icon={<Home size={16} />}>
-            <input name="permanentAddress" onChange={handleChange} className={`input ${errors.permanentAddress ? "error shake" : ""}`} />
+            <input name="permanentAddress" value={formData?.permanentAddress} onChange={handleChange} className={`input ${errors.permanentAddress ? "error shake" : ""}`} />
           </Field>
           <Field label="Local Address" icon={<MapPin size={16} />}>
-            <input name="localAddress" onChange={handleChange} className={`input ${errors.localAddress ? "error shake" : ""}`} />
+            <input name="localAddress" value={formData?.localAddress} onChange={handleChange} className={`input ${errors.localAddress ? "error shake" : ""}`} />
           </Field>
           <Field label="Blood Group" icon={<Droplet size={16} />}>
             <select
               name="bloodGroup"
               onChange={handleChange}
+
               className={`input ${errors.bloodGroup ? "error shake" : ""}`}
               value={formData.bloodGroup} // assuming you have a state object for form values
             >
@@ -550,9 +611,18 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
           </Field>
 
           <Field label="Date Of Birth" icon={<Calendar size={16} />}>
-            <input type="date" name="dob" onChange={handleChange} className={`input ${errors.dob ? "error shake" : ""}`} />
+            <input type="date" name="dob" value={formData.dob} onChange={handleChange} className={`input ${errors.dob ? "error shake" : ""}`} />
           </Field>
+
+
           <Field label="Profile Picture" icon={<Image size={16} />}>
+            {preview && (
+              <img
+                src={preview}
+                alt="Profile Preview"
+                style={{ width: "150px", height: "150px", objectFit: "cover" }}
+              />
+            )}
             <input type="file" name="profilePic" onChange={handleChange} className={`input ${errors.profilePic ? "error shake" : ""}`} />
           </Field>
         </div>
@@ -617,19 +687,19 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
 
 
           <Field label="Status">
-            <select name="status" onChange={handleChange} className={`input ${errors.status ? "error shake" : ""}`}>
+            <select name="status" value={formData?.status} onChange={handleChange} className={`input ${errors.status ? "error shake" : ""}`}>
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
             </select>
           </Field>
           <Field label="Shift Name">
-            <input name="shiftName" onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.shiftName ? "error shake" : ""}`} />
+            <input name="shiftName" value={formData?.shiftDetail.shiftName} onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.shiftName ? "error shake" : ""}`} />
           </Field>
           <Field label="Shift Start">
-            <input type="time" name="startTime" onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.startTime ? "error shake" : ""}`} />
+            <input type="time" name="startTime" value={formData?.shiftDetail.startTime} onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.startTime ? "error shake" : ""}`} />
           </Field>
           <Field label="Shift End">
-            <input type="time" name="endTime" onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.endTime ? "error shake" : ""}`} />
+            <input type="time" name="endTime" value={formData?.shiftDetail.endTime} onChange={(e) => handleChange(e, "shiftDetail")} className={`input ${errors.endTime ? "error shake" : ""}`} />
           </Field>
           <Field label="Stationary Allotted">
             <input
@@ -807,10 +877,10 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
 
           <h3 className="font-semibold text-lg">Documents</h3>
           <Field label="Aadhar">
-            <input type="file" name="aadhar" onChange={handleMultipleFiles} multiple />
-          </Field>
+            <input type="file" name="aadhar"  onChange={handleMultipleFiles} multiple />
+         </Field>
           <Field label="PAN">
-            <input type="file" name="pan" onChange={handleMultipleFiles} multiple />
+            <input type="file" name="pan"  onChange={handleMultipleFiles} multiple />
           </Field>
 
           <h3 className="font-semibold text-lg">Bank Details</h3>
@@ -830,9 +900,9 @@ const EmployeeManage = ({ hideCompanyLayout = false, role = "", department = "" 
               </Field>
             </div>
           ))}
-          <button onClick={addBank} className="px-3 py-1 bg-gray-200 rounded">
+          {/* <button onClick={addBank} className="px-3 py-1 bg-gray-200 rounded">
             + Add Bank
-          </button>
+          </button> */}
         </div>
       )}
 

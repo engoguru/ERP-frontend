@@ -71,6 +71,35 @@ export const employeesByManager = createAsyncThunk(
     }
 );
 
+
+
+// Update Employees
+export const employeesUPdate = createAsyncThunk(
+  "employee/Update",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${base_URL}employee/update/${id}`,
+        data, //  FormData direct body
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
+    }
+  }
+);
+
+
+
 // ----------------- Slice -----------------
 
 const employeeSlice = createSlice({
@@ -79,7 +108,8 @@ const employeeSlice = createSlice({
         employee: null,           // last created employee
         employeeList: [],         // list from /view
         managerEmployees: [],
-        employeeProfile: null,    // list from /reportingManager
+        employeeProfile: null, 
+        employeeUpdateData:null,   // list from /reportingManager
         loading: false,
         error: null,
         success: false,
@@ -165,6 +195,24 @@ const employeeSlice = createSlice({
                 state.error = null;
             })
             .addCase(employeesByManager.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || "Error fetching employees by manager";
+            });
+
+
+
+               // --- Employees by Reporting Manager ---
+        builder
+            .addCase(employeesUPdate.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(employeesUPdate.fulfilled, (state, action) => {
+                state.loading = false;
+                state.employeeUpdateData = action.payload.data || [];
+                state.error = null;
+            })
+            .addCase(employeesUPdate.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || "Error fetching employees by manager";
             });

@@ -142,11 +142,12 @@ function EmployeeAll() {
                             <Eye size={18} />
                           </Link>
                         </button>)}
-                        {(isAdmin || permissionArray.includes("empEdit")) && (<button className="p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                        {(isAdmin || permissionArray.includes("empEdit")) && (
+                          <Link to={`/company/employe/edit/${emp._id}`} className="p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
 
                           <Edit size={18} />
 
-                        </button>)}
+                        </Link>)}
 
 
                       </td>

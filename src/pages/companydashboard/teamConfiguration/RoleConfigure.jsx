@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
 import { Building2, PlusCircle, Shield, Trash2, Save, Check } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { companyConfigures } from "../../../redux/slice/companySlice";
+import { useDispatch, useSelector } from "react-redux";
+import { companyConfigures, companyConfiguresUpdate, companyConfiguresView } from "../../../redux/slice/companySlice";
+import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 
 const Field = ({ label, icon, children }) => (
   <div>
@@ -16,6 +17,39 @@ const Field = ({ label, icon, children }) => (
 
 function RoleConfigure() {
   const dispatch = useDispatch();
+
+
+
+  // Grab state
+  const { companyConfigureViewData } = useSelector(
+    (state) => state?.reducer?.company
+  );
+
+  useEffect(() => {
+    dispatch(companyConfiguresView());
+
+  }, [dispatch]);
+  // console.log(companyConfigureViewData,"fjb")
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    roles: departments.map(({ locked, ...rest }) => rest),
+  };
+
+  try {
+    await dispatch(companyConfiguresUpdate(payload)).unwrap(); // RTK best practice
+    alert("Config saved!");
+
+    // clear / reset state
+    setDepartments([]); // or initialDepartments
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+  // Fetch employee details only if not initialized
+
 
   /* ================= DEFAULT ADMIN DEPARTMENT ================= */
   const [departments, setDepartments] = useState([
@@ -100,12 +134,12 @@ function RoleConfigure() {
     const payload = {
       roles: departments.map(({ locked, ...rest }) => rest), // remove UI flag
     };
-// console.log(payload,"ll")
+    // console.log(payload,"ll")
     try {
       await dispatch(companyConfigures(payload)).unwrap();
       alert("Configuration saved successfully!");
     } catch (err) {
-      console.log(err,"oo")
+      console.log(err, "oo")
       alert("Failed to save configuration");
     }
   };
@@ -193,16 +227,25 @@ function RoleConfigure() {
         )}
 
         {/* ===== SAVE ALL ===== */}
+        {/* ===== SAVE ALL ===== */}
         {!currentDept && departments.length > 1 && (
           <div className="text-right">
             <button
-              onClick={saveConfiguration}
+              onClick={
+                companyConfigureViewData?.data
+                  ? handleSubmit
+                  : saveConfiguration
+              }
               className="btn-success flex gap-2 ml-auto"
             >
-              <Save size={16} /> Save Configuration
+              <Save size={16} />
+              {companyConfigureViewData?.data
+                ? "Update Configuration"
+                : "Save Configuration"}
             </button>
           </div>
         )}
+
       </div>
 
       <style>{`

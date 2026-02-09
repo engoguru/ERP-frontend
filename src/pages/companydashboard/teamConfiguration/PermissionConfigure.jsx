@@ -100,7 +100,7 @@ function PermissionConfigure() {
 
 
 
- useEffect(()=>{ dispatch(companyConfiguresView()) },[]) 
+  useEffect(() => { dispatch(companyConfiguresView()) }, [])
   // roles only for the selected department
   const rolesForDepartment =
     companyConfigureViewData?.data?.roles?.find(
@@ -159,37 +159,37 @@ function PermissionConfigure() {
   };
 
   const savePermissions = async () => {
-  try {
-    // Build the data object to submit
-    const data = {
-      permissions: permissionList,
-    };
+    try {
+      // Build the data object to submit
+      const data = {
+        permissions: permissionList,
+      };
 
-    // console.log("Submitting Permissions:", data);
+      // console.log("Submitting Permissions:", data);
 
-    // Dispatch the update async thunk
-    const resultAction = await dispatch(companyConfiguresUpdate(data)).unwrap();;
+      // Dispatch the update async thunk
+      const resultAction = await dispatch(companyConfiguresUpdate(data)).unwrap();;
+      console.log(resultAction)
+      // You can unwrap the result to check if it succeeded
+      if (resultAction.success) {
+        alert("Permissions saved successfully!");
+        // console.log("Updated permissions:", resultAction.payload);
 
-    // You can unwrap the result to check if it succeeded
-    if (companyConfiguresUpdate.fulfilled.match(resultAction)) {
-      alert("Permissions saved successfully!");
-      console.log("Updated permissions:", resultAction.payload);
-
-      // Optional: reset local state after successful save
-      setPermissionList([]);
-      setSelectedDepartment("");
-      setSelectedRole("");
-      setSelectedAccess([]);
-    } else {
-      // If rejected, show error
-      alert("Failed to save permissions");
-      console.error("Save failed:", resultAction.payload || resultAction.error);
+        // Optional: reset local state after successful save
+        setPermissionList([]);
+        setSelectedDepartment("");
+        setSelectedRole("");
+        setSelectedAccess([]);
+      } else {
+        // If rejected, show error
+        alert("Failed to save permissions");
+        console.error("Save failed:", resultAction.payload || resultAction.error);
+      }
+    } catch (err) {
+      console.error("Error in savePermissions:", err);
+      alert("An unexpected error occurred while saving permissions");
     }
-  } catch (err) {
-    console.error("Error in savePermissions:", err);
-    alert("An unexpected error occurred while saving permissions");
-  }
-};
+  };
 
   // console.log(companyConfigureViewData)
 
@@ -239,25 +239,25 @@ function PermissionConfigure() {
 
           <Field label="Assign Permissions">
             <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
-       {ACCESS_OPTIONS.map((group) => (
-  <div key={group.key}>
-    <h4 className="font-semibold">{group.label}</h4>
-    <div className="grid grid-cols-2 gap-2">
-      {group.actions.map((act) => (
-        <label key={act} className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            value={act}
-            checked={selectedAccess.includes(act)}
-            onChange={() => toggleAccess(act)}
-            className="accent-blue-600"
-          />
-          {act}
-        </label>
-      ))}
-    </div>
-  </div>
-))}
+              {ACCESS_OPTIONS.map((group) => (
+                <div key={group.key}>
+                  <h4 className="font-semibold">{group.label}</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {group.actions.map((act) => (
+                      <label key={act} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          value={act}
+                          checked={selectedAccess.includes(act)}
+                          onChange={() => toggleAccess(act)}
+                          className="accent-blue-600"
+                        />
+                        {act}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
 
             </div>
           </Field>
