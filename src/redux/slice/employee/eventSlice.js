@@ -32,7 +32,7 @@ export const createEvent = createAsyncThunk(
 
 export const viewEvent = createAsyncThunk(
   "event/view",
- async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+ async ({ page = 1, limit = 100 } = {}, { rejectWithValue }) => {
     
     try {
    

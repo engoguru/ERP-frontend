@@ -24,7 +24,7 @@ export const employeeCreate = createAsyncThunk(
 //  View Employees (with optional pagination: page & limit)
 export const viewEmployees = createAsyncThunk(
     "employee/view",
-    async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+    async ({ page = 1, limit = 100 } = {}, { rejectWithValue }) => {
         try {
             const response = await axios.get(`${base_URL}employee/view`, {
                 params: { page, limit },
