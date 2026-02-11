@@ -8,7 +8,7 @@ import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 
 function LeavesApply() {
   const dispatch = useDispatch();
-  
+
   const { leaves: allLeaveData, loading, error } = useSelector(
     (state) => state?.reducer?.leaves
   );
@@ -26,17 +26,17 @@ function LeavesApply() {
   });
 
 
-   // Grab state
-      const { employeeData, initialized } = useSelector(
-          (state) => state.reducer.login
-      );
-  
-      // Fetch employee details only if not initialized
-      useEffect(() => {
-          if (!initialized) {
-              dispatch(employeeDetails());
-          }
-      }, [dispatch, initialized]);
+  // Grab state
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+
+  // Fetch employee details only if not initialized
+  useEffect(() => {
+    if (!initialized) {
+      dispatch(employeeDetails());
+    }
+  }, [dispatch, initialized]);
   useEffect(() => {
     dispatch(viewLeave({ page, limit }));
   }, [dispatch, page, limit]);
@@ -97,7 +97,10 @@ function LeavesApply() {
                 <th className="p-3 text-left">Total Day</th>
                 <th className="p-3 text-left">Reason</th>
                 <th className="p-3 text-left">Status</th>
-              {employeeData?.role==="Admin" ||employeeData?.role==="HR" &&(<th className="p-3 text-left">Actions</th>)}  
+                {(employeeData?.role === "Admin" || employeeData?.role === "HR") && (
+                  <th className="p-3 text-left">Actions</th>
+                )}
+
               </tr>
             </thead>
             <tbody>
@@ -130,39 +133,44 @@ function LeavesApply() {
                     <td className="p-3">
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${leave.status === "Approved"
-                            ? "bg-green-100 text-green-700"
-                            : leave.status === "Reject"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700"
+                          ? "bg-green-100 text-green-700"
+                          : leave.status === "Reject"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-yellow-100 text-yellow-700"
                           }`}
                       >
                         {leave.status}
                       </span>
                     </td>
-                     {employeeData?.role==="Admin" ||employeeData?.role==="HR" &&(
-                    <td className="p-3 flex gap-2">
-                      <button
-                        onClick={() => handleView(leave._id)}
-                        className="p-1 hover:bg-gray-200 rounded"
-                        title="View"
-                      >
-                        <Eye size={16} />
-                      </button>
-                      <Link to={`/company/LeaveDetail/${leave._id}`}
-                        onClick={() => handleEdit(leave._id)}
-                        className="p-1 hover:bg-gray-200 rounded"
-                        title="Edit"
-                      >
-                        <Edit size={16} />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(leave._id)}
-                        className="p-1 hover:bg-gray-200 rounded"
-                        title="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>)}
+                    {(employeeData?.role === "Admin" || employeeData?.role === "HR") && (
+                      <td className="p-3 flex gap-2">
+                        <button
+                          onClick={() => handleView(leave._id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                          title="View"
+                        >
+                          <Eye size={16} />
+                        </button>
+
+                        <Link
+                          to={`/company/LeaveDetail/${leave._id}`}
+                          onClick={() => handleEdit(leave._id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                          title="Edit"
+                        >
+                          <Edit size={16} />
+                        </Link>
+
+                        <button
+                          onClick={() => handleDelete(leave._id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    )}
+
                   </tr>
                 ))
               )}
@@ -193,7 +201,7 @@ function LeavesApply() {
 
         {/* Modal */}
         {showModal && (
-    <div className="fixed inset-0 [background-color:rgba(0,0,0,0.678)] flex items-center justify-center z-50">
+          <div className="fixed inset-0 [background-color:rgba(0,0,0,0.678)] flex items-center justify-center z-50">
 
 
             <div className="bg-white p-6 rounded w-full max-w-md">

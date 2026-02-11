@@ -186,7 +186,7 @@ function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 lg:py-28 bg-gray-500 text-white text-center">
+      <section className="py-20 lg:py-28 bg-gray-500 text-white text-center mb-5">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform HR?</h2>
           <p className="text-lg max-w-2xl mx-auto mb-8">
@@ -209,10 +209,21 @@ function Home() {
         </div>
       </section>
 
+
+
+
+
+
+
+
+
+
+
+
       <Chatbot />
       <Footer />
     </div>
   );
 }
-
+ 
 export default Home;

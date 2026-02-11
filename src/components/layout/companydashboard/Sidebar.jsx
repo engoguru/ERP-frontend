@@ -96,7 +96,7 @@ function Sidebar({ isMobile }) {
               {companyDetailSpecific?.data?.companyLogo?.url ? (
                 <img src={companyDetailSpecific.data.companyLogo.url} alt="Company Logo" />
               ) : (
-                "CA"
+                "ERP"
               )}
             </span>
 

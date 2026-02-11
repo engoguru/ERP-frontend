@@ -86,6 +86,12 @@ function LeadUpdate() {
     ]);
     setSelectedEmployee("");
   };
+  const handleRemoveAssignment = (employeeId) => {
+    setAssignments((prev) =>
+      prev.filter((a) => a.assignedTo?._id !== employeeId)
+    );
+  };
+
   // console.log(followUps, "j")
   const handleSubmit = async () => {
     try {
@@ -105,14 +111,14 @@ function LeadUpdate() {
 
       await dispatch(updateLead({ id, data: payload })).unwrap();
       alert("Lead updated successfully!");
-      navigate(-1);
+      navigate(0);
     } catch (err) {
       console.error(err);
       alert("Update failed");
     }
   };
   const permissionArray = employeeData?.permissionArray;
-   const isAdmin =employeeData?.role === "Admin";
+  const isAdmin = employeeData?.role === "Admin";
 
   if (loading || !leadDetail) {
     return (
@@ -181,7 +187,7 @@ function LeadUpdate() {
         {/* Assignments */}
 
         <div>
-          <h3 className="font-semibold">Lead Assigned By You</h3>
+          <h3 className="font-semibold">Lead Assigned</h3>
           {(isAdmin || permissionArray.includes("ldEdit")) && (
             <div className="flex items-center gap-2 my-2">
               <select
@@ -208,8 +214,21 @@ function LeadUpdate() {
           {assignments.map((a, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
 
-              <p className="px-4 text-sm font-medium">To: {a.assignedTo?.name} ({a.assignedTo?.employeeCode})</p>
+              <p className="px-4 ">
+                <span className="text-sm font-medium">{a.assignedBy.name}</span>
+                <span className="font-bold px-5 text-xs"> : </span>
+                <span className="font-semibold text-sm">
+                  {a.assignedTo?.name} ({a.assignedTo?.employeeCode})
+                </span>
+              </p>
               <p className="px-4 text-sm font-medium">{new Date(a.assignedAt).toLocaleString()}</p>
+              <button
+                onClick={() => handleRemoveAssignment(a.assignedTo._id)}
+                className="text-xs text-red-600 hover:underline"
+              >
+                Remove
+              </button>
+
             </div>
           ))}
         </div>

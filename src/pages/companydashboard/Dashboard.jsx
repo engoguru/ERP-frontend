@@ -78,7 +78,7 @@ function Dashboard() {
                         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
                             <p className="text-gray-700 text-sm font-medium mb-3 border-b-2 ">Latest Joined Employees</p>
                             <ul className="space-y-2">
-                                {userData?.data?.monthlyEmployees?.slice(0, 5).map((emp, idx) => (
+                                {userData?.data?.monthlyEmployees?.slice(-5).map((emp, idx) => (
                                     <li key={idx} className="flex justify-between text-sm  font-medium text-gray-700 hover:text-red-700 hover:border-b hover:border-red-700">
 
                                         <span className="">

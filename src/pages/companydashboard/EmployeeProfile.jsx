@@ -161,8 +161,8 @@ function EmployeeProfile() {
 
                 <InfoItem icon={<Calendar size={18} className="text-[hsl(168,76%,42%)]" />} label="Joining Date" value={new Date(employee.dateOfJoining).toLocaleDateString()} />
                 <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="Qualification" value={employee.qualification} />
-                 <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="Blood Group" value={employee.bloodGroup} />
-                  <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="DOB" value={new Date(employee.dob).toLocaleDateString() }/>
+                <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="Blood Group" value={employee.bloodGroup} />
+                <InfoItem icon={<FileText size={18} className="text-[hsl(168,76%,42%)]" />} label="DOB" value={new Date(employee.dob).toLocaleDateString()} />
 
               </CardSection>
 
@@ -172,15 +172,15 @@ function EmployeeProfile() {
                 <InfoItem icon={<User size={18} className="text-[hsl(168,76%,42%)]" />} label="Mother Name" value={employee.motherName} />
                 <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Permanent Address" value={employee.permanentAddress} />
                 <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Local Address" value={employee.localAddress} />
-                 <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Emg. Contact Person Name" value={employee.localAddress} />
-                  <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Emg. contact" value={employee.emgContact.contact} />
-                  <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Relation-Ship" value={employee.emgContact.relation} />
+                <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Emg. Contact Person Name" value={employee.localAddress} />
+                <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Emg. contact" value={employee.emgContact.contact} />
+                <InfoItem icon={<Home size={18} className="text-[hsl(168,76%,42%)]" />} label="Relation-Ship" value={employee.emgContact.relation} />
               </CardSection>
 
               {/* Documents */}
               <CardSection title="Documents">
                 {/* Aadhar (multiple images) */}
-                {employee?.aadhar?.map((aadharDoc, index) => (
+                {/* {employee?.aadhar?.map((aadharDoc, index) => (
                   <img
                     key={`aadhar-${index}`}
                     src={aadharDoc.url}
@@ -188,10 +188,35 @@ function EmployeeProfile() {
                     className="w-full h-30 object-cover rounded-md shadow-sm mb-2"
                     onClick={() => setIsModalOpen(true)}
                   />
-                ))}
+                ))} */}
+                {employee?.aadhar?.map((aadharDoc, index) => {
+                  const isPdf = aadharDoc.public_id.toLowerCase().endsWith('.pdf');
+                  console.log(isPdf, "h")
+
+                  return isPdf ? (
+                    <object
+                      data={`${aadharDoc.url}#toolbar=0`}
+                      type="application/pdf"
+                      className="w-full h-60 rounded-md mb-2"
+                    >
+                      <p>
+                        PDF cannot be displayed. <a href={aadharDoc.url} target="_blank" rel="noopener noreferrer">Download PDF</a>
+                      </p>
+                    </object>
+                  ) : (
+                    <img
+                      key={`aadhar-${index}`}
+                      src={aadharDoc.url}
+                      alt={`Aadhar ${index + 1}`}
+                      className="w-full h-30 object-cover rounded-md shadow-sm mb-2"
+                      onClick={() => setIsModalOpen(true)}
+                    />
+                  );
+                })}
+
 
                 {/* PAN (multiple images) */}
-                {employee?.pan?.map((panDoc, index) => (
+                {/* {employee?.pan?.map((panDoc, index) => (
                   <img
                     key={`pan-${index}`}
                     src={panDoc.url}
@@ -199,7 +224,36 @@ function EmployeeProfile() {
                     className="w-full h-30 object-cover rounded-md shadow-sm mb-2"
                     onClick={() => setIsModalOpen(true)}
                   />
-                ))}
+                ))} */}
+                {employee?.pan?.map((panDoc, index) => {
+                  const isPdf = panDoc?.public_id?.toLowerCase().endsWith('.pdf');
+                  console.log(isPdf, "h");
+
+                  return isPdf ? (
+                    <object
+                      key={`pan-${index}`}
+                      data={`${panDoc.url}#toolbar=0`}
+                      type="application/pdf"
+                      className="w-full h-60 rounded-md mb-2 "
+                    >
+                      <p>
+                        PDF cannot be displayed.{" "}
+                        <a href={panDoc.url} target="_blank" rel="noopener noreferrer">
+                          Download PDF
+                        </a>
+                      </p>
+                    </object>
+                  ) : (
+                    <img
+                      key={`pan-${index}`}
+                      src={panDoc.url}
+                      alt={`PAN ${index + 1}`}
+                      className="w-full h-30 object-cover rounded-md shadow-sm mb-2"
+                      onClick={() => setIsModalOpen(true)}
+                    />
+                  );
+                })}
+
               </CardSection>
 
             </div>
@@ -221,19 +275,19 @@ function EmployeeProfile() {
       </div>
 
 
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <div
           className="fixed inset-0 bg-[rgba(0,0,0,0.85)] flex items-center justify-center z-50"
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="relative max-w-3xl w-full p-1"
+            className="relative max-w-3xl w-3/5 p-1"
             onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
           >
             <img
               src={employee.profilePic?.url || "/default-avatar.png"}
               alt={employee.name}
-              className="w-full h-auto rounded-lg shadow-lg"
+              className="w-4/5 h-[80%] rounded-lg shadow-lg"
             />
             <button
               onClick={() => setIsModalOpen(false)}
@@ -243,7 +297,32 @@ function EmployeeProfile() {
             </button>
           </div>
         </div>
+      )} */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/85 flex items-center justify-center z-50"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="relative flex items-center justify-center w-full h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={employee.profilePic?.url || "/default-avatar.png"}
+              alt={employee.name}
+              className="w-[80%] max-h-[90vh] object-contain rounded-lg shadow-lg"
+            />
+
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-6 right-6 text-white bg-black/60 rounded-full px-3 py-1 text-xl hover:bg-black transition"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
       )}
+
 
     </CompanyLayout>
   );

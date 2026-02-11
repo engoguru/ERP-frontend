@@ -175,7 +175,7 @@ function Register() {
 };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-400">
       {/* Header */}
       <section className="py-20 bg-[#1b365d] text-white text-center">
         <h1 className="text-4xl md:text-5xl font-bold font-display">Company Registration</h1>
@@ -183,7 +183,7 @@ function Register() {
       </section>
 
       <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4"> 
           <div className="bg-white rounded-2xl shadow-xl p-8 space-y-8">
             {/* ---------------- Company Info ---------------- */}
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -194,7 +194,7 @@ function Register() {
               <div className="flex flex-col">
                 <label className="text-sm mb-1">Company Name</label>
                 <input
-                  className="input w-full border border-gray-400"
+                  className="input w-full border border-gray-400 py-1 px-2 rounded-lg"
                   value={companyData.companyName}
                   onChange={e => handleCompanyChange("companyName", e.target.value)}
                 />
@@ -203,7 +203,8 @@ function Register() {
               <div className="flex flex-col">
                 <label className="text-sm mb-1">Registration Number</label>
                 <input
-                  className="input w-full border border-gray-400"
+                    
+                  className="input w-full border border-gray-400 py-1 px-2 rounded-lg"
                   value={companyData.registrationNumber}
                   onChange={e => handleCompanyChange("registrationNumber", e.target.value)}
                 />
@@ -213,7 +214,7 @@ function Register() {
                 <label className="text-sm mb-1">Registration Date</label>
                 <input
                   type="date"
-                  className="input w-full border border-gray-400"
+                  className="input w-full border border-gray-400 py-1 px-2 rounded-lg"
                   value={companyData.registrationDate}
                   onChange={e => handleCompanyChange("registrationDate", e.target.value)}
                 />
@@ -222,7 +223,7 @@ function Register() {
               <div className="flex flex-col">
                 <label className="text-sm mb-1">GST Number</label>
                 <input
-                  className="input w-full border border-gray-400"
+                  className="input w-full border border-gray-400 py-1 px-2 rounded-lg"
                   value={companyData.gstNumber}
                   onChange={e => handleCompanyChange("gstNumber", e.target.value)}
                 />
@@ -233,7 +234,7 @@ function Register() {
                 <input
                   type="file"
                   multiple
-                  className="input w-full border border-gray-400"
+                  className="input w-full border border-gray-400 py-1 px-2 rounded-lg"
                   onChange={e => handlePanUpload(e.target.files)}
                 />
               </div>
@@ -242,7 +243,7 @@ function Register() {
                 <label className="text-sm mb-1">Company Logo</label>
                 <input
                   type="file"
-                  className="input w-full border border-gray-400"
+                  className="input w-full border border-gray-400 py-1 px-2 rounded-lg"
                   onChange={e => handleLogoUpload(e.target.files[0])}
                 />
               </div>
@@ -252,17 +253,17 @@ function Register() {
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-4">Branches</h3>
               {companyData.companyBranch.map((branch, index) => (
-                <div key={index} className="border p-4 rounded mb-4 space-y-2">
+                <div key={index} className="border border-gray-400 p-8 rounded-xl mb-4 space-y-2">
                   <div className="grid md:grid-cols-2 gap-4">
                     <input
-                      className="input w-full border"
+                      className="input w-full border py-1 px-2 rounded-lg"
                       placeholder="Branch Nickname"
                       value={branch.nickName}
                       onChange={e => handleBranchChange(index, "nickName", e.target.value)}
                     />
 
                     <input
-                      className="input w-full border"
+                      className="input w-full border py-1 px-2 rounded-lg"
                       placeholder="Address"
                       value={branch.address}
                       onChange={e => handleBranchChange(index, "address", e.target.value)}
@@ -275,16 +276,16 @@ function Register() {
                       <label className="text-sm">Phone</label>
                       <div className="flex gap-2">
                         <input
-                          className="input flex-1 border"
+                          className="input flex-1 border py-1 px-2 rounded-lg"
                           value={branch.companyPhone.phone}
                           onChange={e => handleBranchPhone(index, e.target.value)}
                         />
                         {!branchVerified[index].phone && (
                           <button
-                            className="btn-outline"
+                            className="btn-outline flex flex-row gap-2 px-2 my-2 hover:bg-red-700 hover:text-white rounded-lg border border-red-400 "
                             onClick={() => sendOtp(index, "phone")}
                           >
-                            <Phone size={16} /> OTP
+                            <Phone size={16} className="my-1" /> OTP
                           </button>
                         )}
                       </div>
@@ -308,16 +309,16 @@ function Register() {
                       <label className="text-sm">Email</label>
                       <div className="flex gap-2">
                         <input
-                          className="input flex-1 border"
+                          className="input flex-1 border py-1 px-2 rounded-lg"
                           value={branch.companyEmail.email}
                           onChange={e => handleBranchEmail(index, e.target.value)}
                         />
                         {!branchVerified[index].email && (
                           <button
-                            className="btn-outline"
+                            className="btn-outline flex flex-row gap-2 px-1 my-2 border rounded-lg border-red-400 hover:bg-red-700 hover:text-white"
                             onClick={() => sendOtp(index, "email")}
                           >
-                            <Mail size={16} /> OTP
+                            <Mail size={16} className="my-1" /> OTP
                           </button>
                         )}
                       </div>
@@ -342,7 +343,7 @@ function Register() {
                     {Object.keys(branch.companyWebUrl).map(key => (
                       <input
                         key={key}
-                        className="input w-full border"
+                        className="input w-full border py-1 px-2 rounded-lg"
                         placeholder={key}
                         value={branch.companyWebUrl[key]}
                         onChange={e => handleBranchWebUrl(index, key, e.target.value)}
@@ -352,7 +353,7 @@ function Register() {
 
                   <div className="flex justify-end mt-2">
                     {index > 0 && (
-                      <button className="btn-outline" onClick={() => removeBranch(index)}>
+                      <button className="btn-outline btn-outline border bg-red-700 text-white px-3 py-1 rounded-xl hover:bg-red-500" onClick={() => removeBranch(index)}>
                         Remove Branch
                       </button>
                     )}
@@ -360,16 +361,16 @@ function Register() {
                 </div>
               ))}
 
-              <button className="btn-outline" onClick={addBranch}>
+              <button className="btn-outline border bg-green-700 text-white px-3 py-1 rounded-xl hover:bg-green-500" onClick={addBranch}>
                 Add Branch
               </button>
             </div>
 
             <button
-              className="btn-primary w-full mt-6"
+              className=" w-2/6 py-2 mt-6 mx-10 btn-outline border bg-green-700 text-white  rounded-xl hover:bg-green-500"
               onClick={submitCompany}
             >
-              Submit Company Registration
+              Submit Registration
             </button>
           </div>
         </div>

@@ -54,7 +54,7 @@ function PrivacyPolicy() {
                     Introduction
                   </h2>
                   <p className="text-gray-600 leading-relaxed text-start">
-                    This Privacy Policy explains how <strong>CA Services</strong>{" "}
+                    This Privacy Policy explains how <strong>ERP Services</strong>{" "}
                     collects, uses, and protects your personal information.
                   </p>
                 </div>
