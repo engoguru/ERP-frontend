@@ -79,13 +79,13 @@ const HandleLogout = async (e) => {
           {/* Right controls */}
           <div className="flex items-center gap-3">
             {/* Search */}
-            <div className="hidden md:flex items-center relative">
+            {/* <div className="hidden md:flex items-center relative">
               <Search className="absolute left-3 w-4 h-4 text-[hsl(168_76%_42%)]" />
               <input
                 placeholder="Search..."
                 className="pl-10 pr-3 py-2 text-sm rounded-md border border-[hsl(168_76%_42%)] focus:outline-none focus:ring-[hsl(168_76%_42%)]"
               />
-            </div>
+            </div> */}
 
             {/* Notifications */}
             <button className="relative p-2 rounded-md hover:bg-secondary">

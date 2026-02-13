@@ -166,11 +166,11 @@ function EventMain() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 text-left">Event Name</th>
-                <th className="px-4 py-3">Start Date</th>
-                <th className="px-4 py-3">End Date</th>
-                <th className="px-4 py-3 text-center">Total Days</th>
-                <th className="px-4 py-3">Description</th>
+                <th className="px-4 py-3 text-start">Event Name</th>
+                <th className="px-4 py-3 text-start">Start Date</th>
+                <th className="px-4 py-3 text-start">End Date</th>
+                <th className="px-4 py-3 text-start">Total Days</th>
+                <th className="px-4 py-3 text-start">Description</th>
               </tr>
             </thead>
             <tbody>
@@ -184,11 +184,11 @@ function EventMain() {
                 </tr>
               ) : (
                 filteredEvents.map((event) => (
-                  <tr key={event._id || event.id} className="border-t hover:bg-gray-50">
+                  <tr key={event._id || event.id} className="border-t hover:bg-gray-50 text-start">
                     <td className="px-4 py-3 font-medium">{event.eventName}</td>
                     <td className="px-4 py-3">{new Date(event.startDate).toISOString().split("T")[0]}</td>
                     <td className="px-4 py-3">{new Date(event.endDate).toISOString().split("T")[0]}</td>
-                    <td className="px-4 py-3 text-center">{event.totaldays}</td>
+                    <td className="px-4 py-3 ">{event.totaldays}</td>
                     <td className="px-4 py-3">{event.description}</td>
                   </tr>
                 ))

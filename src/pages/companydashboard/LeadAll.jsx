@@ -153,7 +153,7 @@ function LeadAll() {
             <thead className="bg-gray-50 text-left">
               <tr>
                 {/* dynamic headers */}
-                {leadSchema.map((field) => (
+                {leadSchema?.map((field) => (
                   <th key={field.fieldKey} className="px-4 py-3">
                     {field.label}
                   </th>
@@ -164,21 +164,21 @@ function LeadAll() {
               </tr>
             </thead>
             <tbody>
-              {filteredLeads.length === 0 ? (
+              {filteredLeads?.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={leadSchema.length + 2}
+                    colSpan={leadSchema?.length + 2}
                     className="px-4 py-6 text-center text-gray-400"
                   >
                     No leads found
                   </td>
                 </tr>
               ) : (
-                filteredLeads.map((lead) => {
+                filteredLeads?.map((lead) => {
                   const fieldValues = lead.fields || {};
                   return (
                     <tr key={lead._id} className="border-t hover:bg-gray-50">
-                      {leadSchema.map((field) => (
+                      {leadSchema?.map((field) => (
                         <td key={field.fieldKey} className="px-4 py-3">
                           {fieldValues[field.fieldKey] ?? "-"}
                         </td>

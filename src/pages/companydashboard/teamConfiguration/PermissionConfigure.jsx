@@ -169,7 +169,7 @@ function PermissionConfigure() {
 
       // Dispatch the update async thunk
       const resultAction = await dispatch(companyConfiguresUpdate(data)).unwrap();;
-      console.log(resultAction)
+      // console.log(resultAction)
       // You can unwrap the result to check if it succeeded
       if (resultAction.success) {
         alert("Permissions saved successfully!");

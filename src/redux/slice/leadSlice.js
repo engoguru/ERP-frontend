@@ -9,7 +9,7 @@ export const createLead = createAsyncThunk(
   "lead/create",
   async (leadData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${base_URL}lead/create`, leadData, {
+      const response = await axios.post(`${base_URL}lead/createInside`, leadData, {
         withCredentials: true,
       });
       return response.data;

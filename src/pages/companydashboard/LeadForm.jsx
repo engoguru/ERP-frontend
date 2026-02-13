@@ -4,10 +4,12 @@ import CompanyLayout from "../../components/layout/companydashboard/CompanyLayou
 import { useDispatch, useSelector } from "react-redux";
 import { companyConfiguresView } from "../../redux/slice/companySlice";
 import { createLead } from "../../redux/slice/leadSlice";
+import { useNavigate } from "react-router-dom";
 
 const HIDDEN_FIELDS = ["status"]; // 👈 hide Status from UI
 
 function LeadForm() {
+  const navigate=useNavigate()
   const dispatch = useDispatch();
   const { companyConfigureViewData } = useSelector(
     (state) => state.reducer.company
@@ -35,7 +37,8 @@ function LeadForm() {
     try {
       await dispatch(createLead(formData)).unwrap();
       alert("Lead created successfully");
-      setFormData({});
+      setFormData();
+      navigate("/company/leadall")
     } catch (err) {
       alert("Failed to create lead");
       console.error(err);
@@ -102,8 +105,7 @@ function LeadForm() {
             <h2 className="text-xl font-bold mb-6 text-center">Create Lead</h2>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {leadSchema
-                .filter(
+              {leadSchema?.filter(
                   (field) =>
                     !HIDDEN_FIELDS.includes(field.fieldKey?.toLowerCase())
                 )
@@ -135,7 +137,7 @@ function LeadForm() {
                     ) : field.type === "textarea" ? (
                       <textarea
                         className="w-full border p-2 rounded"
-                        value={formData[field.fieldKey] || ""}
+                        value={formData[field?.fieldKey] || ""}
                         onChange={(e) =>
                           handleChange(field.fieldKey, e.target.value)
                         }
@@ -145,7 +147,7 @@ function LeadForm() {
                       <input
                         type={field.type || "text"}
                         className="w-full border p-2 rounded"
-                        value={formData[field.fieldKey] || ""}
+                        value={formData[field?.fieldKey] || ""}
                         onChange={(e) =>
                           handleChange(field.fieldKey, e.target.value)
                         }

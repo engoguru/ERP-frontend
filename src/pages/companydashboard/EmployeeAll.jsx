@@ -72,7 +72,7 @@ function EmployeeAll() {
           {/* Add Employee Button */}
           {(isAdmin || permissionArray.includes("empCreate")) && (<button
             onClick={() => navigate("/company/employe/create")}
-            className="flex items-center text-md gap-2 px-2 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="flex items-center text-md gap-2 px-2 py-1 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-lg hover:text-gray-300"
           >
             <Plus size={15} /> Add Employee
           </button>)}
@@ -87,17 +87,17 @@ function EmployeeAll() {
             placeholder="Search by name, code, email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="p-2 border rounded w-full md:w-1/3"
+            className="p-1 border rounded w-full md:w-1/3"
           />
 
-          <div className="flex gap-4 text-sm font-bold">
+          <div className="flex gap-4 text-sm font-semibold">
 
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="p-2 border rounded"
+              className="p-1 border rounded"
             >
-              <option value="" className="font-semibold">All Departments</option>
+              <option value="" className="font-semibold">Select Department</option>
               {companyConfigureViewData?.data?.roles.map((dept) => (
                 <option key={dept._id} value={dept.department}>{dept.department}</option>
               ))}
@@ -108,9 +108,9 @@ function EmployeeAll() {
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="p-2 border rounded"
+                className="p-1 border rounded"
               >
-                <option value="">All Roles</option>
+                <option value="">Select Role</option>
 
                 {companyConfigureViewData?.data?.roles
                   ?.find((dept) => dept.department === departmentFilter)
@@ -137,10 +137,11 @@ function EmployeeAll() {
           <div className="overflow-x-auto">
             <table className="min-w-full  border-collapse text-start">
               <thead>
-                <tr className="bg-blue-500 text-white ">
+                <tr className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white  ">
                   {/* <th className="px-4 py-2">Name</th> */}
+                   <th className="px-2 text-start py-2">Emp Code</th>
                   <th className="px-2 text-start py-2">Name</th>
-                  <th className="px-2 text-start py-2">Emp Code</th>
+                 
                   <th className="px-2 text-start py-2">Department</th>
                   <th className="px-2 text-start py-2">Role</th>
                   <th className="px-2 text-start py-2">Email</th>
@@ -153,15 +154,16 @@ function EmployeeAll() {
                 {filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp) => (
                     <tr key={emp._id} className="border-b hover:bg-gray-50">
+                       <td className="px-2 py-2 text-xs font-medium">{emp.employeeCode}</td>
                       <td className="px-2 py-2 text-xs font-medium">{emp.name}</td>
-                      <td className="px-2 py-2 text-xs font-medium">{emp.employeeCode}</td>
+                     
                       <td className="px-2 py-2 text-xs font-medium">{emp.department}</td>
                       <td className="px-2 py-2 text-xs font-medium" >{emp.role}</td>
                       <td className="px-2 py-2 text-xs font-medium">{emp.employeeEmail?.email}</td>
                       <td className="px-2 py-2 text-xs font-medium">{emp.employeeContact?.contact}</td>
                       <td className="px-2 py-2 text-xs font-medium">{emp.status}</td>
                       <td className="px-4 py-2 flex gap-2">
-                        {(isAdmin || permissionArray.includes("empCreate")) && (<button className="p-2 bg-green-500 text-white rounded hover:bg-green-600">
+                        {(isAdmin || permissionArray.includes("empCreate")) && (<button className="p-2 bg-emerald-700 text-white rounded hover:bg-green-600">
                           <Link to={`/company/employe/profile/${emp._id}`}>
                             <Eye size={18} />
                           </Link>

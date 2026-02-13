@@ -70,12 +70,12 @@ function AttendanceAll() {
           <table className="w-full text-sm text-gray-700 border-collapse">
             <thead className="bg-gray-50 text-gray-600 text-left">
               <tr>
-                <th className="px-4 py-3">Emp Code</th>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Department</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3 text-center">Action</th>
+                <th className="px-4 py-3 text-start">Emp Code</th>
+                <th className="px-4 py-3 text-start">Name</th>
+                <th className="px-4 py-3 text-start">Status</th>
+                <th className="px-4 py-3 text-start">Department</th>
+                <th className="px-4 py-3 text-start">Role</th>
+                <th className="px-4 py-3 ">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -93,7 +93,7 @@ function AttendanceAll() {
                 </tr>
               ) : (
                 filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="border-t hover:bg-gray-50">
+                  <tr key={emp.id} className="border-t hover:bg-gray-50 text-start">
                     <td className="px-4 py-3 font-medium">{emp.employeeCode}</td>
                     <td className="px-4 py-3">{emp.name}</td>
                     <td className="px-4 py-3">

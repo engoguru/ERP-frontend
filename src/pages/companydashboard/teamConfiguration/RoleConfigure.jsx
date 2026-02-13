@@ -4,7 +4,7 @@ import { Building2, PlusCircle, Shield, Trash2, Save, Check } from "lucide-react
 import { useDispatch, useSelector } from "react-redux";
 import { companyConfigures, companyConfiguresUpdate, companyConfiguresView } from "../../../redux/slice/companySlice";
 import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
-
+import { useNavigate } from "react-router-dom";
 const Field = ({ label, icon, children }) => (
   <div>
     <label className="flex items-center gap-1 text-sm font-medium text-gray-600 mb-1">
@@ -16,6 +16,7 @@ const Field = ({ label, icon, children }) => (
 );
 
 function RoleConfigure() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
 
@@ -30,23 +31,28 @@ function RoleConfigure() {
 
   }, [dispatch]);
   // console.log(companyConfigureViewData,"fjb")
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const payload = {
-    roles: departments.map(({ locked, ...rest }) => rest),
+    const payload = {
+      roles: departments.map(({ locked, ...rest }) => rest),
+    };
+
+    try {
+      await dispatch(companyConfiguresUpdate(payload)).unwrap(); // RTK best practice
+      alert("Config saved!");
+
+      // clear / reset state
+      setDepartments([]); // or initialDepartments
+
+
+
+
+      navigate(0);
+    } catch (err) {
+      console.error(err);
+    }
   };
-
-  try {
-    await dispatch(companyConfiguresUpdate(payload)).unwrap(); // RTK best practice
-    alert("Config saved!");
-
-    // clear / reset state
-    setDepartments([]); // or initialDepartments
-  } catch (err) {
-    console.error(err);
-  }
-};
 
   // Fetch employee details only if not initialized
 
@@ -68,11 +74,11 @@ const handleSubmit = async (e) => {
   const createDepartment = () => {
     if (!departmentName.trim()) return alert("Enter department name");
 
-    const exists = departments.some(
-      (d) => d.department.toLowerCase() === departmentName.trim().toLowerCase()
-    );
+    // const exists = departments.some(
+    //   (d) => d.department.toLowerCase() === departmentName.trim().toLowerCase()
+    // );
 
-    if (exists) return alert("Department already exists");
+    // if (exists) return alert("Department already exists");
 
     const newDept = {
       department: departmentName.trim(),
@@ -138,6 +144,9 @@ const handleSubmit = async (e) => {
     try {
       await dispatch(companyConfigures(payload)).unwrap();
       alert("Configuration saved successfully!");
+      
+
+      navigate(0);
     } catch (err) {
       console.log(err, "oo")
       alert("Failed to save configuration");
@@ -166,10 +175,18 @@ const handleSubmit = async (e) => {
               <div className="flex gap-3 mt-2">
                 <input
                   className="input"
+                  list="deparmentList"
                   placeholder="e.g. HR, IT"
                   value={departmentName}
                   onChange={(e) => setDepartmentName(e.target.value)}
                 />
+                <datalist id="deparmentList">
+                  {companyConfigureViewData?.data?.roles.map((dept) => (
+                    <option key={dept._id} value={dept.department} />
+                    //  <option key={dept.id} value={dept.name} />
+                  ))}
+                </datalist>
+
                 <button className="btn-primary" onClick={createDepartment}>
                   <PlusCircle size={16} /> Add
                 </button>
@@ -188,10 +205,19 @@ const handleSubmit = async (e) => {
               <div className="flex gap-3 mt-2">
                 <input
                   className="input"
+                  list="roleList"
                   placeholder="e.g. Manager"
                   value={roleName}
                   onChange={(e) => setRoleName(e.target.value)}
                 />
+                <datalist id="roleList">
+                  {companyConfigureViewData?.data?.roles
+                    ?.find((dept) => dept.department === currentDept.department)
+                    ?.roles?.map((role) => (
+                      <option key={role} value={role} />
+
+                    ))}
+                </datalist>
                 <button className="btn-primary" onClick={addRole}>
                   <PlusCircle size={16} /> Add Role
                 </button>
@@ -226,7 +252,6 @@ const handleSubmit = async (e) => {
           </div>
         )}
 
-        {/* ===== SAVE ALL ===== */}
         {/* ===== SAVE ALL ===== */}
         {!currentDept && departments.length > 1 && (
           <div className="text-right">

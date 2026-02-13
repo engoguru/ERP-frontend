@@ -15,11 +15,11 @@ function AttendanceProfile({ shiftDetail }) {
 
 /* StatCard component for consistency */
 const StatCard = ({ title, value, icon }) => (
-  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-5 rounded-xl shadow hover:shadow-md transition flex items-center gap-3">
-    {icon && <div className="text-emerald-600">{icon}</div>}
+  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-5 rounded-xl shadow-xl shadow-emerald-800/40 hover:shadow-md transition flex items-center gap-3">
+    {icon && <div className="text-emerald-900">{icon}</div>}
     <div>
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-bold text-emerald-600">{value ?? "—"}</p>
+      <p className="text-sm font-medium text-gray-800">{title}</p>
+      <p className="text-xl font-bold text-emerald-900">{value ?? "—"}</p>
     </div>
   </div>
 );

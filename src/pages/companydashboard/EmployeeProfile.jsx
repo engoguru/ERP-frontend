@@ -19,6 +19,7 @@ import {
 import PayrollProfile from "./payroll/PayrollProfile";
 import AttendanceProfile from "./attendance/AttendanceProfile";
 import LeavesProfile from "./leaves/LeavesProfile";
+import { companyConfiguresView } from "../../redux/slice/companySlice";
 
 function EmployeeProfile() {
   const dispatch = useDispatch();
@@ -30,12 +31,19 @@ function EmployeeProfile() {
     (state) => state.reducer.employee
   );
 
+  const { companyConfigureViewData } = useSelector((state) => state?.reducer?.company);
+
+
+  useEffect(() => {
+    dispatch(companyConfiguresView());
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(viewEmployeesProfile(employeeId));
   }, [dispatch, employeeId]);
 
 
-  console.log(employee)
+  // console.log(companyConfigureViewData)
   const tabs = ["Profile", "Leaves", "Attendance", "Payroll"];
 
   if (loading)
@@ -70,7 +78,7 @@ function EmployeeProfile() {
       <div className="max-w-7xl mx-auto px-6 py-4 space-y-5">
 
         {/* ===== HEADER ===== */}
-        <div className="relative bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl p-8 shadow-lg flex flex-col md:flex-row items-center gap-6">
+        <div className="relative bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-xl p-8 shadow-lg flex flex-col md:flex-row items-center gap-6">
 
           {/* Left: Profile pic + info */}
           <div className="flex items-center gap-6">
@@ -86,9 +94,9 @@ function EmployeeProfile() {
             {/* Name & Status */}
             <div className="space-y-2">
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-3xl font-bold">{employee.name}</h1>
+                <h1 className="text-2xl font-bold">{employee.name}</h1>
                 <span
-                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${employee.status === "ACTIVE"
+                  className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${employee.status === "ACTIVE"
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800"
                     }`}
@@ -102,19 +110,19 @@ function EmployeeProfile() {
                   {employee.status}
                 </span>
               </div>
-              <p className="opacity-90">{employee.role} • {employee.department}</p>
-              <p className="mt-1 text-sm flex items-center gap-2">
-                <FileText size={18} /> Qualification: <span className="font-medium">{employee.qualification}</span>
+              <p className="opacity-90 text-xs font-medium">{employee.role} • {employee.department}</p>
+              <p className="mt-1 text-sm flex items-center gap-2 text-xs font-medium">
+                <FileText size={18} /> Qualification : <span className="font-medium">{employee.qualification}</span>
               </p>
-              <p className="mt-1 text-sm">
-                Father: <span className="font-medium">{employee.fatherName}</span> • Mother: <span className="font-medium">{employee.motherName}</span>
+              <p className="mt-1 text-sm text-sm font-medium">
+                Father Name : <span className="font-medium">{employee.fatherName}</span> • Mother Name : <span className="font-medium">{employee.motherName}</span>
               </p>
             </div>
           </div>
 
           {/* Right: Employee Code */}
-          <p className="absolute right-6  -mt-36 text-sm opacity-90 font-semibold bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md">
-            Employee Code: {employee.employeeCode}
+          <p className="absolute right-6   text-sm opacity-90 font-semibold bg-white text-gray-800 px-4 py-0 rounded-lg shadow-md">
+            {employee.employeeCode}
           </p>
         </div>
 
@@ -124,9 +132,9 @@ function EmployeeProfile() {
             <button
               key={idx}
               onClick={() => setActiveTab(idx)}
-              className={`px-6 py-2 rounded-full font-semibold transition ${activeTab === idx
-                ? "bg-emerald-500 text-white shadow-md scale-105"
-                : "bg-gray-100 text-gray-700 hover:bg-emerald-500 hover:text-white"
+              className={`px-5 border-2  py-1 rounded-full font-semibold transition ${activeTab === idx
+                ? "bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md scale-105"
+                : "bg-gray-100 border-emerald-700 text-gray-700 hover:bg-emerald-900 hover:text-white"
                 }`}
             >
               {tab}
@@ -135,7 +143,7 @@ function EmployeeProfile() {
         </div>
 
         {/* ===== CONTENT ===== */}
-        <div className="bg-white rounded-xl shadow border p-6 space-y-6">
+        <div className="bg-white rounded-xl shadow border border-gray-400 p-6 space-y-6">
 
           {/* PROFILE TAB */}
           {activeTab === 0 && (
@@ -260,7 +268,7 @@ function EmployeeProfile() {
           )}
 
           {/* LEAVES TAB */}
-          {activeTab === 1 && <LeavesProfile balanceLeave={employee.balanceLeave} />}
+          {activeTab === 1 && <LeavesProfile balanceLeave={companyConfigureViewData.data.holiday} />}
 
           {/* ATTENDANCE TAB */}
           {activeTab === 2 && <AttendanceProfile shiftDetail={employee.shiftDetail} />}
@@ -340,8 +348,8 @@ const InfoItem = ({ icon, label, value }) => (
   <div className="flex items-center gap-3">
     {icon && <div className="text-gray-400 ">{icon}</div>}
     <div className="mt-4">
-      <p className="text-sm text-start text-gray-500">{label}</p>
-      <p className="font-normal text-gray-800">{value || "—"}</p>
+      <p className="text-xs text-start text-gray-500">{label}</p>
+      <p className="font-normal text-sm font-medium text-gray-800">{value || "—"}</p>
     </div>
   </div>
 );
