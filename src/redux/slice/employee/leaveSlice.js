@@ -47,11 +47,11 @@ export const viewOneLeave = createAsyncThunk(
     "leave/viewOneLeave",
     async (employeeId, { rejectWithValue }) => {
         try {
-            // console.log(employeeId)
+            console.log(employeeId)
             const response = await axios.get(`${base_URL}leaves/view/${employeeId}`, {
                 withCredentials: true
             });
-            // console.log(response,"v")
+            console.log(response,"v")
             return response.data;
         } catch (error) {
             return rejectWithValue(
@@ -64,6 +64,7 @@ export const viewOneLeave = createAsyncThunk(
 export const updateLeave = createAsyncThunk(
   "leaves/updateLeave",
   async ({ id, status }, { rejectWithValue }) => {
+    console.log(status,"oioi")
     try {
       const response = await axios.put(
         `${base_URL}leaves/update/${id}`,

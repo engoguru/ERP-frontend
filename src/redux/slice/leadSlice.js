@@ -22,14 +22,32 @@ export const createLead = createAsyncThunk(
 );
 
 // Fetch All Leads
+// export const fetchLeads = createAsyncThunk(
+//   "lead/fetchAll",
+//   async (_, { rejectWithValue }) => {
+//     try {
+//       const response = await axios.get(`${base_URL}lead/view`, {
+//         withCredentials: true,
+//       });
+//     //   console.log(response,"ll")
+//       return response.data;
+//     } catch (error) {
+//       const message =
+//         error.response?.data?.message || error.message || "Failed to fetch leads";
+//       return rejectWithValue(message);
+//     }
+//   }
+// );
+
 export const fetchLeads = createAsyncThunk(
   "lead/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${base_URL}lead/view`, {
+        params,
         withCredentials: true,
       });
-    //   console.log(response,"ll")
+
       return response.data;
     } catch (error) {
       const message =
@@ -38,6 +56,7 @@ export const fetchLeads = createAsyncThunk(
     }
   }
 );
+
 
 // Fetch Single Lead by ID
 export const fetchOneLead = createAsyncThunk(
@@ -140,6 +159,9 @@ const leadSlice = createSlice({
       .addCase(fetchLeads.fulfilled, (state, action) => {
         state.loading = false;
         state.leadAll = action.payload.data || [];
+        state.total = action.payload.total;
+      state.totalPages = action.payload.totalPages;
+      state.page = action.payload.page;
       })
       .addCase(fetchLeads.rejected, (state, action) => {
         state.loading = false;
