@@ -168,7 +168,7 @@ function LeadUpdate() {
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-md  font-semibold text-gray-800">
                 Confirmed Services 
-                 {(isAdmin || permissionArray.includes("ldAssign")) && (
+                 {(isAdmin || permissionArray.includes("ldassign")) && (
                  <span className="text-xs ps-2 font-bold text-red-500 cursor-pointer" onClick={() => setOpenModal(true)}>
                   Add New</span>)}
               </h2>
