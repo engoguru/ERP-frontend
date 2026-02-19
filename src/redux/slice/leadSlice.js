@@ -111,10 +111,30 @@ export const deleteLead = createAsyncThunk(
   }
 );
 
+// bulk Assign
+
+export const bulkAssign = createAsyncThunk(
+  "lead/bulkAssign",
+  async ({ leadIds, assignedTo }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${base_URL}lead/assign`, { leadIds, assignedTo }, {
+        withCredentials: true,
+      });
+      console.log(response, "gghrthgehgf")
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || "Lead deletion failed";
+      return rejectWithValue(message);
+    }
+  })
+
+
 const initialState = {
   leadCreated: null,
   leadAll: [],
   leadDetail: null,
+  bulklead: null,
   loading: false,
   error: null,
   success: false,
@@ -160,8 +180,8 @@ const leadSlice = createSlice({
         state.loading = false;
         state.leadAll = action.payload.data || [];
         state.total = action.payload.total;
-      state.totalPages = action.payload.totalPages;
-      state.page = action.payload.page;
+        state.totalPages = action.payload.totalPages;
+        state.page = action.payload.page;
       })
       .addCase(fetchLeads.rejected, (state, action) => {
         state.loading = false;
@@ -208,7 +228,22 @@ const leadSlice = createSlice({
       .addCase(deleteLead.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+
+
+      // DELETE LEAD
+      .addCase(bulkAssign.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(bulkAssign.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bulklead = action.payload.data;
+      })
+      .addCase(bulkAssign.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      ;
   },
 });
 

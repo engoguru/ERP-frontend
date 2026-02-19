@@ -74,7 +74,7 @@ function Dashboard() {
                             <p className="text-gray-400 mt-1 text-sm">Compared to last month</p>
                         </div>
 
-                        {/* Latest Employees */}
+                        {/* latest employee list based on the current month*/}
                         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
                             <p className="text-gray-700 text-sm font-medium mb-3 border-b-2 ">Latest Joined Employees</p>
                             <ul className="space-y-2">
@@ -94,7 +94,7 @@ function Dashboard() {
                             </ul>
                         </div>
                     </div>
-                </section>
+                </section> 
 
                 {/* ====== SECTION 2: LEADS ====== */}
                 {employeeData?.role !== "HR" && (

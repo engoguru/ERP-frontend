@@ -137,9 +137,10 @@ function LeadUpdate() {
                     value={value}
                     onChange={e => handleFieldChange(key, e.target.value)}
                     className="w-full border rounded px-2 py-1"
+                    disabled={value === "Confirmed" && !isAdmin}
                   >
-                    <option value="">Select {field.label || key}</option>
-                    {(isAdmin || permissionArray.includes("ldEdit")) &&
+                    {value === "Confirmed" ? <option value="">{value}</option> : <option value="">Select {field.label || key}</option>}
+                    {value !== "Confirmed" && (isAdmin || permissionArray.includes("ldEdit")) &&
                       field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                   </select>
                 </div>
@@ -160,103 +161,106 @@ function LeadUpdate() {
           })}
         </div>
 
-{leadDetail?.fields?.status === "Confirmed" && (
-  <div className="bg-white shadow-md rounded-lg p-4 mt-6">
+        {leadDetail?.fields?.status === "Confirmed" && (
+          <div className="bg-white shadow-md rounded-lg p-4 mt-6">
 
-    {/* Heading */}
-    <div className="mb-4 flex items-center justify-between">
-      <h2 className="text-lg font-semibold text-gray-800">
-        Confirmed Services  <span className="text-xs text-red-500 cursor-pointer" onClick={()=>setOpenModal(true)}>Add New</span>
-      </h2>
-      <span className="text-sm text-gray-500">
-        Total: {leadDetail?.OnConfirmed?.length || 0}
-      </span>
-    </div>
+            {/* Heading */}
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-md  font-semibold text-gray-800">
+                Confirmed Services 
+                 {(isAdmin || permissionArray.includes("ldAssign")) && (
+                 <span className="text-xs ps-2 font-bold text-red-500 cursor-pointer" onClick={() => setOpenModal(true)}>
+                  Add New</span>)}
+              </h2>
+              <span className="text-sm text-gray-500">
+                Total: {leadDetail?.OnConfirmed?.length || 0}
+              </span>
+            </div>
 
-    {/* Table */}
-    <div className="overflow-x-auto rounded-lg border">
-      <table className="min-w-full text-sm text-left text-gray-700">
-        
-        {/* Table Head */}
-        <thead className="bg-gray-100 text-xs uppercase tracking-wider text-gray-600">
-          <tr>
-            <th className="px-3 py-3">Service</th>
-            <th className="px-3 py-3">Description</th>
-            <th className="px-3 py-3">Total</th>
-            <th className="px-3 py-3">Paid</th>
-            <th className="px-3 py-3">Unpaid</th>
-            <th className="px-3 py-3">Contact</th>
-            <th className="px-3 py-3">Date</th>
-            <th className="px-3 py-3">Added By</th>
-            <th className="px-3 py-3">Docs</th>
-          </tr>
-        </thead>
+            {/* Table */}
+            <div className="overflow-x-auto rounded-lg border border-gray-400">
+              <table className="min-w-full text-xs text-left text-gray-700">
 
-        {/* Table Body */}
-        <tbody className="divide-y divide-gray-200">
-          {leadDetail?.OnConfirmed?.map((item) => (
-            <tr key={item._id} className="hover:bg-gray-50 transition">
-              
-              <td className="px-3 py-3 font-medium text-gray-800">
-                {item.nameOfService}
-              </td>
+                {/* Table Head */}
+                <thead className="bg-gray-100 text-xs  tracking-wider text-gray-600 border-b border-gray-600">
+                  <tr>
+                    <th className="px-2 py-2">Service</th>
+                    <th className="px-2 py-2">Description</th>
+                    <th className="px-2 py-2">Total</th>
+                    <th className="px-2 py-2">Paid</th>
+                    <th className="px-2 py-2">Unpaid</th>
+                    <th className="px-2 py-2">Contact</th>
+                    <th className="px-2 py-2">Date</th>
+                    <th className="px-2 py-2">Added By</th>
+                    <th className="px-2 py-2">Docs</th>
+                  </tr>
+                </thead>
 
-              <td className="px-3 py-3 text-gray-600">
-                {item.description}
-              </td>
+                {/* Table Body */}
+                <tbody className="divide-y divide-gray-200">
+                  {leadDetail?.OnConfirmed?.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50 transition border-b border-gray-300 shadow-lg">
 
-              <td className="px-3 py-3 text-gray-800 font-semibold">
-                ₹ {item.totalAmount}
-              </td>
+                      <td className="px-2 py-2 font-medium text-gray-800">
+                        {item.nameOfService}
+                      </td>
 
-              <td className="px-3 py-3 text-green-600 font-medium">
-                ₹ {item.paidAmount}
-              </td>
+                      <td className="px-2 py-2 text-gray-600">
+                        {item.description}
+                      </td>
 
-              <td className="px-3 py-3 text-red-500 font-medium">
-                ₹ {item.unpaidAmount}
-              </td>
+                      <td className="px-2 py-2 text-gray-800 font-semibold">
+                        ₹ {item.totalAmount}
+                      </td>
 
-              <td className="px-3 py-3">
-                <div className="flex flex-col">
-                  <span>{item.contact?.name}</span>
-                  <span className="text-xs text-gray-500">
-                    {item.contact?.phone}
-                  </span>
-                </div>
-              </td>
+                      <td className="px-2 py-2 text-green-600 font-medium">
+                        ₹ {item.paidAmount}
+                      </td>
 
-              <td className="px-3 py-3">
-                {new Date(item.date).toLocaleDateString()}
-              </td>
+                      <td className="px-2 py-2 text-red-500 font-medium">
+                        ₹ {item.unpaidAmount}
+                      </td>
 
-              <td className="px-3 py-3">
-                {item.addedBy?.name || "-"}
-              </td>
+                      <td className="px-2 py-2">
+                        <div className="flex flex-col">
+                          <span>{item.contact?.name}</span>
+                          <span className="text-xs text-gray-500">
+                            {item.contact?.phone}
+                          </span>
+                        </div>
+                      </td>
 
-              <td className="px-3 py-3">
-                <div className="flex gap-2 flex-wrap">
-                  {[...(item.files || []), ...(item.OnConfirmedFiles || [])]
-                    ?.filter(file => file.url)
-                    ?.map((file) => (
-                      <img
-                        key={file._id}
-                        src={file.url}
-                        alt="file"
-                        className="w-14 h-14 object-cover rounded border cursor-pointer hover:scale-105 transition"
-                        onClick={() => window.open(file.url, "_blank")}
-                      />
-                    ))}
-                </div>
-              </td>
+                      <td className="px-3 py-3">
+                        {new Date(item.date).toLocaleDateString()}
+                      </td>
 
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
+                      <td className="px-3 py-3">
+                        {item.addedBy?.name || "-"}
+                      </td>
+
+                      <td className="px-3 py-3">
+                        <div className="flex gap-2 flex-wrap">
+                          {[...(item.files || []), ...(item.OnConfirmedFiles || [])]
+                            ?.filter(file => file.url)
+                            ?.map((file) => (
+                              <img
+                                key={file._id}
+                                src={file.url}
+                                alt="file"
+                                className="w-14 h-14 object-cover rounded border cursor-pointer hover:scale-105 transition"
+                                onClick={() => window.open(file.url, "_blank")}
+                              />
+                            ))}
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Assignments */}
         <div>
@@ -287,13 +291,13 @@ function LeadUpdate() {
           {assignments.map((a, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
               <p className="px-4">
-                <span className="text-sm font-medium">{a.assignedBy.name}</span>
+                <span className="text-xs font-medium">{a.assignedBy.name}</span>
                 <span className="font-bold px-5 text-xs"> : </span>
-                <span className="font-semibold text-sm">
+                <span className="font-semibold text-xs">
                   {a.assignedTo?.name} ({a.assignedTo?.employeeCode})
                 </span>
               </p>
-              <p className="px-4 text-sm font-medium">{new Date(a.assignedAt).toLocaleString()}</p>
+              <p className="px-4 text-xs font-medium">{new Date(a.assignedAt).toLocaleString()}</p>
               {(isAdmin || permissionArray.includes("ldEdit")) && (
                 <button
                   onClick={() => handleRemoveAssignment(a.assignedTo._id)}
@@ -329,11 +333,11 @@ function LeadUpdate() {
           {followUps.length === 0 && <p className="text-gray-500">No follow-ups yet.</p>}
           {followUps.map((fu, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
-              <p className="text-sm font-medium">
+              <p className="text-xs font-medium">
                 {fu.addedBy?.name || "Unknown"} - {fu.addedBy?.employeeCode || ""}
               </p>
-              <p className="px-4 text-sm font-medium">{fu.messageContent}</p>
-              <p className="px-4 text-sm font-medium">{new Date(fu.date).toLocaleString()}</p>
+              <p className="px-4 text-xs font-medium">{fu.messageContent}</p>
+              <p className="px-4 text-xs font-medium">{new Date(fu.date).toLocaleString()}</p>
             </div>
           ))}
         </div>
@@ -347,112 +351,112 @@ function LeadUpdate() {
         </button>
       </div>
 
-{/* OnConfirmed Modal */}
-{openModal && (
-  <div className="fixed inset-0 bg-black/50 bg-opacity-60 flex justify-center items-center z-50">
-    <div className="bg-white p-6 rounded w-full max-w-2xl">
-      <h3 className="text-lg font-semibold mb-4">Confirm Lead Details</h3>
-      <form
-        onSubmit={async e => {
-          e.preventDefault();
+      {/* OnConfirmed Modal */}
+      {openModal && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-60 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded w-full max-w-2xl">
+            <h3 className="text-lg font-semibold mb-4">Confirm Lead Details</h3>
+            <form
+              onSubmit={async e => {
+                e.preventDefault();
 
-          try {
-            const formPayload = new FormData();
+                try {
+                  const formPayload = new FormData();
 
-            // OnConfirmed fields
-            formPayload.append("OnConfirmed[contact]", JSON.stringify(contact));
-            formPayload.append("OnConfirmed[totalAmount]", totalAmount);
-            formPayload.append("OnConfirmed[paidAmount]", paidAmount);
-            formPayload.append("OnConfirmed[unpaidAmount]", unpaidAmount);
-            formPayload.append("OnConfirmed[nameOfService]", nameOfService);
-            formPayload.append("OnConfirmed[description]", description);
-            formPayload.append("OnConfirmed[addedBy]", employeeData?.id);
-            // formPayload.append("OnConfirmed[date]", date);
+                  // OnConfirmed fields
+                  formPayload.append("OnConfirmed[contact]", JSON.stringify(contact));
+                  formPayload.append("OnConfirmed[totalAmount]", totalAmount);
+                  formPayload.append("OnConfirmed[paidAmount]", paidAmount);
+                  formPayload.append("OnConfirmed[unpaidAmount]", unpaidAmount);
+                  formPayload.append("OnConfirmed[nameOfService]", nameOfService);
+                  formPayload.append("OnConfirmed[description]", description);
+                  formPayload.append("OnConfirmed[addedBy]", employeeData?.id);
+                  // formPayload.append("OnConfirmed[date]", date);
 
-            // Files
-            files.forEach(file => formPayload.append("OnConfirmedFiles", file));
+                  // Files
+                  files.forEach(file => formPayload.append("OnConfirmedFiles", file));
 
-            // Other fields + auto-update status
-            formPayload.append("fields", JSON.stringify({ ...formData, status: "Confirmed" }));
+                  // Other fields + auto-update status
+                  formPayload.append("fields", JSON.stringify({ ...formData, status: "Confirmed" }));
 
-            await dispatch(updateLead({ id, data: formPayload })).unwrap();
-             await  dispatch(employeeDetails())
-            alert("Lead confirmed successfully!");
-               
-            setOpenModal(false);
+                  await dispatch(updateLead({ id, data: formPayload })).unwrap();
+                  await dispatch(employeeDetails())
+                  alert("Lead confirmed successfully!");
 
-            // Reset modal fields
-            setContact({});
-            setTotalAmount(""); setPaidAmount(""); setUnpaidAmount("");
-            setNameOfService(""); setDescription(""); setFiles([]); 
+                  setOpenModal(false);
 
-          } catch (err) {
-            console.error(err);
-            alert("Failed to confirm lead");
-          }
-        }}
-      >
-        {/* Contact */}
-        <div className="grid grid-cols-2 gap-4 mb-2">
-          <div>
-            <label className="block text-sm font-medium">Name</label>
-            <input type="text" value={contact?.name || ""} onChange={e => setContact(prev => ({ ...prev, name: e.target.value }))} className="border rounded px-2 py-1 w-full"/>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Email</label>
-            <input type="email" value={contact?.email || ""} onChange={e => setContact(prev => ({ ...prev, email: e.target.value }))} className="border rounded px-2 py-1 w-full"/>
+                  // Reset modal fields
+                  setContact({});
+                  setTotalAmount(""); setPaidAmount(""); setUnpaidAmount("");
+                  setNameOfService(""); setDescription(""); setFiles([]);
+
+                } catch (err) {
+                  console.error(err);
+                  alert("Failed to confirm lead");
+                }
+              }}
+            >
+              {/* Contact */}
+              <div className="grid grid-cols-2 gap-4 mb-2">
+                <div>
+                  <label className="block text-sm font-medium">Name</label>
+                  <input type="text" value={contact?.name || ""} onChange={e => setContact(prev => ({ ...prev, name: e.target.value }))} className="border rounded px-2 py-1 w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Email</label>
+                  <input type="email" value={contact?.email || ""} onChange={e => setContact(prev => ({ ...prev, email: e.target.value }))} className="border rounded px-2 py-1 w-full" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-2">
+                <div>
+                  <label className="block text-sm font-medium">Phone</label>
+                  <input type="text" value={contact?.phone || ""} onChange={e => setContact(prev => ({ ...prev, phone: e.target.value }))} className="border rounded px-2 py-1 w-full" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium">Paid</label>
+                    <input type="number" value={paidAmount} onChange={e => setPaidAmount(e.target.value)} className="border rounded px-2 py-1 w-full" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium">Unpaid</label>
+                    <input type="number" value={unpaidAmount} onChange={e => setUnpaidAmount(e.target.value)} className="border rounded px-2 py-1 w-full" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Amount + Service */}
+              <div className="grid grid-cols-2 gap-4 mb-2">
+                <div>
+                  <label className="block text-sm font-medium">Total Amount</label>
+                  <input type="number" value={totalAmount} onChange={e => setTotalAmount(e.target.value)} className="border rounded px-2 py-1 w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Name of Service</label>
+                  <input type="text" value={nameOfService} onChange={e => setNameOfService(e.target.value)} className="border rounded px-2 py-1 w-full" />
+                </div>
+              </div>
+
+              <div className="mb-2">
+                <label className="block text-sm font-medium">Description</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} className="border rounded px-2 py-1 w-full" />
+              </div>
+
+              <div className="mb-2">
+                <label className="block text-sm font-medium">Files</label>
+                <input type="file" multiple onChange={e => setFiles(Array.from(e.target.files))} className="border rounded px-2 py-1 w-full" />
+                <small className="text-gray-200">Files will be uploaded</small>
+              </div>
+
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button type="button" onClick={() => setOpenModal(false)} className="px-3 py-1 rounded border">Cancel</button>
+                <button type="submit" className="px-3 py-1 rounded bg-blue-600 text-white">Save</button>
+              </div>
+            </form>
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-2">
-          <div>
-            <label className="block text-sm font-medium">Phone</label>
-            <input type="text" value={contact?.phone || ""} onChange={e => setContact(prev => ({ ...prev, phone: e.target.value }))} className="border rounded px-2 py-1 w-full"/>
-          </div>
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <label className="block text-sm font-medium">Paid</label>
-              <input type="number" value={paidAmount} onChange={e => setPaidAmount(e.target.value)} className="border rounded px-2 py-1 w-full"/>
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium">Unpaid</label>
-              <input type="number" value={unpaidAmount} onChange={e => setUnpaidAmount(e.target.value)} className="border rounded px-2 py-1 w-full"/>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Amount + Service */}
-        <div className="grid grid-cols-2 gap-4 mb-2">
-          <div>
-            <label className="block text-sm font-medium">Total Amount</label>
-            <input type="number" value={totalAmount} onChange={e => setTotalAmount(e.target.value)} className="border rounded px-2 py-1 w-full"/>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Name of Service</label>
-            <input type="text" value={nameOfService} onChange={e => setNameOfService(e.target.value)} className="border rounded px-2 py-1 w-full"/>
-          </div>
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium">Description</label>
-          <textarea value={description} onChange={e => setDescription(e.target.value)} className="border rounded px-2 py-1 w-full"/>
-        </div>
-
-        <div className="mb-2">
-          <label className="block text-sm font-medium">Files</label>
-          <input type="file" multiple onChange={e => setFiles(Array.from(e.target.files))} className="border rounded px-2 py-1 w-full"/>
-          <small className="text-gray-500">Files will be uploaded to backend S3</small>
-        </div>
-
-
-        <div className="flex justify-end gap-2 mt-4">
-          <button type="button" onClick={() => setOpenModal(false)} className="px-3 py-1 rounded border">Cancel</button>
-          <button type="submit" className="px-3 py-1 rounded bg-blue-600 text-white">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
     </CompanyLayout>
   );
