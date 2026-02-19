@@ -265,7 +265,7 @@ function LeadUpdate() {
         {/* Assignments */}
         <div>
           <h3 className="font-semibold">Lead Assigned</h3>
-          {(isAdmin || permissionArray.includes("ldEdit")) && (
+          {(isAdmin || permissionArray.includes("ldassign")) && (
             <div className="flex items-center gap-2 my-2">
               <input
                 list="employees"
@@ -298,7 +298,7 @@ function LeadUpdate() {
                 </span>
               </p>
               <p className="px-4 text-xs font-medium">{new Date(a.assignedAt).toLocaleString()}</p>
-              {(isAdmin || permissionArray.includes("ldEdit")) && (
+              {(isAdmin || permissionArray.includes("ldassign")) && (
                 <button
                   onClick={() => handleRemoveAssignment(a.assignedTo._id)}
                   className="text-xs text-red-600 hover:underline"
