@@ -16,7 +16,7 @@ import {
     CheckCircle,
     GraduationCap, Home, MapPin, Droplet,
 } from "lucide-react";
-import { companyConfiguresAdmin, companyConfiguresView } from "../../redux/slice/companySlice";
+import { companyConfiguresAdmin, companyConfiguresView, getDepartment, getRole } from "../../redux/slice/companySlice";
 import { toast } from "react-toastify";
 const STORAGE_KEY = "employee_create_form";
 
@@ -43,6 +43,8 @@ const EmployeeEdit = ({ hideCompanyLayout = false, role = "", department = "" })
         (state) => state.reducer.company
     );
 
+    const { viewAllDepartment } = useSelector((state) => state.reducer.company);
+    const { viewAllRole } = useSelector((state) => state.reducer.company);
     const [currentStep, setCurrentStep] = useState(0);
     const [search, setSearch] = useState("");
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -108,7 +110,16 @@ const EmployeeEdit = ({ hideCompanyLayout = false, role = "", department = "" })
         pan: null,
         aadhar: null,
     });
+    useEffect(() => {
+        dispatch(getDepartment());
+        // getDepartment
+    }, [dispatch]);
 
+    useEffect(() => {
+        if (formData.department) {
+            dispatch(getRole(formData.department))
+        }
+    }, [formData.department])
     // ================== Handlers ==================
     useEffect(() => {
         dispatch(companyConfiguresView());
@@ -294,75 +305,75 @@ const EmployeeEdit = ({ hideCompanyLayout = false, role = "", department = "" })
         "bankDetail",
     ];
     const [submitStart, setsubmitStart] = useState(false)
-const handleSubmit = async () => {
-//   console.log("SUBMIT START");
+    const handleSubmit = async () => {
+        //   console.log("SUBMIT START");
 
-  try {
-    setsubmitStart(true);
+        try {
+            setsubmitStart(true);
 
-    //  Local updated object (state pe depend nahi)
-    const updatedFormData = {
-      ...formData,
-      stationaryAlloted: stationaryAllotedArray,
+            //  Local updated object (state pe depend nahi)
+            const updatedFormData = {
+                ...formData,
+                stationaryAlloted: stationaryAllotedArray,
+            };
+
+            const data = new FormData();
+
+            //  All normal fields
+            for (const key in updatedFormData) {
+                // files alag se handle honge
+                if (["profilePic", "pan", "aadhar"].includes(key)) continue;
+
+                const value = updatedFormData[key];
+
+                // null / undefined skip
+                if (value === undefined || value === null) continue;
+
+                // object => JSON
+                if (typeof value === "object") {
+                    data.append(key, JSON.stringify(value));
+                } else {
+                    data.append(key, value);
+                }
+            }
+
+            //  Profile Pic (sirf jab user change kare)
+            if (formData.profilePic instanceof File) {
+                data.append("profilePic", formData.profilePic);
+            }
+
+            //  PAN (sirf new files)
+            if (Array.isArray(formData.pan) && formData.pan[0] instanceof File) {
+                formData.pan.forEach((file) => {
+                    data.append("pan", file);
+                });
+            }
+
+            //  Aadhar (sirf new files)
+            if (Array.isArray(formData.aadhar) && formData.aadhar[0] instanceof File) {
+                formData.aadhar.forEach((file) => {
+                    data.append("aadhar", file);
+                });
+            }
+
+            //  Employee ID (IMPORTANT)
+            data.append("employeeId", employeeId);
+
+            // console.log("FORMDATA READY");
+
+            const res = await dispatch(employeesUPdate({ id: employeeId, data })).unwrap();
+
+            if (res?.success) {
+                toast.success("Employee updated successfully");
+                navigate("/company/employe/view");
+            }
+        } catch (err) {
+            console.error("EDIT ERROR 👉", err);
+            toast.error(err?.error || "Update failed");
+        } finally {
+            setsubmitStart(false);
+        }
     };
-
-    const data = new FormData();
-
-    //  All normal fields
-    for (const key in updatedFormData) {
-      // files alag se handle honge
-      if (["profilePic", "pan", "aadhar"].includes(key)) continue;
-
-      const value = updatedFormData[key];
-
-      // null / undefined skip
-      if (value === undefined || value === null) continue;
-
-      // object => JSON
-      if (typeof value === "object") {
-        data.append(key, JSON.stringify(value));
-      } else {
-        data.append(key, value);
-      }
-    }
-
-    //  Profile Pic (sirf jab user change kare)
-    if (formData.profilePic instanceof File) {
-      data.append("profilePic", formData.profilePic);
-    }
-
-    //  PAN (sirf new files)
-    if (Array.isArray(formData.pan) && formData.pan[0] instanceof File) {
-      formData.pan.forEach((file) => {
-        data.append("pan", file);
-      });
-    }
-
-    //  Aadhar (sirf new files)
-    if (Array.isArray(formData.aadhar) && formData.aadhar[0] instanceof File) {
-      formData.aadhar.forEach((file) => {
-        data.append("aadhar", file);
-      });
-    }
-
-    //  Employee ID (IMPORTANT)
-    data.append("employeeId", employeeId);
-
-    // console.log("FORMDATA READY");
-
-    const res = await dispatch(employeesUPdate({id: employeeId,data})).unwrap();
-
-    if (res?.success) {
-      toast.success("Employee updated successfully");
-      navigate("/company/employe/view");
-    }
-  } catch (err) {
-    console.error("EDIT ERROR 👉", err);
-    toast.error(err?.error || "Update failed");
-  } finally {
-    setsubmitStart(false);
-  }
-};
 
 
     // console.log(formData, "gh")
@@ -391,7 +402,7 @@ const handleSubmit = async () => {
         setFormData((prev) => ({ ...prev, reportingManager: manager._id }));
         setShowSuggestions(false);
     };
-
+    // console.log(viewAllRole, "oo")
     // ================== Content JSX ==================
     const content = (
         <div className="max-w-6xl mx-auto p-6 bg-white shadow-xl rounded-xl">
@@ -605,27 +616,22 @@ const handleSubmit = async () => {
                             onChange={handleChange}
                             className={`input ${errors.department && "error"}`}
                         >
-                            {companyConfigureAdmin?.user?.licenseId ? (
-                                <>
-                                    <option value="Admin">Admin</option>
-                                </>
-                            ) : (
-                                <>
-                                    <option value="">Select</option>
-                                    {companyConfigureViewData?.data?.roles?.map((r) => (
-                                        <option key={r.department} value={r.department}>
-                                            {r.department}
-                                        </option>
-                                    ))}
-                                </>
-                            )}
+                            <>
+                                <option value="">Select</option>
+                                {viewAllDepartment?.map((r) => (
+                                    <option key={r.name} value={r.name}>
+                                        {r.name}
+                                    </option>
+                                ))}
+                            </>
+
                         </select>
                     </Field>
 
 
 
 
-                    <Field label="Role" error={errors.role}>
+                    {/* <Field label="Role" error={errors.role}>
                         <select
                             name="role"
                             value={formData.role || ""}
@@ -642,15 +648,124 @@ const handleSubmit = async () => {
                                     {companyConfigureViewData?.data?.roles
                                         ?.find(r => r.department === formData.department)
                                         ?.roles?.map(role => (
-                                            <option key={role} value={role}>
-                                                {role}
+                                            <option key={role} value={role.role}>
+                                                {role.role}
                                             </option>
                                         ))}
                                 </>
                             )}
                         </select>
-                    </Field>
+                    </Field> */}
+                    {/* <Field label="Role" error={errors.role}>
+                        <select
+                            name="roleID"              // store _id here
+                            value={formData.roleID || ""}
+                            onChange={e => {
+                                const selectedRole =viewAllRole?.roles
+                                    ?.find(r => r.department === formData.department)
+                                    ?.roles?.find(role => role._id === e.target.value);
 
+                                setFormData({
+                                    ...formData,
+                                    roleID: e.target.value,       // save _id
+                                    role: selectedRole?.role || "" // save role name
+                                });
+                            }}
+                            className={`input ${errors.role && "error"}`}
+                        >
+                            <option value="">Select</option>
+                            {
+                               
+                               viewAllRole?.roles?.map(role => (
+                                    <option key={role._id} value={role._id}>
+                                        {role.role}
+                                    </option>
+                                ))}
+                        </select>
+                    </Field> */}
+                    {/* <Field label="Role" error={errors.role}>
+                        <select
+                            name="roleID"
+                            value={formData.role || ""}
+                            onChange={e => {
+                                const selectedRole = viewAllRole?.roles?.find(
+                                    role => role._id === e.target.value
+                                );
+
+                                setFormData({
+                                    ...formData,
+                                    roleID: e.target.value,        // save _id
+                                    role: selectedRole?.role || "" // save role name
+                                });
+                            }}
+                            className={`input ${errors.role && "error"}`}
+                        >
+                            <option value="">{formData.role }</option>
+                    
+                            {viewAllRole?.roles
+                                ?.filter(role => role.assign === false)   //  filter here
+                                ?.map(role => (
+                                    <option key={role._id} value={role._id}>
+                                        {role.role}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </Field> */}
+                    <div style={{ display: "flex", gap: "2px" }}>
+                        <select
+                            name="roleID"
+                            value={formData.roleID || ""}
+                            onChange={e => {
+                                const selectedRole = viewAllRole?.roles?.find(
+                                    role => role._id === e.target.value
+                                );
+
+                                setFormData({
+                                    ...formData,
+                                    roleID: e.target.value,
+                                    role: selectedRole?.role || ""
+                                });
+                            }}
+                            className={`input ${errors.role && "error"}`}
+                        >
+                            <option value="">Select</option>
+
+
+                            {viewAllRole?.roles
+                                ?.filter(role =>
+                                    role.assign === false || role._id === formData.roleID
+                                )
+                                ?.map(role => (
+                                    <option key={role._id} value={role._id}>
+                                        {role.role}
+                                    </option>
+                                ))
+                            }
+                        </select>
+
+                        {formData.roleID && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    // const updatedForm = { ...formData };
+                                    // delete updatedForm.roleID;
+                                    // // delete updatedForm.role;
+                                    // setFormData(updatedForm);
+                                    setFormData({ ...formData, roleID:null, })
+                                }}
+                                style={{
+                                    background: "red",
+                                    color: "white",
+                                    border: "none",
+                                    padding: "2px 6px",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                ✕
+                            </button>
+                        )}
+                    </div>
 
                     <Field label="Status">
                         <select name="status" value={formData?.status} onChange={handleChange} className={`input ${errors.status ? "error shake" : ""}`}>

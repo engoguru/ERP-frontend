@@ -334,6 +334,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   companyConfiguresUpdate,
   companyConfiguresView,
+  getDepartment,
+  getRole,
 } from "../../../redux/slice/companySlice";
 
 /* ACCESS OPTIONS (permission choices) */
@@ -343,7 +345,7 @@ const ACCESS_OPTIONS = [
   { key: "attendance", label: "Attendance", actions: ["atnView", "atnCreate", "atnEdit", "atnDelete"] },
   { key: "event", label: "Event", actions: ["etView", "etCreate", "etEdit", "etDelete"] },
   { key: "leaves", label: "Leaves", actions: ["leaView", "leaCreate", "leaEdit", "leaDelete"] },
-  { key: "leads", label: "Leads", actions: ["ldView", "ldCreate", "ldEdit", "ldDelete", "ldassign", "ldfollowUp"] },
+  { key: "leads", label: "Leads", actions: ["ldView", "ldCreate", "ldEdit", "ldDelete", "ldassign", "ldfollowUp", "ldconverter", "ldprocessor"] },
 ];
 
 /* Reusable Field Wrapper */
@@ -359,6 +361,8 @@ const Field = ({ label, icon, children }) => (
 
 function PermissionConfigure() {
   const dispatch = useDispatch();
+     const { viewAllRole } = useSelector((state) => state.reducer.company);
+  const { viewAllDepartment } = useSelector((state) => state.reducer.company);
   const { companyConfigureViewData, loading: companyview } = useSelector(
     (state) => state?.reducer?.company
   );
@@ -379,6 +383,16 @@ function PermissionConfigure() {
       (d) => d.department === selectedDepartment
     )?.roles || [];
 
+  useEffect(() => {
+    dispatch(getDepartment());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (selectedDepartment) {
+      dispatch(getRole(selectedDepartment))
+      // getRole
+    }
+  }, [selectedDepartment])
   // Prefill selectedAccess from backend when department & role changes
   useEffect(() => {
     if (selectedDepartment && selectedRole) {
@@ -492,9 +506,9 @@ function PermissionConfigure() {
               className="w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Department</option>
-              {companyConfigureViewData?.data?.roles?.map((d) => (
-                <option key={d.department} value={d.department}>
-                  {d.department}
+              {viewAllDepartment?.map((d) => (
+                <option key={d.name} value={d.name}>
+                  {d.name}
                 </option>
               ))}
             </select>
@@ -508,9 +522,9 @@ function PermissionConfigure() {
               className="w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
             >
               <option value="">Select Role</option>
-              {rolesForDepartment.map((role) => (
-                <option key={role} value={role}>
-                  {role}
+              {viewAllRole?.roles.map((role) => (
+                <option key={role._id} value={role.role}>
+                  {role.role}
                 </option>
               ))}
             </select>

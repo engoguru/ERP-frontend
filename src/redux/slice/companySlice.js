@@ -142,12 +142,82 @@ export const companyDetailUpdate = createAsyncThunk(
 
 
 
+export const createDepartment=createAsyncThunk(
+  "company/createDepartment",
+  async (departmentData,{isRejectedWithValue})=>{
+      try {
+        // console.log(departmentData,"p")
+        const response = await axios.post(
+        `${base_URL}department/create`,
+        departmentData,
+        { withCredentials: true }
+      );
+
+      // console.log("RESPONSE:", response);
+      return response.data;
+    } catch (error) {
+        console.error("VIEW ERROR:", error);
+      return isRejectedWithValue(error.response?.data);
+    }
+  }
+)
+
+export const getDepartment=createAsyncThunk(
+  "company/getDepartment",
+  async (_,{isRejectedWithValue})=>{
+      try {
+        // console.log(departmentData,"p")
+        const response = await axios.get(
+        `${base_URL}department/viewAll`,
+        { withCredentials: true }
+      );
+
+      // console.log("RESPONSE:", response);
+      return response.data;
+    } catch (error) {
+        console.error("VIEW ERROR:", error);
+      return isRejectedWithValue(error.response?.data);
+    }
+  }
+)
 
 
+export const createRole=createAsyncThunk(
+  "company/createRole",
+  async (data,{isRejectedWithValue})=>{
+      try {
+        // console.log(departmentData,"p")
+        const response = await axios.post(
+        `${base_URL}role/create`,
+        data,
+        { withCredentials: true }
+      );
 
+      // console.log("RESPONSE:", response);
+      return response.data;
+    } catch (error) {
+        console.error("VIEW ERROR:", error);
+      return isRejectedWithValue(error.response?.data);
+    }
+  }
+)
 
-
-
+export const getRole = createAsyncThunk(
+  "company/getRole",
+  async (departmentName, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${base_URL}role/viewViaDepartment`, {
+        params: { departmentName }, // <-- send query param
+        withCredentials: true,
+      });
+// console.log(response,"po")
+      return response.data;
+    } catch (error) {
+      console.error("VIEW ERROR:", error);
+      return rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
 
 
 
@@ -163,6 +233,11 @@ const companySlice = createSlice({
     companyDetailSpecific:null,
 
     updateCompanyData:null,
+    newDepartment:null,
+    viewAllDepartment:null,
+
+    newRole:null,
+    viewAllRole:null,
     loading: false,
     error: null,
   },
@@ -277,6 +352,65 @@ const companySlice = createSlice({
         state.updateCompanyData = action.payload;
       })
       .addCase(companyDetailUpdate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+    //  create department
+     .addCase(createDepartment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createDepartment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.newDepartment = action.payload;
+      })
+      .addCase(createDepartment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+
+          //  viewAll department
+     .addCase(getDepartment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getDepartment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.viewAllDepartment = action.payload;
+      })
+      .addCase(getDepartment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+
+          // create role
+     .addCase(createRole.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createRole.fulfilled, (state, action) => {
+        state.loading = false;
+        state.newRole = action.payload;
+      })
+      .addCase(createRole.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+
+          //  viewAll role
+     .addCase(getRole.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getRole.fulfilled, (state, action) => {
+        state.loading = false;
+        state.viewAllRole = action.payload;
+      })
+      .addCase(getRole.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

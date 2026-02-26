@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CompanyLayout from "../../components/layout/companydashboard/CompanyLayout";
 import { useDispatch, useSelector } from "react-redux";
-import { companyConfiguresView } from "../../redux/slice/companySlice";
+import { companyConfiguresView, getRole } from "../../redux/slice/companySlice";
 import { fetchOneLead, updateLead } from "../../redux/slice/leadSlice";
 import { viewEmployees } from "../../redux/slice/employee/employeeCreateSlice";
 import { employeeDetails } from "../../redux/slice/employee/loginSlice";
@@ -21,7 +21,9 @@ function LeadUpdate() {
 
   const [formData, setFormData] = useState({});
   const [followUps, setFollowUps] = useState([]);
+  const [nextFollowUpDate, setnextFollowUpDate] = useState()
   const [assignments, setAssignments] = useState([]);
+  const [roleID, setRoleId] = useState()
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [followUpMessage, setFollowUpMessage] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -38,6 +40,17 @@ function LeadUpdate() {
 
   const permissionArray = employeeData?.permissionArray;
   const isAdmin = employeeData?.role === "Admin";
+  const { viewAllRole } = useSelector((state) => state.reducer.company);
+  // useEffect(() => {
+  //     if (formData.department) {
+  //         dispatch(getRole(formData.department))
+  //         // getRole
+  //     }
+  // }, [formData.department])
+  useEffect(() => {
+    // Hardcode "Business Development" instead of formData.department
+    dispatch(getRole("Business Development"));
+  }, [dispatch]);
 
   useEffect(() => {
     if (!initialized) dispatch(employeeDetails());
@@ -59,47 +72,100 @@ function LeadUpdate() {
     if (key === "status" && value === "Confirmed") setOpenModal(true);
   };
 
+  // const handleAddFollowUp = () => {
+  //   if (!followUpMessage) return alert("Enter follow-up message!");
+  //   setFollowUps(prev => [
+  //     ...prev,
+  //     {
+  //       addedBy: {
+  //         // _id: employeeData?.id,
+  //         _id: employeeData?.roleID,
+  //         name: employeeData?.name,
+  //         employeeCode: employeeData?.employeeCode,
+  //       },
+  //       date: new Date().toISOString(),
+  //       messageContent: followUpMessage,
+  //     },
+  //   ]);
+  //   setFollowUpMessage("");
+  // };
+
+
   const handleAddFollowUp = () => {
     if (!followUpMessage) return alert("Enter follow-up message!");
+    if (!nextFollowUpDate) return alert("Select next follow-up date!");
+    const hasPending = followUps.some(fu => fu.status === "pending");
+
+    if (hasPending) {
+      return alert("Please complete the existing pending follow-up first.");
+    }
     setFollowUps(prev => [
       ...prev,
       {
         addedBy: {
-          _id: employeeData?.id,
+          _id: employeeData?.roleID,
           name: employeeData?.name,
           employeeCode: employeeData?.employeeCode,
         },
-        date: new Date().toISOString(),
+        date: new Date().toISOString(), // created date
+        nextFollowUpDate: new Date(nextFollowUpDate).toISOString(), // due date
         messageContent: followUpMessage,
+        status: "pending", // important
       },
     ]);
+
     setFollowUpMessage("");
+    setnextFollowUpDate("");
   };
 
-  const handleAddAssignment = () => {
-    if (!selectedEmployee) return alert("Select an employee!");
-    const employee = employeeList.find(
-      e => `${e.name} (${e.employeeCode})` === selectedEmployee
+  const handleCompleteFollowUp = (index) => {
+    setFollowUps(prev =>
+      prev.map((fu, i) =>
+        i === index
+          ? {
+            ...fu,
+            status: "completed",
+            completedAt: new Date().toISOString(),
+          }
+          : fu
+      )
     );
-    if (!employee) return alert("Invalid employee selected!");
+  };
+  const handleAddAssignment = () => {
+    if (!selectedEmployee) return alert("Select a role!");
+
+    // Find employee whose roleID matches the selected role
+    const employee = employeeList.find(e => e.roleID === selectedEmployee);
+    if (!employee) return alert("No employee found for this role!");
+
+    // Add to assignments state
     setAssignments(prev => [
       ...prev,
-      { assignedBy: employeeData?.id, assignedTo: employee, assignedAt: new Date().toISOString() },
+      {
+        assignedBy: employeeData?.id, // logged-in user ID
+        assignedTo: employee._id,      // employee ID
+        assignedAt: new Date().toISOString(),
+      },
     ]);
+    setRoleId(selectedEmployee)
+
+    // Clear selection
     setSelectedEmployee("");
   };
 
   const handleRemoveAssignment = employeeId => {
     setAssignments(prev => prev.filter(a => a.assignedTo?._id !== employeeId));
   };
-
+  // console.log(companyConfigureViewData,"kll")
   const handleSubmit = async () => {
     try {
       const payload = {
         fields: formData,
         followUp: followUps.map(fu => ({ ...fu, addedBy: employeeData?.id })),
         whoAssignedwho: assignments,
+        roleID: roleID,
       };
+      console.log(payload, "opterrerfgerffer")
       await dispatch(updateLead({ id, data: payload })).unwrap();
       alert("Lead updated successfully!");
       navigate(0);
@@ -167,10 +233,10 @@ function LeadUpdate() {
             {/* Heading */}
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-md  font-semibold text-gray-800">
-                Confirmed Services 
-                 {(isAdmin || permissionArray.includes("ldassign")) && (
-                 <span className="text-xs ps-2 font-bold text-red-500 cursor-pointer" onClick={() => setOpenModal(true)}>
-                  Add New</span>)}
+                Confirmed Services
+                {(isAdmin || permissionArray.includes("ldprocessor")) && (
+                  <span className="text-xs ps-2 font-bold text-red-500 cursor-pointer" onClick={() => setOpenModal(true)}>
+                    Add New</span>)}
               </h2>
               <span className="text-sm text-gray-500">
                 Total: {leadDetail?.OnConfirmed?.length || 0}
@@ -267,18 +333,20 @@ function LeadUpdate() {
           <h3 className="font-semibold">Lead Assigned</h3>
           {(isAdmin || permissionArray.includes("ldassign")) && (
             <div className="flex items-center gap-2 my-2">
-              <input
-                list="employees"
-                value={selectedEmployee}
+              <select
+                value={selectedEmployee} // use existing state
                 onChange={e => setSelectedEmployee(e.target.value)}
-                placeholder="Type Employee Name.."
                 className="border rounded px-2 py-1 w-72"
-              />
-              <datalist id="employees">
-                {employeeList.map(emp => (
-                  <option key={emp._id} value={`${emp.name} (${emp.employeeCode})`} />
-                ))}
-              </datalist>
+              >
+                <option value="">Select Role...</option>
+                {viewAllRole.roles
+                  .filter(role => role.assign === true)
+                  .map(role => (
+                    <option key={role._id} value={role._id}>
+                      {role.role}
+                    </option>
+                  ))}
+              </select>
               <button
                 onClick={handleAddAssignment}
                 className="bg-blue-600 text-white px-3 py-1 rounded"
@@ -287,20 +355,20 @@ function LeadUpdate() {
               </button>
             </div>
           )}
-          {assignments.length === 0 && <p className="text-gray-500">No assignments yet.</p>}
-          {assignments.map((a, i) => (
+          {assignments?.length === 0 && <p className="text-gray-500">No assignments yet.</p>}
+          {assignments?.map((a, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
               <p className="px-4">
-                <span className="text-xs font-medium">{a.assignedBy.name}</span>
+                <span className="text-xs font-medium">{a?.assignedBy?.name}</span>
                 <span className="font-bold px-5 text-xs"> : </span>
                 <span className="font-semibold text-xs">
-                  {a.assignedTo?.name} ({a.assignedTo?.employeeCode})
+                  {a.assignedTo?.name}
                 </span>
               </p>
-              <p className="px-4 text-xs font-medium">{new Date(a.assignedAt).toLocaleString()}</p>
+              <p className="px-4 text-xs font-medium">{new Date(a?.assignedAt).toLocaleString()}</p>
               {(isAdmin || permissionArray.includes("ldassign")) && (
                 <button
-                  onClick={() => handleRemoveAssignment(a.assignedTo._id)}
+                  onClick={() => handleRemoveAssignment(a?.assignedTo._id)}
                   className="text-xs text-red-600 hover:underline"
                 >
                   Remove
@@ -313,7 +381,7 @@ function LeadUpdate() {
         {/* Follow-Ups */}
         <div>
           <h3 className="font-semibold">Follow-Ups</h3>
-          {(isAdmin || permissionArray.includes("ldEdit")) && (
+          {/* {(isAdmin || permissionArray.includes("ldEdit")) && (
             <div className="flex items-center gap-2 my-2">
               <input
                 type="text"
@@ -329,7 +397,34 @@ function LeadUpdate() {
                 Add
               </button>
             </div>
+          )} */}
+          {(isAdmin || permissionArray.includes("ldEdit")) && (
+            <div className="flex items-center gap-2 my-2">
+              <input
+                type="text"
+                value={followUpMessage}
+                onChange={e => setFollowUpMessage(e.target.value)}
+                placeholder="Add next follow-up message"
+                className="border rounded px-2 py-1 flex-1"
+              />
+
+              <input
+                type="date"
+                value={nextFollowUpDate || ""}
+                min={new Date().toISOString().split("T")[0]}   // prevents past dates
+                onChange={e => setnextFollowUpDate(e.target.value)}
+                className="border rounded px-2 py-1"
+              />
+
+              <button
+                onClick={handleAddFollowUp}
+                className="bg-green-600 text-white px-3 py-1 rounded"
+              >
+                Add
+              </button>
+            </div>
           )}
+
           {followUps.length === 0 && <p className="text-gray-500">No follow-ups yet.</p>}
           {followUps.map((fu, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
@@ -338,6 +433,24 @@ function LeadUpdate() {
               </p>
               <p className="px-4 text-xs font-medium">{fu.messageContent}</p>
               <p className="px-4 text-xs font-medium">{new Date(fu.date).toLocaleString()}</p>
+              <p
+                className={`px-4 text-xs font-medium ${fu.status === "pending"
+                    ? "text-red-600"
+                    : fu.status === "completed"
+                      ? "text-green-600"
+                      : ""
+                  }`}
+              >
+                {fu.status}
+              </p>
+              {fu.status === "pending" && (
+                <button
+                  onClick={() => handleCompleteFollowUp(i)}
+                  className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs"
+                >
+                  Mark Completed
+                </button>
+              )}
             </div>
           ))}
         </div>

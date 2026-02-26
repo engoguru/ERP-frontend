@@ -46,7 +46,7 @@ function EmployeeAll() {
     }
   }, [dispatch, initialized]);
 
-  console.log(companyConfigureViewData, departmentFilter, "hg")
+  // console.log(companyConfigureViewData, departmentFilter, "hg")
   const permissionArray = employeeData?.permissionArray
   const isAdmin = employeeData?.role === "Admin";
   // Filter employees based on search, role, and department

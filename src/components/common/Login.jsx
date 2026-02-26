@@ -57,10 +57,10 @@ function Login() {
 
 const handleVerifyOtp =async (e) => {
   e.preventDefault();
-
+console.log(otp.emailOtp,otp.phoneOtp)
   if (
-    otp.emailOtp === testOtp.email ||
-    otp.phoneOtp === testOtp.phone
+    otp.emailOtp&&
+    otp.phoneOtp
   ) {
 
     alert("OTP verified successfully!");
