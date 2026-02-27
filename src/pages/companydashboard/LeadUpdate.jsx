@@ -69,6 +69,7 @@ function LeadUpdate() {
 
   const handleFieldChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
+    alert("Are you Confirm ?")
     if (key === "status" && value === "Confirmed") setOpenModal(true);
   };
 
@@ -379,6 +380,7 @@ function LeadUpdate() {
         </div>
 
         {/* Follow-Ups */}
+         {(isAdmin || permissionArray.includes("ldfollowUp")) && (
         <div>
           <h3 className="font-semibold">Follow-Ups</h3>
           {/* {(isAdmin || permissionArray.includes("ldEdit")) && (
@@ -398,7 +400,7 @@ function LeadUpdate() {
               </button>
             </div>
           )} */}
-          {(isAdmin || permissionArray.includes("ldEdit")) && (
+         
             <div className="flex items-center gap-2 my-2">
               <input
                 type="text"
@@ -423,7 +425,7 @@ function LeadUpdate() {
                 Add
               </button>
             </div>
-          )}
+         
 
           {followUps.length === 0 && <p className="text-gray-500">No follow-ups yet.</p>}
           {followUps.map((fu, i) => (
@@ -454,7 +456,7 @@ function LeadUpdate() {
             </div>
           ))}
         </div>
-
+ )}
         {/* Save Button */}
         <button
           onClick={handleSubmit}
