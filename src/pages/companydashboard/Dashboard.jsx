@@ -28,7 +28,7 @@ function Dashboard() {
         dispatch(fetchDashboardUserData());
         dispatch(fetchDashboardLeadData());
     }, [dispatch]);
-    // console.log(leads)
+    console.log(leads)
     // console.log(employeeData,"pp")
       const permissionArray = employeeData?.permissionArray || [];
   const isAdmin = employeeData?.role === "Admin";
@@ -124,7 +124,7 @@ function Dashboard() {
                                 <p className="text-gray-500 text-sm">Current Month Leads</p>
                                      {isAdmin &&(
                                 <h3 className="text-3xl font-bold mt-2 text-blue-600">
-                                    {leads?.data?.monthlyleads?.length || 0}
+                                    {leads?.data?.monthlyleads || 0}
                                 </h3>
                                      )}
                             </div>
@@ -134,10 +134,10 @@ function Dashboard() {
                                 <p className="text-gray-800 text-md font-medium mb-3 border-b-2 border-red-700 ">Latest Leads</p>
                                      {isAdmin &&(
                                 <ul className="space-y-2">
-                                    {leads?.data?.monthlyleads?.slice(0, 5).map((lead, idx) => (
+                                    {leads?.data?.roleWise?.slice(0, 10).map((lead, idx) => (
                                         <li key={idx} className="flex justify-between font-medium text-sm text-gray-700">
-                                            <span>{lead.fields.Name}</span>
-                                            <span className="text-gray-700 font-medium">{lead.fields.OrganizationName}</span>
+                                            <span>{lead.role}</span>
+                                            <span className="text-gray-700 font-medium">{lead.leads}</span>
                                         </li>
                                     )) || <li className="text-gray-400">No new leads</li>}
                                 </ul>

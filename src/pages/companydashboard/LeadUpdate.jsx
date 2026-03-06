@@ -37,7 +37,7 @@ function LeadUpdate() {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState([]);
   // const [date, setDate] = useState("");
-
+const [statusRecord,setStatusRecord]=useState([])
   const permissionArray = employeeData?.permissionArray;
   const isAdmin = employeeData?.role === "Admin";
   const { viewAllRole } = useSelector((state) => state.reducer.company);
@@ -49,7 +49,7 @@ function LeadUpdate() {
   // }, [formData.department])
   useEffect(() => {
     // Hardcode "Business Development" instead of formData.department
-//  dispatch(employeeDetails();
+    //  dispatch(employeeDetails();
     dispatch(getRole("Business Development"));
   }, [dispatch]);
 
@@ -68,12 +68,33 @@ function LeadUpdate() {
     }
   }, [leadDetail]);
 
-  const handleFieldChange = (key, value) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
-    alert("Are you Confirm ?")
-    if (key === "status" && value === "Confirmed") setOpenModal(true);
-  };
+  // const handleFieldChange = (key, value) => {
+  //   setFormData(prev => ({ ...prev, [key]: value }));
+  //   alert("Are you Confirm ?")
+  //   if (key === "status" && value === "Confirmed") setOpenModal(true);
+  // };
+const handleFieldChange = (key, value) => {
+  setFormData(prev => ({
+    ...prev,
+    [key]: value
+  }));
 
+  // Only track status changes
+  if (key === "status") {
+    const newStatusEntry = {
+      roleId: employeeData?.roleID,
+      userId: employeeData?.id,
+      status: value,
+      changedAt: new Date() // optional timestamp
+    };
+
+    setStatusRecord(prev => [...prev, newStatusEntry]);
+
+    if (value === "Confirmed") {
+      setOpenModal(true); // show modal for Confirmed
+    }
+  }
+};
   // const handleAddFollowUp = () => {
   //   if (!followUpMessage) return alert("Enter follow-up message!");
   //   setFollowUps(prev => [
@@ -163,11 +184,12 @@ function LeadUpdate() {
     try {
       const payload = {
         fields: formData,
+        statusRecord: statusRecord, // separate array
         followUp: followUps.map(fu => ({ ...fu, addedBy: employeeData?.id })),
         whoAssignedwho: assignments,
         roleID: roleID,
       };
-      console.log(payload, "opterrerfgerffer")
+      // console.log(payload, "opterrerfgerffer")
       await dispatch(updateLead({ id, data: payload })).unwrap();
       alert("Lead updated successfully!");
       navigate(0);
@@ -364,7 +386,7 @@ function LeadUpdate() {
                 <span className="text-xs font-medium">{a?.assignedBy?.name}</span>
                 <span className="font-bold px-5 text-xs"> : </span>
                 <span className="font-semibold text-xs">
-                  {a.assignedTo?.name}
+                  {a.assignedTo?.name} -  {a.assignedTo?.role}
                 </span>
               </p>
               <p className="px-4 text-xs font-medium">{new Date(a?.assignedAt).toLocaleString()}</p>
@@ -381,10 +403,10 @@ function LeadUpdate() {
         </div>
 
         {/* Follow-Ups */}
-         {(isAdmin || permissionArray.includes("ldfollowUp")) && (
-        <div>
-          <h3 className="font-semibold">Follow-Ups</h3>
-          {/* {(isAdmin || permissionArray.includes("ldEdit")) && (
+        {(isAdmin || permissionArray.includes("ldfollowUp")) && (
+          <div>
+            <h3 className="font-semibold">Follow-Ups</h3>
+            {/* {(isAdmin || permissionArray.includes("ldEdit")) && (
             <div className="flex items-center gap-2 my-2">
               <input
                 type="text"
@@ -401,7 +423,7 @@ function LeadUpdate() {
               </button>
             </div>
           )} */}
-         
+
             <div className="flex items-center gap-2 my-2">
               <input
                 type="text"
@@ -426,16 +448,17 @@ function LeadUpdate() {
                 Add
               </button>
             </div>
-         
 
-          {followUps.length === 0 && <p className="text-gray-500">No follow-ups yet.</p>}
-          {followUps.map((fu, i) => (
+
+            {followUps.length === 0 && <p className="text-gray-500">No follow-ups yet.</p>}
+            {/* {followUps.map((fu, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
               <p className="text-xs font-medium">
                 {fu.addedBy?.name || "Unknown"} - {fu.addedBy?.employeeCode || ""}
               </p>
               <p className="px-4 text-xs font-medium">{fu.messageContent}</p>
               <p className="px-4 text-xs font-medium">{new Date(fu.date).toLocaleString()}</p>
+               <p className="px-4 text-xs font-medium">{new Date(fu.nextFollowUpDate).toLocaleString()}</p>
               <p
                 className={`px-4 text-xs font-medium ${fu.status === "pending"
                     ? "text-red-600"
@@ -446,6 +469,7 @@ function LeadUpdate() {
               >
                 {fu.status}
               </p>
+               <p className="px-4 text-xs font-medium">{new Date(fu.completedAt).toLocaleString()}</p>
               {fu.status === "pending" && (
                 <button
                   onClick={() => handleCompleteFollowUp(i)}
@@ -455,9 +479,59 @@ function LeadUpdate() {
                 </button>
               )}
             </div>
-          ))}
-        </div>
- )}
+          ))} */}
+            <table className="min-w-full border-collapse border border-gray-300 text-xs">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border px-2 py-1 text-left">Added By</th>
+                  {/* <th className="border px-2 py-1 text-left">Employee Code</th> */}
+                  <th className="border px-2 py-1 text-left">Message</th>
+                  <th className="border px-2 py-1 text-left">Date</th>
+                  <th className="border px-2 py-1 text-left">Next Follow-Up</th>
+                  <th className="border px-2 py-1 text-left">Status</th>
+                  <th className="border px-2 py-1 text-left">Completed At</th>
+                  <th className="border px-2 py-1 text-left">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {followUps.map((fu, i) => (
+                  <tr key={i} className="border-b">
+                    <td className="border px-2 py-1">{fu.addedBy?.name || "Unknown"}</td>
+                    {/* <td className="border px-2 py-1">{fu.addedBy?.employeeCode || ""}</td> */}
+                    <td className="border px-2 text-start py-1 font-medium">{fu.messageContent}</td>
+                    <td className="border px-2 py-1">{new Date(fu.date).toLocaleString()}</td>
+                    <td className="border px-2 py-1">
+                      {fu.nextFollowUpDate ? new Date(fu.nextFollowUpDate).toLocaleDateString() : "-"}
+                    </td>
+                    <td
+                      className={`border px-2 py-1 font-medium ${fu.status === "pending"
+                          ? "text-red-600"
+                          : fu.status === "completed"
+                            ? "text-green-600"
+                            : ""
+                        }`}
+                    >
+                      {fu.status}
+                    </td>
+                    <td className="border px-2 py-1">
+                      {fu.completedAt ? new Date(fu.completedAt).toLocaleString() : "-"}
+                    </td>
+                    <td className="border px-2 py-1">
+                      {fu.status === "pending" && (
+                        <button
+                          onClick={() => handleCompleteFollowUp(i)}
+                          className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs"
+                        >
+                          Mark Completed
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
         {/* Save Button */}
         <button
           onClick={handleSubmit}

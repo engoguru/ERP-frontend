@@ -331,7 +331,7 @@ import { viewEmployees } from "../../redux/slice/employee/employeeCreateSlice";
 function LeadAll() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const [itemsPerPage, setItemsPerPage] = useState(10)
   // ---------------- REDUX STATE ----------------
   const { companyConfigureViewData } = useSelector(
     (state) => state?.reducer?.company
@@ -365,7 +365,7 @@ function LeadAll() {
   const [selectedLeads, setSelectedLeads] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState("");
 
-  const itemsPerPage =5;
+  // const itemsPerPage =10;
 
   // ---------------- INIT ----------------
   useEffect(() => {
@@ -395,7 +395,7 @@ function LeadAll() {
         assigned: assignedFilter,
       })
     );
-  }, [dispatch, page, debouncedSearch, statusFilter, dateFilter, assignedFilter]);
+  }, [dispatch, page, debouncedSearch, statusFilter, dateFilter, assignedFilter,itemsPerPage]);
 
   // ---------------- SCHEMA ----------------
   const leadSchema = companyConfigureViewData?.data?.leadForm || [];
@@ -413,20 +413,20 @@ function LeadAll() {
   };
 
   const handleAssignSubmit = () => {
-    if (!selectedEmployee) return alert("Please select an employee"); 
+    if (!selectedEmployee) return alert("Please select an employee");
     if (selectedLeads.length === 0) return alert("Please select at least one lead");
 
     const employee = employeeList.find(
       (e) => `${e.name} (${e.employeeCode})` === selectedEmployee
     );
- 
+
     if (!employee) return alert("Invalid employee selected");
-// console.log(employee,"op")
+    // console.log(employee,"op")
     dispatch(
       bulkAssign({
         leadIds: selectedLeads,
         assignedTo: employee._id,
-        roleID:employee.roleID
+        roleID: employee.roleID
 
       })
     );
@@ -445,38 +445,58 @@ function LeadAll() {
     setPage(1);
   };
 
-// ---------------- PAGINATION LOGIC ----------------
-const getVisiblePages = () => {
-  const pages = [];
-  if (totalPages <= 5) {
-    for (let i = 1; i <= totalPages; i++) pages.push(i);
-  } else {
-    let start = Math.max(page - 2, 1);
-    let end = Math.min(start + 4, totalPages);
+  // ---------------- PAGINATION LOGIC ----------------
+  const getVisiblePages = () => {
+    const pages = [];
+    if (totalPages <= 20) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      let start = Math.max(page - 2, 1);
+      let end = Math.min(start + 4, totalPages);
 
-    if (end - start < 4) start = Math.max(end - 4, 1);
+      if (end - start < 4) start = Math.max(end - 4, 1);
 
-    for (let i = start; i <= end; i++) pages.push(i);
-  }
-  return pages;
-};
+      for (let i = start; i <= end; i++) pages.push(i);
+    }
+    return pages;
+  };
   // ---------------- UI ----------------
   return (
     <CompanyLayout>
       <div className="mx-auto w-full p-6 space-y-6">
         {/* HEADER */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">All Leads</h2>
+   <div className="flex items-center justify-start gap-6 mb-4">
+  {/* Header */}
+  <h2 className="text-xl font-bold text-gray-800">All Leads</h2>
 
-          {(isAdmin || permissionArray.includes("ldCreate")) && (
-            <button
-              onClick={() => navigate("/company/lead-form")}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
-            >
-              <Plus size={16} /> Create Lead
-            </button>
-          )}
-        </div>
+  {/* Items per page selector */}
+  <div className="flex items-center gap-2">
+    <label className="text-gray-700 font-medium text-md">Items per page:</label>
+    <select
+      className="border border-gray-300 rounded-md px-2 py-1 text-gray-800 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+      value={itemsPerPage}
+      onChange={e => {
+        setItemsPerPage(Number(e.target.value));
+        setCurrentPage(1); // reset to first page
+      }}
+    >
+      <option value={10}>10</option>
+      <option value={25}>25</option>
+      <option value={50}>50</option>
+      <option value={100}>100</option>
+    </select>
+  </div>
+
+  {/* Optional Create Lead button */}
+  {(isAdmin || permissionArray.includes("ldCreate")) && (
+    <button
+      onClick={() => navigate("/company/lead-form")}
+      className="ml-auto flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition"
+    >
+      <Plus size={16} /> Create Lead
+    </button>
+  )}
+</div>
 
         {/* ASSIGN SECTION */}
         {assignedFilter === "unassigned" &&
@@ -571,7 +591,7 @@ const getVisiblePages = () => {
 
         {/* TABLE */}
         <div className="overflow-x-auto bg-white rounded shadow">
-          <table className="w-full text-left text-sm">
+          <table className="min-w-[100px] text-left text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-3 py-3">#</th>
@@ -600,17 +620,16 @@ const getVisiblePages = () => {
                       {assignedFilter === "unassigned" ? (
                         <CheckCircle
                           onClick={() => toggleLeadSelection(lead._id)}
-                          className={`cursor-pointer ${
-                            selectedLeads.includes(lead._id)
+                          className={`cursor-pointer ${selectedLeads.includes(lead._id)
                               ? "text-green-600 fill-green-600"
                               : "text-gray-400"
-                          }`}
+                            }`}
                         />
                       ) : (
                         (page - 1) * itemsPerPage + index + 1
                       )}
                     </td>
- 
+
                     {leadSchema.map((field) => (
                       <td
                         key={field.fieldKey}
@@ -645,50 +664,47 @@ const getVisiblePages = () => {
         </div>
 
         {/* PAGINATION */}
-      {/* PAGINATION */}
-{totalPages > 1 && (
-  <div className="flex items-center justify-between mt-4">
-    <button
-      onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-      disabled={page === 1}
-      className={`px-3 py-1 rounded border text-sm ${
-        page === 1
-          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-          : "bg-white hover:bg-gray-50"
-      }`}
-    >
-      Previous
-    </button>
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              disabled={page === 1}
+              className={`px-3 py-1 rounded border text-sm ${page === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white hover:bg-gray-50"
+                }`}
+            >
+              Previous
+            </button>
 
-    <div className="flex items-center gap-2">
-      {getVisiblePages().map((pageNumber) => (
-        <button
-          key={pageNumber}
-          onClick={() => setPage(pageNumber)}
-          className={`px-3 py-1 rounded text-sm ${
-            page === pageNumber
-              ? "bg-blue-600 text-white"
-              : "bg-white border hover:bg-gray-50"
-          }`}
-        >
-          {pageNumber}
-        </button>
-      ))}
-    </div>
+            <div className="flex items-center gap-2">
+              {getVisiblePages().map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => setPage(pageNumber)}
+                  className={`px-3 py-1 rounded text-sm ${page === pageNumber
+                      ? "bg-blue-600 text-white"
+                      : "bg-white border hover:bg-gray-50"
+                    }`}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+            </div>
 
-    <button
-      onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={page === totalPages}
-      className={`px-3 py-1 rounded border text-sm ${
-        page === totalPages
-          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-          : "bg-white hover:bg-gray-50"
-      }`}
-    >
-      Next
-    </button>
-  </div>
-)}
+            <button
+              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={page === totalPages}
+              className={`px-3 py-1 rounded border text-sm ${page === totalPages
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white hover:bg-gray-50"
+                }`}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </CompanyLayout>
   );

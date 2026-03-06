@@ -31,19 +31,39 @@ function LeadForm() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
-    try {
-      await dispatch(createLead(formData)).unwrap();
-      alert("Lead created successfully");
-      setFormData();
-      navigate("/company/leadall")
-    } catch (err) {
-      alert("Failed to create lead");
-      console.error(err);
-    }
-  };
+  //   try {
+  //     await dispatch(createLead(formData)).unwrap();
+  //     alert("Lead created successfully");
+  //     setFormData();
+  //     navigate("/company/leadall")
+  //   } catch (err) {
+  //     alert("Failed to create lead");
+  //     console.error(err);
+  //   }
+  // };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    await dispatch(createLead(formData)).unwrap();
+    alert("Lead created successfully");
+    setFormData({}); // reset form
+    navigate("/company/leadall");
+  } catch (err) {
+    // err could be a string or an object depending on your API
+    // console.log(err)
+    // const errorMessage =
+    //   err?.message || // if your backend sends { message: "..." }
+    //   err?.data?.message || // if using RTK query error structure
+    //   "Failed to create lead";
+
+    alert(err);
+    // console.error("Backend error:", err);
+  }
+};
 
   /* -------------------- BULK UPLOAD -------------------- */
 
@@ -60,19 +80,48 @@ function LeadForm() {
     reader.readAsArrayBuffer(file);
   };
 
-  const handleBulkSubmit = async () => {
-    try {
-      for (const lead of bulkLeads) {
-        await dispatch(createLead(lead)).unwrap();
-      }
-      alert("Bulk leads created");
-      setBulkLeads([]);
-    } catch (err) {
-      alert("Bulk upload failed");
-      console.error(err);
-    }
-  };
+  // const handleBulkSubmit = async () => {
+  //   try {
+  //     for (const lead of bulkLeads) {
+  //       await dispatch(createLead(lead)).unwrap();
+  //     }
+  //     alert("Bulk leads created");
+  //     setBulkLeads([]);
+  //   } catch (err) {
+  //     alert("Bulk upload failed",err);
+  //     console.error(err);
+  //   }
+  // };
+const handleBulkSubmit = async () => {
+  setIsSubmitting(true);
 
+  const results = await Promise.allSettled(
+    bulkLeads.map(lead => dispatch(createLead(lead)).unwrap())
+  );
+
+  const success = results
+    .filter(r => r.status === "fulfilled")
+    .map(r => r.value);
+
+  const failed = results
+    .filter(r => r.status === "rejected")
+    .map((r, idx) => ({ lead: bulkLeads[idx], error: r.reason?.message || "Unknown error" }));
+
+  setIsSubmitting(false);
+  setBulkLeads([]);
+
+  // Show simple alert feedback
+  alert(
+    `Bulk upload complete.\n` +
+    `Success: ${success.length}\n` +
+    `Failed: ${failed.length}\n` +
+    (failed.length > 0 ? `Check console for failed leads.` : '')
+  );
+
+  if (failed.length > 0) {
+    console.log("Failed leads:", failed);
+  }
+};
   /* -------------------- RENDER -------------------- */
 
   return (
