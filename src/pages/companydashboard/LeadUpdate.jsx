@@ -49,6 +49,7 @@ function LeadUpdate() {
   // }, [formData.department])
   useEffect(() => {
     // Hardcode "Business Development" instead of formData.department
+//  dispatch(employeeDetails();
     dispatch(getRole("Business Development"));
   }, [dispatch]);
 
@@ -340,7 +341,7 @@ function LeadUpdate() {
                 className="border rounded px-2 py-1 w-72"
               >
                 <option value="">Select Role...</option>
-                {viewAllRole.roles
+                {viewAllRole?.roles
                   .filter(role => role.assign === true)
                   .map(role => (
                     <option key={role._id} value={role._id}>

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { base_URL } from "../../utils/BaseUrl";
 
-// ==================== THUNKS ====================
+//==================== THUNKS ====================
 
 // Create Lead
 export const createLead = createAsyncThunk(
@@ -115,12 +115,12 @@ export const deleteLead = createAsyncThunk(
 
 export const bulkAssign = createAsyncThunk(
   "lead/bulkAssign",
-  async ({ leadIds, assignedTo }, { rejectWithValue }) => {
+  async ({ leadIds, assignedTo ,roleID}, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${base_URL}lead/assign`, { leadIds, assignedTo }, {
+      const response = await axios.post(`${base_URL}lead/assign`, { leadIds, assignedTo ,roleID}, {
         withCredentials: true,
       });
-      console.log(response, "gghrthgehgf")
+      // console.log(response, "gghrthgehgf")
       return response.data;
     } catch (error) {
       const message =

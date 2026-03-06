@@ -413,19 +413,21 @@ function LeadAll() {
   };
 
   const handleAssignSubmit = () => {
-    if (!selectedEmployee) return alert("Please select an employee");
+    if (!selectedEmployee) return alert("Please select an employee"); 
     if (selectedLeads.length === 0) return alert("Please select at least one lead");
 
     const employee = employeeList.find(
       (e) => `${e.name} (${e.employeeCode})` === selectedEmployee
     );
-
+ 
     if (!employee) return alert("Invalid employee selected");
-
+// console.log(employee,"op")
     dispatch(
       bulkAssign({
         leadIds: selectedLeads,
         assignedTo: employee._id,
+        roleID:employee.roleID
+
       })
     );
 
@@ -533,7 +535,7 @@ const getVisiblePages = () => {
             </select>
           )}
 
-          {(isAdmin || permissionArray.includes("ldssign")) && (
+          {(isAdmin || permissionArray.includes("ldassign")) && (
             <select
               value={assignedFilter}
               onChange={(e) => {
@@ -608,7 +610,7 @@ const getVisiblePages = () => {
                         (page - 1) * itemsPerPage + index + 1
                       )}
                     </td>
-
+ 
                     {leadSchema.map((field) => (
                       <td
                         key={field.fieldKey}
