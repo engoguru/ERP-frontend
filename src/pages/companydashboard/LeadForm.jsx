@@ -92,7 +92,9 @@ function LeadForm() {
   //     console.error(err);
   //   }
   // };
+  const [IsSubmitting , setIsSubmitting]=useState(false)
 const handleBulkSubmit = async () => {
+  console.log("fbgsd")
   setIsSubmitting(true);
 
   const results = await Promise.allSettled(

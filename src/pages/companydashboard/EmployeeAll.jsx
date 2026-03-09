@@ -112,13 +112,13 @@ function EmployeeAll() {
               >
                 <option value="">Select Role</option>
 
-                {companyConfigureViewData?.data?.roles
+                {/* {companyConfigureViewData?.data?.roles
                   ?.find((dept) => dept.department === departmentFilter)
                   ?.roles?.map((role) => (
                     <option key={role} value={role}>
                       {role}
                     </option>
-                  ))}
+                  ))} */}
               </select>
             )}
 
@@ -152,7 +152,7 @@ function EmployeeAll() {
               </thead>
               <tbody>
                 {filteredEmployees.length > 0 ? (
-                  filteredEmployees.map((emp) => (
+                  filteredEmployees?.map((emp) => (
                     <tr key={emp._id} className="border-b hover:bg-gray-50">
                        <td className="px-2 py-2 text-xs font-medium">{emp.employeeCode}</td>
                       <td className="px-2 py-2 text-xs font-medium">{emp.name}</td>

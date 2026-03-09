@@ -20,6 +20,7 @@ import PayrollProfile from "./payroll/PayrollProfile";
 import AttendanceProfile from "./attendance/AttendanceProfile";
 import LeavesProfile from "./leaves/LeavesProfile";
 import { companyConfiguresView } from "../../redux/slice/companySlice";
+import Bdreport from "./reports/Bdreport";
 
 function EmployeeProfile() {
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ function EmployeeProfile() {
 
 
   // console.log(companyConfigureViewData)
-  const tabs = ["Profile", "Leaves", "Attendance", "Payroll"];
+  const tabs = ["Profile", "Leaves", "Attendance", "Payroll","Report"];
 
   if (loading)
     return (
@@ -278,6 +279,10 @@ function EmployeeProfile() {
           {activeTab === 3 &&
             <PayrollProfile salaryStructure={employee.salaryStructure} bankDetail={employee?.bankDetail} />
           }
+          {activeTab===4 &&
+              <Bdreport id={employeeId}/>
+            
+              }
 
         </div>
       </div>
