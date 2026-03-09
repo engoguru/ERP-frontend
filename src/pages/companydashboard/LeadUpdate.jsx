@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+// import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import CompanyLayout from "../../components/layout/companydashboard/CompanyLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { companyConfiguresView, getRole } from "../../redux/slice/companySlice";
@@ -11,6 +12,14 @@ function LeadUpdate() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+
+  const location = useLocation();
+  const params = useParams();
+  const leadId = params.id;
+
+  const queryParams = new URLSearchParams(location.search);
+  const previousPage = queryParams.get("page") || 1; // fallback to 1
 
   const { companyConfigureViewData } = useSelector(state => state.reducer.company);
   const leadSchema = companyConfigureViewData?.data?.leadForm || [];
@@ -78,18 +87,26 @@ const handleFieldChange = (key, value) => {
     ...prev,
     [key]: value
   }));
-
+console.log(key,value,"oo")
   // Only track status changes
-  if (key === "status") {
+  if (key === "status" && employeeData?.roleID && employeeData?.id) {
     const newStatusEntry = {
-      roleId: employeeData?.roleID,
-      userId: employeeData?.id,
+      roleId: employeeData.roleID,
+      userId: employeeData.id,
       status: value,
-      changedAt: new Date() // optional timestamp
+      changedAt: new Date()
     };
 
-    setStatusRecord(prev => [...prev, newStatusEntry]);
-
+    //  
+    if (value === "Confirmed") {
+  setStatusRecord(prev => {
+    const updated = [...(prev || []), newStatusEntry];
+    setTimeout(() => setOpenModal(true), 50); // modal opens after state is set
+    return updated;
+  });
+}else{
+  setStatusRecord(prev => [...(prev || []), newStatusEntry]);
+}
     if (value === "Confirmed") {
       setOpenModal(true); // show modal for Confirmed
     }
@@ -181,6 +198,7 @@ const handleFieldChange = (key, value) => {
   };
   // console.log(companyConfigureViewData,"kll")
   const handleSubmit = async () => {
+    console.log(statusRecord,"pp")
     try {
       const payload = {
         fields: formData,
@@ -192,7 +210,9 @@ const handleFieldChange = (key, value) => {
       // console.log(payload, "opterrerfgerffer")
       await dispatch(updateLead({ id, data: payload })).unwrap();
       alert("Lead updated successfully!");
-      navigate(0);
+      // navigate(0);
+        // Go back to the list on the same page
+    navigate(`/company/leadall?page=${previousPage}`);
     } catch (err) {
       console.error(err);
       alert("Update failed");
@@ -568,7 +588,8 @@ const handleFieldChange = (key, value) => {
 
                   // Other fields + auto-update status
                   formPayload.append("fields", JSON.stringify({ ...formData, status: "Confirmed" }));
-
+    // ✅ Correct way to send array
+  formPayload.append("statusRecord", JSON.stringify(statusRecord));
                   await dispatch(updateLead({ id, data: formPayload })).unwrap();
                   await dispatch(employeeDetails())
                   alert("Lead confirmed successfully!");

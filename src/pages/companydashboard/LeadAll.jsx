@@ -319,7 +319,7 @@
 
 
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CompanyLayout from "../../components/layout/companydashboard/CompanyLayout";
 import { Plus, Search, Edit, CheckCircle } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -329,6 +329,11 @@ import { employeeDetails } from "../../redux/slice/employee/loginSlice";
 import { viewEmployees } from "../../redux/slice/employee/employeeCreateSlice";
 
 function LeadAll() {
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const currentPage = Number(queryParams.get("page") || 1);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [itemsPerPage, setItemsPerPage] = useState(10)
@@ -360,13 +365,18 @@ function LeadAll() {
   const [statusFilter, setStatusFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [assignedFilter, setAssignedFilter] = useState("");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(currentPage);
 
   const [selectedLeads, setSelectedLeads] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState("");
 
   // const itemsPerPage =10;
-
+  // ---------------- SYNC PAGE WITH URL ----------------
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const pageFromUrl = Number(params.get("page") || 1);
+    setPage(pageFromUrl);
+  }, [location.search]);
   // ---------------- INIT ----------------
   useEffect(() => {
     if (!initialized) dispatch(employeeDetails());
@@ -378,10 +388,17 @@ function LeadAll() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1);
+
+      // reset page when search changes
+      if (search) {
+        setPage(1);
+        navigate("/company/leadall?page=1", { replace: true });
+      }
+
     }, 500);
+
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, navigate]);
 
   // ---------------- FETCH LEADS ----------------
   useEffect(() => {
@@ -395,7 +412,7 @@ function LeadAll() {
         assigned: assignedFilter,
       })
     );
-  }, [dispatch, page, debouncedSearch, statusFilter, dateFilter, assignedFilter,itemsPerPage]);
+  }, [dispatch, page, debouncedSearch, statusFilter, dateFilter, assignedFilter, itemsPerPage]);
 
   // ---------------- SCHEMA ----------------
   const leadSchema = companyConfigureViewData?.data?.leadForm || [];
@@ -448,55 +465,76 @@ function LeadAll() {
   // ---------------- PAGINATION LOGIC ----------------
   const getVisiblePages = () => {
     const pages = [];
+
+    const current = Math.min(page, totalPages);
+
     if (totalPages <= 20) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
-      let start = Math.max(page - 2, 1);
+      let start = Math.max(current - 2, 1);
       let end = Math.min(start + 4, totalPages);
 
       if (end - start < 4) start = Math.max(end - 4, 1);
 
       for (let i = start; i <= end; i++) pages.push(i);
     }
+
     return pages;
   };
+  const changePage = (newPage) => {
+    setPage(newPage); // update state
+    navigate(`/company/leadall?page=${newPage}`, { replace: true }); // update URL
+  };
+
+  const handleEdit = (leadId) => {
+    // Pass current page in query
+    // console.log(leadId, "pp")
+    navigate(`/company/lead/update/${leadId}?page=${page}`);
+  };
   // ---------------- UI ----------------
+    const handleItemsChange = (value) => {
+
+    setItemsPerPage(value);
+
+    setPage(1);
+
+    navigate("/company/leadall?page=1");
+
+  };
+
   return (
     <CompanyLayout>
       <div className="mx-auto w-full p-6 space-y-6">
         {/* HEADER */}
-   <div className="flex items-center justify-start gap-6 mb-4">
-  {/* Header */}
-  <h2 className="text-xl font-bold text-gray-800">All Leads</h2>
+        <div className="flex items-center justify-start gap-6 mb-4">
+          {/* Header */}
+          <h2 className="text-xl font-bold text-gray-800">All Leads</h2>
 
-  {/* Items per page selector */}
-  <div className="flex items-center gap-2">
-    <label className="text-gray-700 font-medium text-md">Items per page:</label>
-    <select
-      className="border border-gray-300 rounded-md px-2 py-1 text-gray-800 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-      value={itemsPerPage}
-      onChange={e => {
-        setItemsPerPage(Number(e.target.value));
-        setCurrentPage(1); // reset to first page
-      }}
-    >
-      <option value={10}>10</option>
-      <option value={25}>25</option>
-      <option value={50}>50</option>
-      <option value={100}>100</option>
-    </select>
-  </div>
+          {/* Items per page selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-gray-700 font-medium text-md">Items per page:</label>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => handleItemsChange(Number(e.target.value))}
+              className="border border-gray-300 rounded-md px-2 py-1"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
 
-  {/* Optional Create Lead button */}
-  {(isAdmin || permissionArray.includes("ldCreate")) && (
-    <button
-      onClick={() => navigate("/company/lead-form")}
-      className="ml-auto flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition"
-    >
-      <Plus size={16} /> Create Lead
-    </button>
-  )}
-</div>
+          {/* Optional Create Lead button */}
+          {(isAdmin || permissionArray.includes("ldCreate")) && (
+            <button
+              onClick={() => navigate("/company/lead-form")}
+              className="ml-auto flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition"
+            >
+              <Plus size={16} /> Create Lead
+            </button>
+          )}
+        </div>
 
         {/* ASSIGN SECTION */}
         {assignedFilter === "unassigned" &&
@@ -547,6 +585,7 @@ function LeadAll() {
               className="border rounded px-3 py-2 text-sm"
             >
               <option value="">All Status</option>
+              <option value="other">Other</option>
               {statusField.options?.map((opt, idx) => (
                 <option key={idx} value={opt}>
                   {opt}
@@ -621,8 +660,8 @@ function LeadAll() {
                         <CheckCircle
                           onClick={() => toggleLeadSelection(lead._id)}
                           className={`cursor-pointer ${selectedLeads.includes(lead._id)
-                              ? "text-green-600 fill-green-600"
-                              : "text-gray-400"
+                            ? "text-green-600 fill-green-600"
+                            : "text-gray-400"
                             }`}
                         />
                       ) : (
@@ -648,12 +687,8 @@ function LeadAll() {
 
                     <td className="px-4 py-3 text-center">
                       {(isAdmin || permissionArray.includes("ldEdit")) && (
-                        <Link
-                          to={`/company/lead/update/${lead._id}`}
-                          className="text-green-600"
-                        >
-                          <Edit size={16} />
-                        </Link>
+                        <button className="text-green-600" onClick={() => handleEdit(lead._id)}>     <Edit size={16} /></button>
+
                       )}
                     </td>
                   </tr>
@@ -668,11 +703,9 @@ function LeadAll() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
             <button
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => changePage(Math.max(page - 1, 1))}
               disabled={page === 1}
-              className={`px-3 py-1 rounded border text-sm ${page === 1
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white hover:bg-gray-50"
+              className={`px-3 py-1 rounded border text-sm ${page === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white hover:bg-gray-50"
                 }`}
             >
               Previous
@@ -682,10 +715,8 @@ function LeadAll() {
               {getVisiblePages().map((pageNumber) => (
                 <button
                   key={pageNumber}
-                  onClick={() => setPage(pageNumber)}
-                  className={`px-3 py-1 rounded text-sm ${page === pageNumber
-                      ? "bg-blue-600 text-white"
-                      : "bg-white border hover:bg-gray-50"
+                  onClick={() => changePage(pageNumber)}
+                  className={`px-3 py-1 rounded text-sm ${page === pageNumber ? "bg-blue-600 text-white" : "bg-white border hover:bg-gray-50"
                     }`}
                 >
                   {pageNumber}
@@ -694,11 +725,9 @@ function LeadAll() {
             </div>
 
             <button
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() => changePage(Math.min(page + 1, totalPages))}
               disabled={page === totalPages}
-              className={`px-3 py-1 rounded border text-sm ${page === totalPages
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white hover:bg-gray-50"
+              className={`px-3 py-1 rounded border text-sm ${page === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white hover:bg-gray-50"
                 }`}
             >
               Next
