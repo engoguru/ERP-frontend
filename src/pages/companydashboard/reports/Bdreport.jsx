@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { base_URL } from "../../../utils/BaseUrl";
+import { useSelector } from "react-redux";
 
 function Bdreport({ id }) {
   const [data, setData] = useState({});
@@ -12,7 +13,11 @@ function Bdreport({ id }) {
   const [currentPageLeads, setCurrentPageLeads] = useState(1);
   const [currentPageStatus, setCurrentPageStatus] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
+  const { employeeData, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+  const permissionArray = employeeData?.permissionArray;
+  const isAdmin = employeeData?.role === "Admin";
   // Fetch data
   const fetchData = async () => {
     try {
@@ -78,13 +83,16 @@ function Bdreport({ id }) {
         >
           All Leads {allAssignedLeads.length}
         </button>
-        <button
-          onClick={() => setActiveTab("status")}
-          className={`px-3 py-1 rounded text-sm font-medium ${activeTab === "status" ? "bg-blue-500 text-white" : "bg-gray-300"
-            }`}
-        >
-          Status Report {statusLeads.length}
-        </button>
+        {(isAdmin || permissionArray.includes("ldconverter")) && (
+          <button
+            onClick={() => setActiveTab("status")}
+            className={`px-3 py-1 rounded text-sm font-medium ${activeTab === "status" ? "bg-blue-500 text-white" : "bg-gray-300"
+              }`}
+          >
+            Status Report {statusLeads.length}
+          </button>
+        )}
+
       </div>
 
       {/* ================= FILTER INPUTS ================= */}
@@ -225,18 +233,18 @@ function Bdreport({ id }) {
                       <div key={sr._id} className="text-xs bg-gray-100 px-2 rounded">
                         <span className="font-semibold">{sr.roleId?.role}</span>{" "}
                         - {sr.userId?.name} →{" "}
-                     
-                          <span className="font-bold">
-                            {sr.status === "Interested" ? (
-                              <span className="text-blue-800">Interested</span>
-                            ) : sr.status === "Confirmed" ? (
-                              <span className="text-green-800">Confirmed</span>
-                            ) : sr.status === "Dump" ? (
-                              <span className="text-red-800">Dump</span>
-                            ) : sr.status === "Not Connected" ? (
-                              <span className="text-yellow-700">Not Connected</span>
-                            ) : null}
-                      
+
+                        <span className="font-bold">
+                          {sr.status === "Interested" ? (
+                            <span className="text-blue-800">Interested</span>
+                          ) : sr.status === "Confirmed" ? (
+                            <span className="text-green-800">Confirmed</span>
+                          ) : sr.status === "Dump" ? (
+                            <span className="text-red-800">Dump</span>
+                          ) : sr.status === "Not Connected" ? (
+                            <span className="text-yellow-700">Not Connected</span>
+                          ) : null}
+
 
                         </span> -{" "}
                         <span className="text-gray-500 text-xs">

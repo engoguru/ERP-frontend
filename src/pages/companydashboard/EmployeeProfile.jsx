@@ -200,7 +200,7 @@ function EmployeeProfile() {
                 ))} */}
                 {employee?.aadhar?.map((aadharDoc, index) => {
                   const isPdf = aadharDoc.public_id.toLowerCase().endsWith('.pdf');
-                  console.log(isPdf, "h")
+                  // console.log(isPdf, "h")
 
                   return isPdf ? (
                     <object

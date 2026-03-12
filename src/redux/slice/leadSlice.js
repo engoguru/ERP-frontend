@@ -78,11 +78,11 @@ export const fetchOneLead = createAsyncThunk(
 // Update Lead
 export const updateLead = createAsyncThunk(
   "lead/update",
-  async ({ id, data }, { rejectWithValue }) => {
+  async ({ id,objId, data }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
         `${base_URL}lead/update/${id}`, // your backend route
-        data,
+        { ...data, objId },
         { withCredentials: true }
       );
       return response.data;

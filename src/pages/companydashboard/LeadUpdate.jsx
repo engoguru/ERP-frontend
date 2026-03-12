@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import CompanyLayout from "../../components/layout/companydashboard/CompanyLayout";
 import { useDispatch, useSelector } from "react-redux";
-import { companyConfiguresView, getRole } from "../../redux/slice/companySlice";
+import { companyConfiguresView, getDepartment, getRole } from "../../redux/slice/companySlice";
 import { fetchOneLead, updateLead } from "../../redux/slice/leadSlice";
 import { viewEmployees } from "../../redux/slice/employee/employeeCreateSlice";
 import { employeeDetails } from "../../redux/slice/employee/loginSlice";
@@ -19,7 +19,8 @@ function LeadUpdate() {
   const leadId = params.id;
 
   const queryParams = new URLSearchParams(location.search);
-  const previousPage = queryParams.get("page") || 1; // fallback to 1
+  const previousPage = queryParams.get("page") || 1;
+  const limit = queryParams.get("limit") || 10; // fallback to 1
 
   const { companyConfigureViewData } = useSelector(state => state.reducer.company);
   const leadSchema = companyConfigureViewData?.data?.leadForm || [];
@@ -37,6 +38,7 @@ function LeadUpdate() {
   const [followUpMessage, setFollowUpMessage] = useState("");
   const [openModal, setOpenModal] = useState(false);
 
+  const [departmentName, setDepartmentName] = useState("");
   // OnConfirmed modal states
   const [contact, setContact] = useState({});
   const [totalAmount, setTotalAmount] = useState("");
@@ -46,21 +48,30 @@ function LeadUpdate() {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState([]);
   // const [date, setDate] = useState("");
-const [statusRecord,setStatusRecord]=useState([])
+  const [statusRecord, setStatusRecord] = useState([])
   const permissionArray = employeeData?.permissionArray;
   const isAdmin = employeeData?.role === "Admin";
   const { viewAllRole } = useSelector((state) => state.reducer.company);
-  // useEffect(() => {
-  //     if (formData.department) {
-  //         dispatch(getRole(formData.department))
-  //         // getRole
-  //     }
-  // }, [formData.department])
+  const { viewAllDepartment } = useSelector((state) => state.reducer.company);
   useEffect(() => {
-    // Hardcode "Business Development" instead of formData.department
-    //  dispatch(employeeDetails();
-    dispatch(getRole("Business Development"));
-  }, [dispatch]);
+    if (employeeData?.permissionArray?.includes("ldprocessor")) {
+      dispatch(getDepartment());
+    }
+  }, [employeeData])
+
+  useEffect(() => {
+    if (employeeData?.permissionArray?.includes("ldprocessor")) {
+      dispatch(getRole(departmentName));
+    }
+
+    if (employeeData?.permissionArray?.includes("ldassign") || isAdmin) {
+      dispatch(getRole("Business Development"));
+    }
+
+    if (/manager/i.test(employeeData?.role)) {
+      dispatch(getRole(employeeData?.department));
+    }
+  }, [dispatch, employeeData, departmentName,isAdmin]);
 
   useEffect(() => {
     if (!initialized) dispatch(employeeDetails());
@@ -82,36 +93,36 @@ const [statusRecord,setStatusRecord]=useState([])
   //   alert("Are you Confirm ?")
   //   if (key === "status" && value === "Confirmed") setOpenModal(true);
   // };
-const handleFieldChange = (key, value) => {
-  setFormData(prev => ({
-    ...prev,
-    [key]: value
-  }));
-console.log(key,value,"oo")
-  // Only track status changes
-  if (key === "status" && employeeData?.roleID && employeeData?.id) {
-    const newStatusEntry = {
-      roleId: employeeData.roleID,
-      userId: employeeData.id,
-      status: value,
-      changedAt: new Date()
-    };
+  const handleFieldChange = (key, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [key]: value
+    }));
+    console.log(key, value, "oo")
+    // Only track status changes
+    if (key === "status" && employeeData?.roleID && employeeData?.id) {
+      const newStatusEntry = {
+        roleId: employeeData.roleID,
+        userId: employeeData.id,
+        status: value,
+        changedAt: new Date()
+      };
 
-    //  
-    if (value === "Confirmed") {
-  setStatusRecord(prev => {
-    const updated = [...(prev || []), newStatusEntry];
-    setTimeout(() => setOpenModal(true), 50); // modal opens after state is set
-    return updated;
-  });
-}else{
-  setStatusRecord(prev => [...(prev || []), newStatusEntry]);
-}
-    if (value === "Confirmed") {
-      setOpenModal(true); // show modal for Confirmed
+      //  
+      if (value === "Confirmed") {
+        setStatusRecord(prev => {
+          const updated = [...(prev || []), newStatusEntry];
+          setTimeout(() => setOpenModal(true), 50); // modal opens after state is set
+          return updated;
+        });
+      } else {
+        setStatusRecord(prev => [...(prev || []), newStatusEntry]);
+      }
+      if (value === "Confirmed") {
+        setOpenModal(true); // show modal for Confirmed
+      }
     }
-  }
-};
+  };
   // const handleAddFollowUp = () => {
   //   if (!followUpMessage) return alert("Enter follow-up message!");
   //   setFollowUps(prev => [
@@ -198,7 +209,7 @@ console.log(key,value,"oo")
   };
   // console.log(companyConfigureViewData,"kll")
   const handleSubmit = async () => {
-    console.log(statusRecord,"pp")
+    // console.log(statusRecord,"pp")
     try {
       const payload = {
         fields: formData,
@@ -211,8 +222,9 @@ console.log(key,value,"oo")
       await dispatch(updateLead({ id, data: payload })).unwrap();
       alert("Lead updated successfully!");
       // navigate(0);
-        // Go back to the list on the same page
-    navigate(`/company/leadall?page=${previousPage}`);
+      // Go back to the list on the same page
+      // navigate(`/users/edit/${id}?page=${page}&limit=${limit}`);
+      navigate(`/company/leadall?page=${previousPage}&limit=${limit}`);
     } catch (err) {
       console.error(err);
       alert("Update failed");
@@ -228,9 +240,9 @@ console.log(key,value,"oo")
       </CompanyLayout>
     );
   }
-
+  // console.log(viewAllRole, "kj")
   return (
-    <CompanyLayout>
+    <CompanyLayout >
       <div className="max-w-5xl mx-auto px-6 py-0 space-y-2">
         <h2 className="text-2xl font-bold">Update Lead</h2>
 
@@ -288,85 +300,148 @@ console.log(key,value,"oo")
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-lg border border-gray-400">
-              <table className="min-w-full text-xs text-left text-gray-700">
+            <div className="overflow-x-auto rounded-lg">
+              <table className="min-w-full text-xs text-left text-gray-700 border border-gray-400 border-collapse">
 
                 {/* Table Head */}
-                <thead className="bg-gray-100 text-xs  tracking-wider text-gray-600 border-b border-gray-600">
+                <thead className="bg-gray-200 text-xs tracking-wider text-gray-700">
                   <tr>
-                    <th className="px-2 py-2">Service</th>
-                    <th className="px-2 py-2">Description</th>
-                    <th className="px-2 py-2">Total</th>
-                    <th className="px-2 py-2">Paid</th>
-                    <th className="px-2 py-2">Unpaid</th>
-                    <th className="px-2 py-2">Contact</th>
-                    <th className="px-2 py-2">Date</th>
-                    <th className="px-2 py-2">Added By</th>
-                    <th className="px-2 py-2">Docs</th>
+
+
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Service</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Description</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Paid</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Unpaid</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Contact</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Date</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Added By</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Docs</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Status</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total Time</th>
                   </tr>
                 </thead>
 
                 {/* Table Body */}
-                <tbody className="divide-y divide-gray-200">
-                  {leadDetail?.OnConfirmed?.map((item) => (
-                    <tr key={item._id} className="hover:bg-gray-50 transition border-b border-gray-300 shadow-lg">
+                <tbody>
+                  {leadDetail?.OnConfirmed?.map((item) => {
 
-                      <td className="px-2 py-2 font-medium text-gray-800">
-                        {item.nameOfService}
-                      </td>
+                    const lastStatus = item?.status?.at(-1)?.label;
 
-                      <td className="px-2 py-2 text-gray-600">
-                        {item.description}
-                      </td>
+                    return (
+                      <tr key={item._id} className="hover:bg-gray-300 transition">
 
-                      <td className="px-2 py-2 text-gray-800 font-semibold">
-                        ₹ {item.totalAmount}
-                      </td>
+                        <td className="border border-gray-500 px-2 py-1 font-medium text-gray-800">
+                          {item.nameOfService}
+                        </td>
 
-                      <td className="px-2 py-2 text-green-600 font-medium">
-                        ₹ {item.paidAmount}
-                      </td>
+                        <td className="border border-gray-500 px-2 py-1 font-medium text-gray-800">
+                          {item.description}
+                        </td>
 
-                      <td className="px-2 py-2 text-red-500 font-medium">
-                        ₹ {item.unpaidAmount}
-                      </td>
+                        <td className="border border-gray-500 px-2 py-1 font-semibold">
+                          ₹ {item.totalAmount}
+                        </td>
 
-                      <td className="px-2 py-2">
-                        <div className="flex flex-col">
-                          <span>{item.contact?.name}</span>
-                          <span className="text-xs text-gray-500">
-                            {item.contact?.phone}
-                          </span>
-                        </div>
-                      </td>
+                        <td className="border border-gray-500 px-2 py-1 text-green-600 font-medium">
+                          ₹ {item.paidAmount}
+                        </td>
 
-                      <td className="px-3 py-3">
-                        {new Date(item.date).toLocaleDateString()}
-                      </td>
+                        <td className="border border-gray-500 px-2 py-1 text-red-500 font-medium">
+                          ₹ {item.unpaidAmount}
+                        </td>
 
-                      <td className="px-3 py-3">
-                        {item.addedBy?.name || "-"}
-                      </td>
+                        <td className="border border-gray-500 px-2 py-1">
+                          <div className="flex flex-col text-xs">
+                            <span>{item.contact?.name}</span>
+                            <span className="text-xs text-gray-500">
+                              {item.contact?.phone}
+                            </span>
+                          </div>
+                        </td>
 
-                      <td className="px-3 py-3">
-                        <div className="flex gap-2 flex-wrap">
-                          {[...(item.files || []), ...(item.OnConfirmedFiles || [])]
-                            ?.filter(file => file.url)
-                            ?.map((file) => (
-                              <img
-                                key={file._id}
-                                src={file.url}
-                                alt="file"
-                                className="w-14 h-14 object-cover rounded border cursor-pointer hover:scale-105 transition"
-                                onClick={() => window.open(file.url, "_blank")}
-                              />
-                            ))}
-                        </div>
-                      </td>
+                        <td className="border border-gray-500 px-2 py-1">
+                          {item.date ? new Date(item.date).toLocaleDateString() : "-"}
+                        </td>
 
-                    </tr>
-                  ))}
+                        <td className="border border-gray-500 px-2 py-1">
+                          {item.addedBy?.name || "-"}
+                        </td>
+
+                        {/* Files */}
+                        <td className="border border-gray-500 px-2 py-1">
+                          <div className="flex gap-1 flex-wrap">
+                            {[...(item.files || []), ...(item.OnConfirmedFiles || [])]
+                              ?.filter(file => file?.url)
+                              ?.map((file) => (
+                                <img
+                                  key={file._id}
+                                  src={file.url}
+                                  alt="file"
+                                  className="w-12 h-12 object-cover rounded border cursor-pointer hover:scale-115 transition"
+                                  onClick={() => window.open(file.url, "_blank")}
+                                />
+                              ))}
+                          </div>
+                        </td>
+
+                        {/* Status */}
+                        <td className="border border-gray-500 px-2 py-1">
+                          <select
+                            value={lastStatus || ""}
+                            onChange={async (e) => {
+                              const newStatus = e.target.value;
+
+                              const formPayload = {
+                                status: [
+                                  ...(Array.isArray(item.status) ? item.status : []),
+                                  {
+                                    label: newStatus,
+                                    addedBy: employeeData.id,
+                                    date: new Date().toISOString(),
+                                  },
+                                ],
+                              };
+
+                              try {
+                                await dispatch(
+                                  updateLead({
+                                    id,
+                                    objId: item._id,
+                                    data: formPayload,
+                                  })
+                                ).unwrap();
+                              } catch (err) {
+                                console.error("Failed to update lead:", err);
+                              }
+                            }}
+                            className="border rounded px-1 py-1"
+                          >
+                            <option value="" disabled>
+                              Update Status
+                            </option>
+                            <option value="Pending">Pending</option>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Completed">Completed</option>
+                          </select>
+                        </td>
+
+                        {/* Total Time */}
+                        <td className="border border-gray-500 px-2 py-1 font-bold">
+                          {lastStatus === "Completed"
+                            ? item.totalTime
+                            : lastStatus === "Ongoing"
+                              ? "Processing.."
+                              : lastStatus === "Pending"
+                                ? "Not started"
+                                : "-"}
+                        </td>
+
+                      </tr>
+                    );
+                  })}
                 </tbody>
+
               </table>
             </div>
           </div>
@@ -374,7 +449,7 @@ console.log(key,value,"oo")
 
         {/* Assignments */}
         <div>
-          <h3 className="font-semibold">Lead Assigned</h3>
+          <h3 className="font-semibold flex">Lead Assigned</h3>
           {(isAdmin || permissionArray.includes("ldassign")) && (
             <div className="flex items-center gap-2 my-2">
               <select
@@ -399,7 +474,88 @@ console.log(key,value,"oo")
               </button>
             </div>
           )}
-          {assignments?.length === 0 && <p className="text-gray-500">No assignments yet.</p>}
+          {( permissionArray.includes("ldprocessor")) && (
+            <>
+              <p label="Select Department" className="flex items-center gap-2 my-2" >
+                <select
+                  className="input border rounded px-2 py-1 w-72"
+                  value={departmentName}
+                  onChange={(e) => setDepartmentName(e.target.value)}
+                >
+                  <option value="">-- Select Department --</option>
+                  {viewAllDepartment?.map((dept) => (
+                    <option key={dept._id} value={dept.name}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+              </p>
+
+              {departmentName && (
+                <div className="flex items-center gap-2 my-2">
+                  <select
+                    value={selectedEmployee}
+                    onChange={(e) => setSelectedEmployee(e.target.value)}
+                    className="border rounded px-2 py-1 w-72"
+                  >
+                    <option value="">Select Manager...</option>
+
+                    {viewAllRole?.roles
+                      ?.filter(
+                        (role) =>
+                          role.assign &&
+                          /Manager/i.test(role.role)
+                      )
+                      .map((role) => (
+                        <option key={role._id} value={role._id}>
+                          {role.role}
+                        </option>
+                      ))}
+                  </select>
+
+                  <button
+                    onClick={handleAddAssignment}
+                    className="bg-blue-600 text-white px-3 py-1 rounded"
+                  >
+                    Assign
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+          {( /manager/i.test(employeeData?.role)) && (
+            <>
+              <div className="flex items-center gap-2 my-2">
+                <select
+                  value={selectedEmployee}
+                  onChange={(e) => setSelectedEmployee(e.target.value)}
+                  className="border rounded px-2 py-1 w-72"
+                >
+                  <option value="">Select Manager...</option>
+
+                  {viewAllRole?.roles
+                    ?.filter(
+                      (role) =>
+                        role.assign &&
+                        !/Manager/i.test(role.role)
+                    )
+                    .map((role) => (
+                      <option key={role._id} value={role._id}>
+                        {role.role}
+                      </option>
+                    ))}
+                </select>
+
+                <button
+                  onClick={handleAddAssignment}
+                  className="bg-blue-600 text-white px-3 py-1 rounded"
+                >
+                  Assign
+                </button>
+              </div>
+            </>
+          )}
+          {assignments?.length === 0 && <p className="text-gray-500">No assignments</p>}
           {assignments?.map((a, i) => (
             <div key={i} className="flex gap-4 border-b py-1">
               <p className="px-4">
@@ -525,10 +681,10 @@ console.log(key,value,"oo")
                     </td>
                     <td
                       className={`border px-2 py-1 font-medium ${fu.status === "pending"
-                          ? "text-red-600"
-                          : fu.status === "completed"
-                            ? "text-green-600"
-                            : ""
+                        ? "text-red-600"
+                        : fu.status === "completed"
+                          ? "text-green-600"
+                          : ""
                         }`}
                     >
                       {fu.status}
@@ -555,7 +711,7 @@ console.log(key,value,"oo")
         {/* Save Button */}
         <button
           onClick={handleSubmit}
-          className="bg-purple-600 text-white px-4 py-2 rounded"
+          className="bg-purple-600 text-white px-4 py-2 rounded mb-6"
         >
           Save Changes
         </button>
@@ -588,8 +744,8 @@ console.log(key,value,"oo")
 
                   // Other fields + auto-update status
                   formPayload.append("fields", JSON.stringify({ ...formData, status: "Confirmed" }));
-    // ✅ Correct way to send array
-  formPayload.append("statusRecord", JSON.stringify(statusRecord));
+                  // ✅ Correct way to send array
+                  formPayload.append("statusRecord", JSON.stringify(statusRecord));
                   await dispatch(updateLead({ id, data: formPayload })).unwrap();
                   await dispatch(employeeDetails())
                   alert("Lead confirmed successfully!");

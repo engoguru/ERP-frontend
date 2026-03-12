@@ -3,6 +3,8 @@ import CompanyLayout from "../../../components/layout/companydashboard/CompanyLa
 import { Building2, PlusCircle, Shield, Trash2, Save, Check } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { createDepartment, createRole, getDepartment} from "../../../redux/slice/companySlice";
+import axios from "axios";
+import { base_URL } from "../../../utils/BaseUrl";
 
 function Field({ label, icon, children }) {
   return (
@@ -26,13 +28,21 @@ function RoleConfigure() {
   const [roleName, setRoleName] = useState("");
   const [roleEmail, setRoleEmail] = useState("");
   const [rolePhone, setRolePhone] = useState("");
-
+const [currentRole,setCurrentrole]=useState([])
   /* ================= LOAD DEPARTMENTS ================= */
   useEffect(() => {
     dispatch(getDepartment());
     // getDepartment
   }, [dispatch]);
-// console.log(viewAllDepartment,"p")
+
+useEffect(()=>{
+ const handlefetch=async()=>{
+  const  response=await axios.get(`${base_URL}role/viewViaDepartment2?departmentId=${selectedDept}`)
+    setCurrentrole(response.data.roles)
+ }
+ handlefetch()
+ },[selectedDept])
+console.log(currentRole,"p")
   /* ================= CREATE DEPARTMENT ================= */
   const handleCreateDepartment = async () => {
     if (!departmentName.trim()) return alert("Enter department name");
@@ -65,7 +75,7 @@ function RoleConfigure() {
         email: roleEmail.trim(),
         phone: rolePhone.trim(),
       };
-console.log(payload,"pp")
+// console.log(payload,"pp")
       await dispatch(createRole(payload)).unwrap();
       // createRole
       alert("Role added!");
@@ -115,7 +125,41 @@ console.log(payload,"pp")
             </select>
           </Field>
         </div>
+<div className="overflow-x-auto">
+  <table className="min-w-full border border-gray-300 text-sm">
+    <thead className="bg-gray-100">
+      <tr>
+        <th className="border px-3 py-2">#</th>
+        <th className="border px-3 py-2">Role</th>
+        <th className="border px-3 py-2">Email</th>
+        <th className="border px-3 py-2">Phone</th>
+        <th className="border px-3 py-2">Assign</th>
+        <th className="border px-3 py-2">Status</th>
+        <th className="border px-3 py-2">Created</th>
+      </tr>
+    </thead>
 
+    <tbody>
+      {currentRole?.map((item, index) => (
+        <tr key={item._id} className="hover:bg-gray-50">
+          <td className="border px-3 py-2">{index + 1}</td>
+          <td className="border px-3 py-2">{item.role}</td>
+          <td className="border px-3 py-2">{item.email}</td>
+          <td className="border px-3 py-2">{item.phone}</td>
+          <td className="border px-3 py-2">
+            {item.assign ? "Yes" : "No"}
+          </td>
+          <td className="border px-3 py-2">
+            {item.isActive ? "Active" : "Inactive"}
+          </td>
+          <td className="border px-3 py-2">
+            {new Date(item.createdAt).toLocaleDateString()}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
         {/* ================= CREATE ROLE ================= */}
         {selectedDept && (
           <div className="bg-white p-6 rounded-xl shadow mb-6">

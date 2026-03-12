@@ -487,7 +487,7 @@ function PermissionConfigure() {
       alert("An unexpected error occurred while saving permissions");
     }
   };
-
+console.log(permissionList,companyConfigureViewData)
   return (
     <CompanyLayout>
       <div className="mx-auto max-w-5xl p-6">
