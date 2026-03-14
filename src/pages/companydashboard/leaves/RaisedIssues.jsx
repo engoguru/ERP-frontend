@@ -101,8 +101,8 @@ function RaisedIssues() {
                 </tr>
               ))}
               {!loading && issues?.length === 0 && (
-                <tr>
-                  <td colSpan="4" className="p-6 text-center text-gray-500">
+                <tr className="border">
+                  <td colSpan="4" className="p-6 text-center text-gray-500 ">
                     No issues found
                   </td>
                 </tr>
@@ -156,7 +156,7 @@ function RaisedIssues() {
 
         {/* VIEW MODAL */}
         {showView && selectedIssue && (
-          <Modal title="Issue Details" onClose={() => setShowView(false)}>
+          <Modal title="Issue Details" onClose={() => setShowView(false)} >
             <div className="space-y-4">
               <Info label="Title" value={selectedIssue.title} />
               <Info label="Description" value={selectedIssue.description} />
@@ -198,9 +198,9 @@ function RaisedIssues() {
 const Modal = ({ title, children, onClose }) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div className="bg-white rounded-xl w-full max-w-md p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold">{title}</h3>
-        <button onClick={onClose} className="text-gray-500">✕</button>
+      <div className="flex justify-between items-center mb-4 border-b-2 border-gray-400">
+        <h3 className="text-lg font-bold pb-2 ">{title}</h3>
+        <button onClick={onClose} className="text-gray-900 mb-2 font-bold border-2 px-2 text-red-700 rounded-lg border-red-600">✕</button>
       </div>
       {children}
     </div>
@@ -208,8 +208,8 @@ const Modal = ({ title, children, onClose }) => (
 );
 
 const Info = ({ label, value }) => (
-  <div>
-    <p className="text-sm text-gray-500">{label}</p>
+  <div className="text-left">
+    <p className="text-sm  text-gray-500">{label}</p>
     <p className="font-medium text-gray-800">{value}</p>
   </div>
 );

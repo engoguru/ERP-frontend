@@ -118,7 +118,7 @@ const handleUpdate = async (e) => {
     if (allLeaveData?.total && page * limit < allLeaveData.total)
       setPage((prev) => prev + 1);
   };
-
+ const permissionArray = employeeData?.permissionArray || [];
   return (
     <CompanyLayout>
       <div className="p-6">
@@ -145,7 +145,7 @@ const handleUpdate = async (e) => {
                 <th className="p-3 text-left">Days</th>
                 <th className="p-3 text-left">Reason</th>
                 <th className="p-3 text-left">Status</th>
-                {(employeeData?.role === "Admin" || employeeData?.role === "HR") && (
+                {(employeeData?.role === "Admin" || employeeData?.role === "HR" ||permissionArray.includes("leaEdit")) && (
                   <th className="p-3 text-left">Actions</th>
                 )}
               </tr>
@@ -185,7 +185,7 @@ const handleUpdate = async (e) => {
                         {leave.status}
                       </span>
                     </td>
-                    {(employeeData?.role === "Admin" || employeeData?.role === "HR") && (
+                    {(employeeData?.role === "Admin" || employeeData?.role === "HR" || permissionArray.includes("leaEdit")) && (
                       <td className="p-3 flex gap-2">
                         <button
                           onClick={() => handleEditOpen(leave._id)}
@@ -265,26 +265,26 @@ const handleUpdate = async (e) => {
 
         {/* Edit Leave Modal */}
         {showEditModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded w-full max-w-md">
+          <div className="fixed inset-0 bg-black/50 bg-opacity-60 flex justify-center items-center z-50">
+            <div className="bg-gray-200 p-6 rounded w-full max-w-md">
               <h3 className="text-lg font-semibold mb-4">Update Leave Status</h3>
               <form onSubmit={handleUpdate} className="space-y-4">
-                <input type="date" value={editData.fromDate} className="w-full border rounded px-3 py-2 bg-gray-100" disabled />
-                <input type="date" value={editData.toDate} className="w-full border rounded px-3 py-2 bg-gray-100" disabled />
-                <input type="text" value={editData.leaveType} className="w-full border rounded px-3 py-2 bg-gray-100" disabled />
-                <textarea value={editData.reason} className="w-full border rounded px-3 py-2 bg-gray-100" disabled />
-                <input type="text" value={editData.totalday?.totalPaid + editData.totalday?.totalUnpaid} className="w-full border rounded px-3 py-2 bg-gray-100" disabled />
+                <input type="date" value={editData.fromDate} className="w-full border-2 border-gray-400 rounded px-3 py-1 bg-gray-100" disabled />
+                <input type="date" value={editData.toDate} className="w-full border-2 border-gray-400 rounded px-3 py-1 bg-gray-100" disabled />
+                <input type="text" value={editData.leaveType} className="w-full border-2 border-gray-400 rounded px-3 py-1 bg-gray-100" disabled />
+                <textarea value={editData.reason} className="w-full border-2 border-gray-400 rounded px-3 py-1 bg-gray-100" disabled />
+                <input type="text" value={editData.totalday?.totalPaid + editData.totalday?.totalUnpaid} className="w-full border-2 border-gray-400 rounded px-3 py-2 bg-gray-100" disabled/>
 
                 {/* Only editable field */}
-                <select name="status" value={editData.status} onChange={handleEditChange} className="w-full border rounded px-3 py-2" required>
+                <select name="status" value={editData.status} onChange={handleEditChange} className="w-full border-2 rounded px-3 py-2" required>
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
                   <option value="Reject">Reject</option>
                 </select>
 
                 <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded">Cancel</button>
-                  <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+                  <button type="button " onClick={() => setShowEditModal(false)} className="px-4 py-1 font-medium rounded-lg border rounded">Cancel</button>
+                  <button type="submit" className="bg-blue-600 text-white rounded-lg font-medium px-4 py-1 rounded">Update</button>
                 </div>
               </form>
             </div>

@@ -93,36 +93,61 @@ function LeadUpdate() {
   //   alert("Are you Confirm ?")
   //   if (key === "status" && value === "Confirmed") setOpenModal(true);
   // };
-  const handleFieldChange = (key, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [key]: value
-    }));
-    console.log(key, value, "oo")
-    // Only track status changes
-    if (key === "status" && employeeData?.roleID && employeeData?.id) {
-      const newStatusEntry = {
-        roleId: employeeData.roleID,
-        userId: employeeData.id,
-        status: value,
-        changedAt: new Date()
-      };
+  // const handleFieldChange = (key, value) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     [key]: value
+  //   }));
+  //   // console.log(key, value, "oo")
+  //   // Only track status changes
+  //   if (key === "status" && employeeData?.roleID && employeeData?.id) {
+  //     const newStatusEntry = {
+  //       roleId: employeeData.roleID,
+  //       userId: employeeData.id,
+  //       status: value,
+  //       changedAt: new Date()
+  //     };
 
-      //  
-      if (value === "Confirmed") {
-        setStatusRecord(prev => {
-          const updated = [...(prev || []), newStatusEntry];
-          setTimeout(() => setOpenModal(true), 50); // modal opens after state is set
-          return updated;
-        });
-      } else {
-        setStatusRecord(prev => [...(prev || []), newStatusEntry]);
-      }
-      if (value === "Confirmed") {
-        setOpenModal(true); // show modal for Confirmed
-      }
-    }
-  };
+  //     //  
+  //     if (value === "Confirmed") {
+  //       setStatusRecord(prev => {
+  //         const updated = [...(prev || []), newStatusEntry];
+  //         setTimeout(() => setOpenModal(true), 50); // modal opens after state is set
+  //         return updated;
+  //       });
+  //     } else {
+  //       setStatusRecord(prev => [...(prev || []), newStatusEntry]);
+  //     }
+  //     if (value === "Confirmed") {
+  //       setOpenModal(true); // show modal for Confirmed
+  //     }
+  //   }
+  // };
+const handleFieldChange = (key, value) => {
+setFormData(prev => {
+  const updated = { ...prev, [key]: value };
+  console.log("Updated data:", updated);
+  return updated;
+});
+console.log(key,value,formData,"opop")
+  if (key === "status" && employeeData?.roleID && employeeData?.id) {
+    const newStatusEntry = {
+      roleId: employeeData.roleID,
+      userId: employeeData.id,
+      status: value,
+      changedAt: new Date()
+    };
+
+    setStatusRecord(prev => [...(prev || []), newStatusEntry]);
+  }
+};
+useEffect(() => {
+  const lastStatus = statusRecord?.[statusRecord.length - 1];
+
+  if (lastStatus?.status === "Confirmed") {
+    setOpenModal(true);
+  }
+}, [statusRecord]);
   // const handleAddFollowUp = () => {
   //   if (!followUpMessage) return alert("Enter follow-up message!");
   //   setFollowUps(prev => [
@@ -209,7 +234,7 @@ function LeadUpdate() {
   };
   // console.log(companyConfigureViewData,"kll")
   const handleSubmit = async () => {
-    // console.log(statusRecord,"pp")
+    console.log(formData,"pp")
     try {
       const payload = {
         fields: formData,
@@ -218,6 +243,7 @@ function LeadUpdate() {
         whoAssignedwho: assignments,
         roleID: roleID,
       };
+      
       // console.log(payload, "opterrerfgerffer")
       await dispatch(updateLead({ id, data: payload })).unwrap();
       alert("Lead updated successfully!");
@@ -378,7 +404,7 @@ function LeadUpdate() {
                                   key={file._id}
                                   src={file.url}
                                   alt="file"
-                                  className="w-12 h-12 object-cover rounded border cursor-pointer hover:scale-115 transition"
+                                  className="w-11 h-11 object-cover rounded border cursor-pointer hover:scale-110 transition"
                                   onClick={() => window.open(file.url, "_blank")}
                                 />
                               ))}

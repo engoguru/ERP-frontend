@@ -76,15 +76,51 @@ export const fetchOneLead = createAsyncThunk(
 );
 
 // Update Lead
+// export const updateLead = createAsyncThunk(
+//   "lead/update",
+//   async ({ id, objId, data }, { rejectWithValue }) => {
+//     try {
+//       // add objId into FormData
+//       if (objId) {
+//         data.append("objId", objId);
+//       }
+
+//       const response = await axios.put(
+//         `${base_URL}lead/update/${id}`,
+//         data,   // ✅ send FormData directly
+//         {
+//           withCredentials: true
+//         }
+//       );
+
+//       return response.data;
+//     } catch (error) {
+//       const message =
+//         error.response?.data?.message || error.message || "Lead update failed";
+//       return rejectWithValue(message);
+//     }
+//   }
+// );
 export const updateLead = createAsyncThunk(
   "lead/update",
-  async ({ id,objId, data }, { rejectWithValue }) => {
+  async ({ id, objId, data }, { rejectWithValue }) => {
     try {
+
+      let payload;
+
+      if (objId) {
+         payload = { ...data, objId };
+
+      } else {
+               payload = data;
+      }
+
       const response = await axios.put(
-        `${base_URL}lead/update/${id}`, // your backend route
-        { ...data, objId },
+        `${base_URL}lead/update/${id}`,
+        payload,
         { withCredentials: true }
       );
+
       return response.data;
     } catch (error) {
       const message =
@@ -93,7 +129,6 @@ export const updateLead = createAsyncThunk(
     }
   }
 );
-
 // Delete Lead
 export const deleteLead = createAsyncThunk(
   "lead/delete",
