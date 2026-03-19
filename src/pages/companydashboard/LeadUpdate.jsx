@@ -263,13 +263,13 @@ useEffect(() => {
         <div className="flex justify-center items-center min-h-screen">
           <p className="text-gray-500 text-lg">Loading lead...</p>
         </div>
-      </CompanyLayout>
+      </CompanyLayout> 
     );
   }
   // console.log(viewAllRole, "kj")
   return (
     <CompanyLayout >
-      <div className="max-w-5xl mx-auto px-6 py-0 space-y-2">
+      <div className="max-w-5xl border-2 border-gray-500 mx-auto px-6 py-0 my-4 rounded-lg shadow-xl/30 space-y-2">
         <h2 className="text-2xl font-bold">Update Lead</h2>
 
         {/* Dynamic Fields */}
@@ -343,7 +343,7 @@ useEffect(() => {
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Date</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Added By</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Docs</th>
-                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Status</th>
+                     {( isAdmin || /manager/i.test(employeeData?.role)) && ( <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Status</th>)}
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total Time</th>
                   </tr>
                 </thead>
@@ -412,6 +412,7 @@ useEffect(() => {
                         </td>
 
                         {/* Status */}
+                          {( isAdmin || /manager/i.test(employeeData?.role)) && (
                         <td className="border border-gray-500 px-2 py-1">
                           <select
                             value={lastStatus || ""}
@@ -450,12 +451,12 @@ useEffect(() => {
                             <option value="Ongoing">Ongoing</option>
                             <option value="Completed">Completed</option>
                           </select>
-                        </td>
+                        </td>)}
 
                         {/* Total Time */}
                         <td className="border border-gray-500 px-2 py-1 font-bold">
                           {lastStatus === "Completed"
-                            ? item.totalTime
+                            ? `${item.totalTime} Days`
                             : lastStatus === "Ongoing"
                               ? "Processing.."
                               : lastStatus === "Pending"

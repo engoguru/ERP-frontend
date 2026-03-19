@@ -137,6 +137,7 @@ import { base_URL } from "../../utils/BaseUrl";
 import { nanoid } from "nanoid";
 
 function Chatbot() {
+  const messagesEndRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [question, setQuestion] = useState(""); // only input text
   const [messages, setMessages] = useState([]);
@@ -144,78 +145,57 @@ function Chatbot() {
   function cleanReply(text) {
     return text.replace(/\*/g, "").trim();
   }
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (!question.trim()) return;
 
-  //   const payload = {
-  //     message: question,
-  //     userId: userIdRef.current,
-  //   };
-
-  //   try {
-  //     const response = await axios.post(`${base_URL}chat/start`, payload);
-
-
-  //     // When adding AI message
-  //     setMessages((prev) => [
-  //       ...prev,
-  //       { id: nanoid(), type: "user", content: question },
-  //       { id: nanoid(), type: "bot", content: cleanReply(response.data.reply) },
-  //     ]);
-  //     // Add user message and AI reply to chat
-
-  //     setQuestion(""); // clear input
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!question.trim()) return;
+    e.preventDefault();
+    if (!question.trim()) return;
 
-  const userMsg = { id: nanoid(), type: "user", content: question };
+    const userMsg = { id: nanoid(), type: "user", content: question };
 
-  // 1️⃣ Show the user message immediately
-  setMessages((prev) => [...prev, userMsg]);
+    // 1️⃣ Show the user message immediately
+    setMessages((prev) => [...prev, userMsg]);
 
-  setQuestion(""); // clear input
+    setQuestion(""); // clear input
 
-  // Add a "bot is typing" placeholder
-  const botPlaceholder = { id: nanoid(), type: "bot", content: "typing..." };
-  setMessages((prev) => [...prev, botPlaceholder]);
+    // Add a "bot is typing" placeholder
+    const botPlaceholder = { id: nanoid(), type: "bot", content: "typing..." };
+    setMessages((prev) => [...prev, botPlaceholder]);
 
-  try {
-    // Call your backend API
-    const response = await axios.post(`${base_URL}chat/start`, {
-      message: question,
-      userId: userIdRef.current,
-    });
+    try {
+      // Call your backend API
+      const response = await axios.post(`${base_URL}chat/start`, {
+        message: question,
+        userId: userIdRef.current,
+      });
 
-    //Clean and shorten the reply
-    const botReply = cleanReply(response.data.reply);
+      //Clean and shorten the reply
+      const botReply = cleanReply(response.data.reply);
 
-    //  Replace the typing placeholder with actual reply
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === botPlaceholder.id ? { ...m, content: botReply } : m
-      )
-    );
-  } catch (error) {
-    console.error(error);
-    // Replace typing placeholder with error message
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === botPlaceholder.id
-          ? { ...m, content: "Sorry, something went wrong." }
-          : m
-      )
-    );
-  }
-};
-
+      //  Replace the typing placeholder with actual reply
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === botPlaceholder.id ? { ...m, content: botReply } : m
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      // Replace typing placeholder with error message
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === botPlaceholder.id
+            ? { ...m, content: "Sorry, something went wrong." }
+            : m
+        )
+      );
+    }
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
   return (
     <>
       {/* Floating Button */}
@@ -233,7 +213,7 @@ function Chatbot() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}   
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed bottom-10 right-6 z-100 w-[340px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-5xl border border-gray-300 overflow-hidden"
@@ -267,15 +247,18 @@ function Chatbot() {
                 >
                   <div
                     className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-xs font-normal text-start ${msg.type === "user"
-                        ? "bg-[hsl(168_76%_42%)] text-white rounded-br-md"
-                        : "bg-gray-700 text-gray-200 rounded-bl-md"
+                      ? "bg-[hsl(168_76%_42%)] text-white rounded-br-md"
+                      : "bg-gray-700 text-gray-200 rounded-bl-md"
                       }`}
                   >
                     {msg.content}
                   </div>
                 </div>
               ))}
+              {/*          THIS is important */}
+              <div ref={messagesEndRef} />
             </div>
+
 
             {/* Input */}
             <div className="p-4 border-t border-gray-200 bg-white">

@@ -56,7 +56,7 @@ function ProtectRoute() {
 
   // console.log(employeeData, "employeeData");
 
-  // 1️⃣ Show loader while fetching or uninitialized
+  //  Show loader while fetching or uninitialized
   if (loading || !initialized) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -65,12 +65,12 @@ function ProtectRoute() {
     );
   }
 
-  // 2️⃣ Redirect if fetch is done but no user
+  //  Redirect if fetch is done but no user
   if (!employeeData) {
     return <Navigate to="/login" replace />;
   }
 
-  // 3️⃣ Authorized → render child routes
+  // Authorized → render child routes
   return <Outlet />;
 }
 

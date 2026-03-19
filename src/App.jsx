@@ -39,6 +39,7 @@ import RaisedIssues from './pages/companydashboard/leaves/RaisedIssues';
 import LeavesProfile from './pages/companydashboard/leaves/LeavesProfile';
 import CompanyEdit from './pages/companydashboard/CompanyEdit';
 import EmployeeEdit from './pages/companydashboard/EmployeeEdit';
+import Chatbot from './components/common/Chatbot';
 
 
 function App() {
@@ -136,9 +137,11 @@ const dispatch = useDispatch();
       
 
       
+      {/* <Chatbot */}
+      
        
       </Routes>
-
+<Chatbot />
     </>
   );
 }

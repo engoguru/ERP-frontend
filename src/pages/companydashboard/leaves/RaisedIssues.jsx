@@ -57,7 +57,7 @@ function RaisedIssues() {
           </h2>
           <button
             onClick={() => setShowCreate(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-red-600 hover:bg-red-900 text-xs font-semibold text-white px-4 py-1 rounded-lg hover:bg-blue-700"
           >
             Raise Issue
           </button>
@@ -65,35 +65,37 @@ function RaisedIssues() {
 
         {/* TABLE */}
         <div className="bg-white shadow rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-100 text-gray-600">
+          <table className="w-full  text-left border">
+            <thead className="bg-gray-500 text-white border text-sm ">
               <tr>
                 <th className="p-4 text-left">Title</th>
+                <th className="p-4 text-left">Description</th>
                 <th className="p-4 text-left">Submitted By</th>
                 <th className="p-4 text-left">Status</th>
                 <th className="p-4 text-center">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody >
               {issues?.map((issue) => (
-                <tr key={issue._id} className="border-t hover:bg-gray-50">
-                  <td className="p-4 font-medium">{issue.title}</td>
-                  <td className="p-4">{issue.submittedBy?.name}</td>
-                  <td className="p-4">
+                <tr key={issue._id} className="border-t hover:bg-gray-400 text-xs">
+                  <td className="p-2 font-medium">{issue.title}</td>
+                   <td className="p-2 font-medium">{issue.description}</td>
+                  <td className="p-2">{issue.submittedBy?.name}</td>
+                  <td className="p-2">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBadge[issue.status]}`}
                     >
                       {issue.status}
                     </span>
                   </td>
-                  <td className="p-4 text-center">
+                  <td className="p-2 text-center">
                     <button
                       onClick={() => {
                         setSelectedIssue(issue);
                         setStatus(issue.status);
-                        setShowView(true);
+                        setShowView(true);              
                       }}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-blue-600 hover:text-red-500"
                     >
                       <Eye size={18} />
                     </button>

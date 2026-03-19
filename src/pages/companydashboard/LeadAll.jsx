@@ -15,7 +15,7 @@ function LeadAll() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const currentPage = Number(queryParams.get("page") || 1);
- const limit = queryParams.get("limit") || 10; 
+  const limit = queryParams.get("limit") || 10;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [itemsPerPage, setItemsPerPage] = useState(limit)
@@ -43,6 +43,7 @@ function LeadAll() {
 
   // ---------------- LOCAL STATE ----------------
   const [search, setSearch] = useState("");
+  const [source, setSource] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
@@ -92,14 +93,15 @@ function LeadAll() {
         status: statusFilter,
         date: dateFilter,
         assigned: assignedFilter,
+        source: source
       })
     );
-  }, [dispatch, page, debouncedSearch, statusFilter, dateFilter, assignedFilter, itemsPerPage]);
-useEffect(() => {
-  navigate(`/company/leadall?page=${page}&search=${debouncedSearch}`, {
-    replace: true,
-  });
-}, [page, debouncedSearch, navigate]);
+  }, [dispatch, page, debouncedSearch, statusFilter, dateFilter, assignedFilter, itemsPerPage, source]);
+  useEffect(() => {
+    navigate(`/company/leadall?page=${page}&search=${debouncedSearch}`, {
+      replace: true,
+    });
+  }, [page, debouncedSearch, navigate]);
   // ---------------- SCHEMA ----------------
   const leadSchema = companyConfigureViewData?.data?.leadForm || [];
   const statusField = leadSchema.find(
@@ -192,7 +194,7 @@ useEffect(() => {
     <CompanyLayout>
       <div className="mx-auto w-full p-6 space-y-6">
         {/* HEADER */}
-        <div className="flex items-center justify-start gap-6 mb-4">
+        <div className="flex items-center justify-start gap-3 mb-4">
           {/* Header */}
           <h2 className="text-xl font-bold text-gray-800">All Leads</h2>
 
@@ -249,7 +251,7 @@ useEffect(() => {
           )}
 
         {/* FILTERS */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 bg-white p-4 rounded shadow">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 bg-white p-4 rounded shadow">
           <div className="relative">
             <Search className="absolute left-3 top-3 text-gray-400" />
             <input
@@ -259,6 +261,21 @@ useEffect(() => {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full border rounded py-2 pl-9 pr-3 text-sm"
             />
+          </div>
+          <div>
+            <select
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              className="w-[100%] border rounded py-2 pl-3 pr-3 text-sm"
+            >meetingWebsite
+              <option value="">Select Source</option>
+              <option value="mumbai seminar">Mumbai Seminar</option>
+              <option value="delhi seminar">Delhi Seminar</option>
+              <option value="mahakumbh">Mahakumbh</option>
+              <option value="Trust Registration">Trust Registration</option>
+              <option value="meeting">Meeting</option>
+              <option value="Website">Website</option>
+            </select>
           </div>
 
           {statusField && (
@@ -421,7 +438,7 @@ useEffect(() => {
           </div>
         )}
       </div>
-    </CompanyLayout>
+    </CompanyLayout >
   );
 }
 

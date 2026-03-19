@@ -85,17 +85,17 @@ const Footer = () => {
             <ul className="space-y-4 text-sm text-gray-300">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-[hsl(168_76%_42%)] mt-0.5" />
-                <span>123 ERP Street, Tech Park, Bangalore 560001</span>
+                <span>123 ERP Street, Laxmi Nagar, Delhi 110092</span>
               </li>
-              <li className="flex items-center gap-3">
+              <li className="flex items-center gap-3">  
                 <Phone className="w-5 h-5 text-[hsl(168_76%_42%)]" />
-                <span>+91 98765 43210</span>
+                <span>+91 99104 01351</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[hsl(168_76%_42%)]" />
                 <span>support@erpsolutions.com</span>
               </li>
-            </ul>
+            </ul>     
           </div>
         </div>
 
