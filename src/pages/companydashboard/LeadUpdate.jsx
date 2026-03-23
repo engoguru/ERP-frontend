@@ -302,7 +302,7 @@ useEffect(() => {
                   value={value}
                   onChange={e => handleFieldChange(key, e.target.value)}
                   className="w-full border text-xs font-semibold rounded px-2  py-1"
-                  disabled
+                
                 />
               </div>
             );
