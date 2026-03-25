@@ -68,6 +68,9 @@ function Sidebar({ isMobile }) {
     ...(isAdmin || permissionArray.includes("ldView")
       ? [{ label: "Leads", path: "/company/leadall", icon: Briefcase }]
       : []),
+       ...(isAdmin || permissionArray.includes("etView")
+      ? [{ label: "Seminar", path: "/company/seminar", icon: Briefcase }]
+      : []),
     { label: "Apply Leaves", path: "/company/applyLeave", icon: Briefcase },
     { label: "Raised Issues", path: "/company/raised", icon: Briefcase },
     //  Admin-only menus

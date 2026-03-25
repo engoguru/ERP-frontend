@@ -40,6 +40,7 @@ import LeavesProfile from './pages/companydashboard/leaves/LeavesProfile';
 import CompanyEdit from './pages/companydashboard/CompanyEdit';
 import EmployeeEdit from './pages/companydashboard/EmployeeEdit';
 import Chatbot from './components/common/Chatbot';
+import SeminarData from './pages/companydashboard/seminar/SeminarData';
 
 
 function App() {
@@ -85,6 +86,8 @@ const dispatch = useDispatch();
           <Route path="/company/form-configure" element={<LeadFormConfigure />} />
           <Route path="/company/lead-form" element={<LeadForm />} />
           <Route path="/company/leadall" element={<LeadAll />} />
+          
+ <Route path="/company/seminar" element={<SeminarData />} />
           <Route path="/company/lead/update/:id" element={<LeadUpdate/>}/>
 
           <Route path="/company/role-configure" element={<RoleConfigure />} />

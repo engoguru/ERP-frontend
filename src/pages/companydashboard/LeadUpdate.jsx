@@ -71,7 +71,7 @@ function LeadUpdate() {
     if (/manager/i.test(employeeData?.role)) {
       dispatch(getRole(employeeData?.department));
     }
-  }, [dispatch, employeeData, departmentName,isAdmin]);
+  }, [dispatch, employeeData, departmentName, isAdmin]);
 
   useEffect(() => {
     if (!initialized) dispatch(employeeDetails());
@@ -123,31 +123,31 @@ function LeadUpdate() {
   //     }
   //   }
   // };
-const handleFieldChange = (key, value) => {
-setFormData(prev => {
-  const updated = { ...prev, [key]: value };
-  console.log("Updated data:", updated);
-  return updated;
-});
-console.log(key,value,formData,"opop")
-  if (key === "status" && employeeData?.roleID && employeeData?.id) {
-    const newStatusEntry = {
-      roleId: employeeData.roleID,
-      userId: employeeData.id,
-      status: value,
-      changedAt: new Date()
-    };
+  const handleFieldChange = (key, value) => {
+    setFormData(prev => {
+      const updated = { ...prev, [key]: value };
+      console.log("Updated data:", updated);
+      return updated;
+    });
+    console.log(key, value, formData, "opop")
+    if (key === "status" && employeeData?.roleID && employeeData?.id) {
+      const newStatusEntry = {
+        roleId: employeeData.roleID,
+        userId: employeeData.id,
+        status: value,
+        changedAt: new Date()
+      };
 
-    setStatusRecord(prev => [...(prev || []), newStatusEntry]);
-  }
-};
-useEffect(() => {
-  const lastStatus = statusRecord?.[statusRecord.length - 1];
+      setStatusRecord(prev => [...(prev || []), newStatusEntry]);
+    }
+  };
+  useEffect(() => {
+    const lastStatus = statusRecord?.[statusRecord.length - 1];
 
-  if (lastStatus?.status === "Confirmed") {
-    setOpenModal(true);
-  }
-}, [statusRecord]);
+    if (lastStatus?.status === "Confirmed") {
+      setOpenModal(true);
+    }
+  }, [statusRecord]);
   // const handleAddFollowUp = () => {
   //   if (!followUpMessage) return alert("Enter follow-up message!");
   //   setFollowUps(prev => [
@@ -234,7 +234,7 @@ useEffect(() => {
   };
   // console.log(companyConfigureViewData,"kll")
   const handleSubmit = async () => {
-    console.log(formData,"pp")
+    // console.log(formData,"pp")
     try {
       const payload = {
         fields: formData,
@@ -243,7 +243,7 @@ useEffect(() => {
         whoAssignedwho: assignments,
         roleID: roleID,
       };
-      
+
       // console.log(payload, "opterrerfgerffer")
       await dispatch(updateLead({ id, data: payload })).unwrap();
       alert("Lead updated successfully!");
@@ -263,7 +263,7 @@ useEffect(() => {
         <div className="flex justify-center items-center min-h-screen">
           <p className="text-gray-500 text-lg">Loading lead...</p>
         </div>
-      </CompanyLayout> 
+      </CompanyLayout>
     );
   }
   // console.log(viewAllRole, "kj")
@@ -302,7 +302,7 @@ useEffect(() => {
                   value={value}
                   onChange={e => handleFieldChange(key, e.target.value)}
                   className="w-full border text-xs font-semibold rounded px-2  py-1"
-                
+                  disabled={!isAdmin}
                 />
               </div>
             );
@@ -343,7 +343,7 @@ useEffect(() => {
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Date</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Added By</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Docs</th>
-                     {( isAdmin || /manager/i.test(employeeData?.role)) && ( <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Status</th>)}
+                    {(isAdmin || /manager/i.test(employeeData?.role)) && (<th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Status</th>)}
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total Time</th>
                   </tr>
                 </thead>
@@ -412,46 +412,46 @@ useEffect(() => {
                         </td>
 
                         {/* Status */}
-                          {( isAdmin || /manager/i.test(employeeData?.role)) && (
-                        <td className="border border-gray-500 px-2 py-1">
-                          <select
-                            value={lastStatus || ""}
-                            onChange={async (e) => {
-                              const newStatus = e.target.value;
+                        {(isAdmin || /manager/i.test(employeeData?.role)) && (
+                          <td className="border border-gray-500 px-2 py-1">
+                            <select
+                              value={lastStatus || ""}
+                              onChange={async (e) => {
+                                const newStatus = e.target.value;
 
-                              const formPayload = {
-                                status: [
-                                  ...(Array.isArray(item.status) ? item.status : []),
-                                  {
-                                    label: newStatus,
-                                    addedBy: employeeData.id,
-                                    date: new Date().toISOString(),
-                                  },
-                                ],
-                              };
+                                const formPayload = {
+                                  status: [
+                                    ...(Array.isArray(item.status) ? item.status : []),
+                                    {
+                                      label: newStatus,
+                                      addedBy: employeeData.id,
+                                      date: new Date().toISOString(),
+                                    },
+                                  ],
+                                };
 
-                              try {
-                                await dispatch(
-                                  updateLead({
-                                    id,
-                                    objId: item._id,
-                                    data: formPayload,
-                                  })
-                                ).unwrap();
-                              } catch (err) {
-                                console.error("Failed to update lead:", err);
-                              }
-                            }}
-                            className="border rounded px-1 py-1"
-                          >
-                            <option value="" disabled>
-                              Update Status
-                            </option>
-                            <option value="Pending">Pending</option>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Completed">Completed</option>
-                          </select>
-                        </td>)}
+                                try {
+                                  await dispatch(
+                                    updateLead({
+                                      id,
+                                      objId: item._id,
+                                      data: formPayload,
+                                    })
+                                  ).unwrap();
+                                } catch (err) {
+                                  console.error("Failed to update lead:", err);
+                                }
+                              }}
+                              className="border rounded px-1 py-1"
+                            >
+                              <option value="" disabled>
+                                Update Status
+                              </option>
+                              <option value="Pending">Pending</option>
+                              <option value="Ongoing">Ongoing</option>
+                              <option value="Completed">Completed</option>
+                            </select>
+                          </td>)}
 
                         {/* Total Time */}
                         <td className="border border-gray-500 px-2 py-1 font-bold">
@@ -501,7 +501,7 @@ useEffect(() => {
               </button>
             </div>
           )}
-          {( permissionArray.includes("ldprocessor")) && (
+          {(permissionArray.includes("ldprocessor")) && (
             <>
               <p label="Select Department" className="flex items-center gap-2 my-2" >
                 <select
@@ -550,7 +550,7 @@ useEffect(() => {
               )}
             </>
           )}
-          {( /manager/i.test(employeeData?.role)) && (
+          {(/manager/i.test(employeeData?.role)) && (
             <>
               <div className="flex items-center gap-2 my-2">
                 <select
@@ -754,6 +754,10 @@ useEffect(() => {
                 e.preventDefault();
 
                 try {
+                  if (!files || files.length === 0) {
+                    alert("Please upload at least one file");
+                    return;
+                  }
                   const formPayload = new FormData();
 
                   // OnConfirmed fields
@@ -837,8 +841,10 @@ useEffect(() => {
               </div>
 
               <div className="mb-2">
-                <label className="block text-sm font-medium">Files</label>
-                <input type="file" multiple onChange={e => setFiles(Array.from(e.target.files))} className="border rounded px-2 py-1 w-full" />
+                <label className="block text-sm font-medium text-red-00">
+                  Files <span className="text-red-800">*</span>
+                </label>
+                <input type="file" required multiple onChange={e => setFiles(Array.from(e.target.files))} className="border rounded px-2 py-1 w-full" />
                 <small className="text-gray-200">Files will be uploaded</small>
               </div>
 
