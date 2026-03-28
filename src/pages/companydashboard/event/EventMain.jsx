@@ -115,13 +115,13 @@ function EventMain() {
 
   return (
     <CompanyLayout pageTitle="Company Events">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6 p-2">
 
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <CalendarDays className="text-emerald-600" />
-            Company Events
+           
+            {/* Company Events */}
           </h2>
              {(isAdmin || permissionArray.includes("etCreate")) && (
           <button

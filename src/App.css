@@ -48,3 +48,492 @@ body {
 .read-the-docs {
   color: #888;
 } */
+
+
+
+
+/* ─────────────────────────────────────────────────────────────
+   GLOBAL BASE
+───────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #f0f4f8;
+  margin: 0;
+}
+
+.font-mono-dm { font-family: 'DM Mono', monospace !important; }
+
+/* Shared root scope for dashboard pages */
+.ent, .ent * {
+  font-family: 'DM Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   KEYFRAME ANIMATIONS
+───────────────────────────────────────────────────────────── */
+
+/* Fade up — used by dashboard cards, section headers */
+@keyframes ent-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Fade in from left — used by sidebar nav items */
+@keyframes sb-fade-in {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Slide + scale — used by IP dropdown panel */
+@keyframes ip-dd {
+  from { opacity: 0; transform: translateY(6px) scaleY(0.96); }
+  to   { opacity: 1; transform: translateY(0)   scaleY(1); }
+}
+
+/* Fade up (small) — used by IP form fields */
+@keyframes ip-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Spinner — used by IP loading state */
+@keyframes ip-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Pop — used by copy button success */
+@keyframes ip-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* Pulse dot — emerald (active status) */
+@keyframes ent-pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+/* Pulse dot — indigo (sidebar online status) */
+@keyframes sb-pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(99, 102, 241, 0); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ANIMATION UTILITY CLASSES
+───────────────────────────────────────────────────────────── */
+.anim-up-1  { animation: ent-up 0.5s ease  60ms  both; }
+.anim-up-2  { animation: ent-up 0.5s ease  80ms  both; }
+.anim-up-3  { animation: ent-up 0.5s ease 140ms  both; }
+.anim-up-4  { animation: ent-up 0.5s ease 200ms  both; }
+.anim-up-5  { animation: ent-up 0.5s ease 240ms  both; }
+.anim-up-6  { animation: ent-up 0.5s ease 260ms  both; }
+.anim-up-7  { animation: ent-up 0.45s ease  0ms  both; }
+.anim-kpi-0 { animation: ent-up 0.5s ease   0ms  both; }
+.anim-kpi-1 { animation: ent-up 0.5s ease  60ms  both; }
+.anim-kpi-2 { animation: ent-up 0.5s ease 120ms  both; }
+.anim-kpi-3 { animation: ent-up 0.5s ease 180ms  both; }
+
+/* Pulse dots */
+.pulse-dot    { animation: ent-pulse-dot 2.2s infinite; }
+.pulse-dot-sm { animation: ent-pulse-dot 2.0s infinite; }
+
+/* ─────────────────────────────────────────────────────────────
+   DASHBOARD — CARD VARIANTS
+───────────────────────────────────────────────────────────── */
+
+/* White surface card with hover lift */
+.white-card {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+.white-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 20px 48px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* Dark gradient card (hero stats) */
+.dark-card {
+  background: linear-gradient(140deg, #0f172a 0%, #1a2744 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.dark-card:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07);
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DASHBOARD — DECORATIVE ELEMENTS
+───────────────────────────────────────────────────────────── */
+
+/* Glowing blur orb */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+/* Dot-grid overlay on hero banner */
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Curved bottom edge on hero section */
+.hero-curve {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: #f0f4f8;
+  border-radius: 60% 60% 0 0 / 30px 30px 0 0;
+}
+
+/* Horizontal gradient divider line */
+.grad-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(226,232,240,0.8), rgba(226,232,240,0.2), transparent);
+}
+
+/* Section header trailing accent line */
+.section-accent-line {
+  flex: 1;
+  height: 1px;
+  margin-left: 6px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DASHBOARD — PROGRESS BARS
+───────────────────────────────────────────────────────────── */
+.bar-track {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.bar-fill-el {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DASHBOARD — TABLE ROW HOVER
+───────────────────────────────────────────────────────────── */
+.tr-hover {
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.tr-hover:hover {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SIDEBAR
+───────────────────────────────────────────────────────────── */
+
+/* Deep navy gradient background */
+.sb-bg {
+  background: linear-gradient(180deg, #0b1120 0%, #0f172a 40%, #111827 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Logo area top strip */
+.sb-logo-sep {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Section group label (Workspace / Personal / Admin) */
+.sb-group-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.35);
+  padding: 16px 16px 6px;
+}
+
+/* Active nav item */
+.sb-item-active {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: #ffffff;
+}
+
+/* Inactive nav item */
+.sb-item-inactive {
+  border: 1px solid transparent;
+  color: rgba(148, 163, 184, 0.75);
+}
+.sb-item-inactive:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+}
+
+/* Active left indicator bar with glow */
+.sb-active-bar {
+  background: linear-gradient(180deg, #6366f1, #8b5cf6);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
+}
+
+/* Avatar gradient circle */
+.sb-avatar {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Support card at sidebar footer */
+.sb-support-card {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: background 0.2s;
+}
+.sb-support-card:hover {
+  background: rgba(99, 102, 241, 0.14);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* Stagger fade-in on sidebar nav items */
+.sb-nav-item { animation: sb-fade-in 0.35s ease both; }
+.sb-nav-item:nth-child(1)  { animation-delay:   0ms; }
+.sb-nav-item:nth-child(2)  { animation-delay:  30ms; }
+.sb-nav-item:nth-child(3)  { animation-delay:  60ms; }
+.sb-nav-item:nth-child(4)  { animation-delay:  90ms; }
+.sb-nav-item:nth-child(5)  { animation-delay: 120ms; }
+.sb-nav-item:nth-child(6)  { animation-delay: 150ms; }
+.sb-nav-item:nth-child(7)  { animation-delay: 180ms; }
+.sb-nav-item:nth-child(8)  { animation-delay: 210ms; }
+.sb-nav-item:nth-child(9)  { animation-delay: 240ms; }
+.sb-nav-item:nth-child(10) { animation-delay: 270ms; }
+.sb-nav-item:nth-child(11) { animation-delay: 300ms; }
+.sb-nav-item:nth-child(12) { animation-delay: 330ms; }
+.sb-nav-item:nth-child(13) { animation-delay: 360ms; }
+.sb-nav-item:nth-child(14) { animation-delay: 390ms; }
+.sb-nav-item:nth-child(15) { animation-delay: 420ms; }
+.sb-nav-item:nth-child(16) { animation-delay: 450ms; }
+.sb-nav-item:nth-child(17) { animation-delay: 480ms; }
+.sb-nav-item:nth-child(18) { animation-delay: 510ms; }
+.sb-nav-item:nth-child(19) { animation-delay: 540ms; }
+.sb-nav-item:nth-child(20) { animation-delay: 570ms; }
+
+/* Sidebar scrollbar */
+.sb-nav::-webkit-scrollbar       { width: 3px; }
+.sb-nav::-webkit-scrollbar-track { background: transparent; }
+.sb-nav::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 99px; }
+
+/* Version chip (DM Mono) */
+.sb-version {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.25);
+  letter-spacing: 1px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   IP CONFIGURE — FORM INPUTS
+───────────────────────────────────────────────────────────── */
+.ip-input {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 10px;
+  padding: 11px 14px 11px 36px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.ip-input:focus {
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+.ip-input:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: #ffffff;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   IP CONFIGURE — CUSTOM SELECT DROPDOWN
+───────────────────────────────────────────────────────────── */
+
+/* Trigger button */
+.ip-sel-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.ip-sel-trigger:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: #ffffff;
+}
+.ip-sel-trigger.open {
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-radius: 10px 10px 0 0;
+}
+
+/* Dropdown panel */
+.ip-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: #ffffff;
+  border: 1px solid #6366f1;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 16px 40px rgba(99,102,241,0.14), 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 999;
+  overflow: hidden;
+  animation: ip-dd 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top center;
+}
+
+/* Search input inside dropdown */
+.ip-dd-search {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+  border: none;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: #f8fafc;
+  outline: none;
+}
+.ip-dd-search::placeholder { color: #94a3b8; }
+
+/* Dropdown scrollable list */
+.ip-dd-list { max-height: 220px; overflow-y: auto; padding: 6px; }
+.ip-dd-list::-webkit-scrollbar       { width: 4px; }
+.ip-dd-list::-webkit-scrollbar-track { background: transparent; }
+.ip-dd-list::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 99px; }
+
+/* Option row */
+.ip-dd-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+}
+.ip-dd-opt:hover            { background: rgba(99, 102, 241, 0.07); }
+.ip-dd-opt.selected         { background: rgba(99, 102, 241, 0.10); }
+.ip-dd-opt.selected .ip-check { opacity: 1; }
+.ip-check { opacity: 0; margin-left: auto; flex-shrink: 0; }
+
+/* ─────────────────────────────────────────────────────────────
+   IP CONFIGURE — BUTTONS & STATES
+───────────────────────────────────────────────────────────── */
+
+/* Submit button */
+.ip-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+.ip-submit:hover   { opacity: 0.92; box-shadow: 0 6px 20px rgba(99,102,241,0.45); }
+.ip-submit:active  { transform: scale(0.985); }
+.ip-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: #94a3b8;
+}
+
+/* Copy button */
+.ip-copy-btn {
+  flex-shrink: 0;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.ip-copy-btn:hover  { background: #dcfce7; border-color: #86efac; }
+.ip-copy-btn:active { transform: scale(0.96); }
+.ip-copy-btn.copied {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+  animation: ip-pop 0.3s ease;
+}
+
+/* Loading spinner */
+.ip-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: ip-spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* Form field label */
+.ip-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+/* Form field stagger animation */
+.ip-field { animation: ip-up 0.4s ease both; }
