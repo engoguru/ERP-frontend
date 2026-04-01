@@ -156,7 +156,11 @@ function Dashboard() {
                 </span>
               </div>
               <h1 className="m-0 font-bold" style={{ fontSize: 27, color: "#fff", letterSpacing: "-0.8px", lineHeight: 1.2 }}>
-                {greeting}{employeeData?.name ? `, ${employeeData.name.split(" ")[0]}` : ""} 👋
+                {greeting}{employeeData?.name ? `, ${employeeData.name.split(" ")[0]}` : ""}<span
+                  style={{
+    display: "inline-block", // ❗ important
+    animation: "wave 0.6s ease-in-out infinite"
+  }}>👋</span>
               </h1>
               <p className="mt-2 text-[13px]" style={{ color: "rgba(148,163,184,0.55)" }}>{dateStr}</p>
             </div>

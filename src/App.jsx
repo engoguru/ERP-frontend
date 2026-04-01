@@ -41,11 +41,14 @@ import CompanyEdit from './pages/companydashboard/CompanyEdit';
 import EmployeeEdit from './pages/companydashboard/EmployeeEdit';
 import Chatbot from './components/common/Chatbot';
 import SeminarData from './pages/companydashboard/seminar/SeminarData';
+import ReTreatCamp from './pages/companydashboard/re-treatCamp/ReTreatCamp';
+import RegisterCamp from './pages/companydashboard/re-treatCamp/RegisterCamp';
+import UpdateRetreat from './pages/companydashboard/re-treatCamp/UpdateRetreat';
 
 
 function App() {
 
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const { employeeData, loading } = useSelector((state) => state.reducer.login);
 
@@ -54,7 +57,7 @@ const dispatch = useDispatch();
       dispatch(employeeDetails());
     }
 
-   
+
   }, [dispatch, employeeData]);
   return (
     <>
@@ -73,7 +76,7 @@ const dispatch = useDispatch();
 
       <Routes>
         {/* ---------------- Public/Register Routes ---------------- */}
-        <Route path='/' element={<Home/>}/>
+        <Route path='/' element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path='/login' element={<Login />} />
 
@@ -86,25 +89,29 @@ const dispatch = useDispatch();
           <Route path="/company/form-configure" element={<LeadFormConfigure />} />
           <Route path="/company/lead-form" element={<LeadForm />} />
           <Route path="/company/leadall" element={<LeadAll />} />
-          
- <Route path="/company/seminar" element={<SeminarData />} />
-          <Route path="/company/lead/update/:id" element={<LeadUpdate/>}/>
+
+          <Route path="/company/seminar" element={<SeminarData />} />
+          <Route path="/company/re-treat" element={<ReTreatCamp/>}/>
+          <Route path="/company/re-treat/register" element={<RegisterCamp/>}/>
+          <Route path="/company/re-treat/update/:id" element={<UpdateRetreat/>}/>
+
+          <Route path="/company/lead/update/:id" element={<LeadUpdate />} />
 
           <Route path="/company/role-configure" element={<RoleConfigure />} />
           <Route path="/company/permission-configure" element={<PermissionConfigure />} />
 
-           <Route path='/company/leave-configure' element={<MonthlyLeaveConfigure/>}/>
+          <Route path='/company/leave-configure' element={<MonthlyLeaveConfigure />} />
 
 
           <Route path="/company/employe/view" element={<EmployeeAll />} />
           <Route path="/company/employe/create" element={<EmployeeManage />} />
-           <Route path="/company/employe/edit/:id" element={<EmployeeEdit/>} />
+          <Route path="/company/employe/edit/:id" element={<EmployeeEdit />} />
 
           <Route path="/company/employe/profile/:id" element={<EmployeeProfile />} />
 
-          <Route path="/company/applyLeave" element={<LeavesApply/>}/>
-           <Route path="/company/LeaveDetail/:id" element={<LeavesProfile/>}/>
-          <Route path="/company/raised" element={<RaisedIssues/>}/>
+          <Route path="/company/applyLeave" element={<LeavesApply />} />
+          <Route path="/company/LeaveDetail/:id" element={<LeavesProfile />} />
+          <Route path="/company/raised" element={<RaisedIssues />} />
 
 
           {/* payroll */}
@@ -119,7 +126,7 @@ const dispatch = useDispatch();
 
 
           {/* used for company info edit  */}
-           <Route path='/company/edit' element={<CompanyEdit/>}/>
+          <Route path='/company/edit' element={<CompanyEdit />} />
         </Route>
 
 
@@ -137,14 +144,14 @@ const dispatch = useDispatch();
 
 
         {/* ---------------- Client Pages Routes ---------------- */}
-      
 
-      
-      {/* <Chatbot */}
-      
-       
+
+
+        {/* <Chatbot */}
+
+
       </Routes>
-<Chatbot />
+      <Chatbot />
     </>
   );
 }

@@ -506,7 +506,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 import { base_URL } from "../../../utils/BaseUrl";
 import { Eye, EyeOff } from "lucide-react"; // Lucide icons
-const seminar = ["Mumbai Seminar", "Delhi Seminar","Patna Seminar","Ahmedabad Seminar","Lucknow Seminar"];
+import { Link } from "react-router-dom";
+const seminar = ["Mumbai Seminar", "Delhi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar"];
 
 function SeminarData() {
   const dispatch = useDispatch();
@@ -615,7 +616,7 @@ function SeminarData() {
   };
   // const [waitAccess, setWaitAccess] = useState(true);
   const [seminarDate, setSeminarDate] = useState(""); // store chosen date
-  const handleDuesDone = (item) => console.log("Dues Done for:", item);
+
   const handleGenerateCard = (item) => console.log("Generate Card for:", item);
 
   const [waitAccess, setWaitAccess] = useState(true)
@@ -715,13 +716,13 @@ function SeminarData() {
   const handleSeminarAccessblank = async () => {
     setWaitblank(false)
     try {
-      const response = await axios.get(`${base_URL}id/blank/`,{
+      const response = await axios.get(`${base_URL}id/blank/`, {
         responseType: "arraybuffer", // IMPORTANT for PDF
       })
       const blob = new Blob([response.data], {
         type: "application/pdf"
       })
-      const url = window.URL.createObjectURL(blob) 
+      const url = window.URL.createObjectURL(blob)
 
       const link = document.createElement('a')
       link.href = url
@@ -737,6 +738,9 @@ function SeminarData() {
       alert("Failed to download PDF. Please try again.");
     }
   }
+
+
+  const handleDuesDone = (item) => console.log("Dues Done for:", item);
   return (
     <CompanyLayout>
       <div className="p-4">
@@ -888,17 +892,41 @@ function SeminarData() {
                       <td className="border px-2 py-2 text-red-600 font-semibold">{oc.unpaidAmount || 0}</td>
                       <td className="border-t px-2 py-1 flex gap-2 justify-center">
                         {oc.unpaidAmount !== 0 &&
-                          <button onClick={() => handleDuesDone(lead)} className="bg-red-500 border text-white px-2 py-1 rounded font-medium text-xs">Clear Due</button>}
+                          // <button onClick={() => handleDuesDone(lead)} className="bg-red-500 border text-white px-1 py-1 rounded font-medium text-xs">Clear Due</button>
+                          <div className="relative group inline-block">
+                          <Link 
+  to={`/company/lead/update/${rowId}`} 
+  className="bg-red-400 text-white px-1 py-1 rounded text-xs font-medium"
+>
+  Clear Due
+</Link>
+
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 
+                  opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto 
+                  transition-opacity duration-200 
+                  bg-gray-800 text-white text-xs rounded-md px-3 py-2 w-64 
+                  shadow-lg z-50">
+                              Go to <span className="font-semibold text-yellow-400">Leads</span> →
+                              Search the lead → Click <span className="font-semibold text-yellow-400">Edit</span> →
+                              Then update due payment ||
+                              {/* Tooltip Arrow */}
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                            </div>
+                          </div>
+                        }
                         <button
                           onClick={() => handleSeminarAccessOne(lead._id)}
-                          className={`bg-green-500 border text-white px-2 py-1 rounded font-medium text-xs${waitone ? "bg-blue-500" : "bg-gray-400"}`}
+                          className={`bg-green-500 border text-white px-1 py-1 rounded font-medium text-xs${waitone ? "bg-blue-500" : "bg-gray-400"}`}
                         >
                           Card
                         </button>
 
 
                         {oc.unpaidAmount === 0 &&
-                          <button onClick={() => handleGenerateCard(lead)} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Get Certificate</button>}
+                          <button onClick={() => handleGenerateCard(lead)} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Certificate</button>}
+                        {oc.unpaidAmount === 0 &&
+                          <Link to={`/company/re-treat/register?id=${lead._id}`} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Camp</Link>}
                       </td>
                     </tr>
                   );

@@ -7,6 +7,8 @@ import { companyConfiguresView, getDepartment, getRole } from "../../redux/slice
 import { fetchOneLead, updateLead } from "../../redux/slice/leadSlice";
 import { viewEmployees } from "../../redux/slice/employee/employeeCreateSlice";
 import { employeeDetails } from "../../redux/slice/employee/loginSlice";
+import { base_URL } from "../../utils/BaseUrl";
+import axios from "axios";
 
 function LeadUpdate() {
   const { id } = useParams();
@@ -39,7 +41,7 @@ function LeadUpdate() {
   const [openModal, setOpenModal] = useState(false);
 
   const [departmentName, setDepartmentName] = useState("");
-  // OnConfirmed modal states
+
   const [contact, setContact] = useState({});
   const [totalAmount, setTotalAmount] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
@@ -51,6 +53,19 @@ function LeadUpdate() {
   const [statusRecord, setStatusRecord] = useState([])
   const permissionArray = employeeData?.permissionArray;
   const isAdmin = employeeData?.role === "Admin";
+    const [confirmedData, setConfirmedData] = useState(
+  ); // OnConfirmed modal states
+  useEffect(()=>{
+    if(leadDetail?.OnConfirmed){
+         setConfirmedData( leadDetail?.OnConfirmed?.map(item => ({
+      ...item,
+      paidAmount: item.paidAmount || 0,
+      unpaidAmount: item.unpaidAmount || 0,
+      newFiles: [],       // files added during this session
+      changed: false      // track if this service is edited
+    })) || [])
+    }
+  },[leadDetail])
   const { viewAllRole } = useSelector((state) => state.reducer.company);
   const { viewAllDepartment } = useSelector((state) => state.reducer.company);
   useEffect(() => {
@@ -267,6 +282,70 @@ function LeadUpdate() {
     );
   }
   // console.log(viewAllRole, "kj")
+
+  // updaate service
+
+
+  const handleAmountChange = (serviceId, field, value) => {
+    setConfirmedData(prev =>
+      prev.map(item =>
+        item._id === serviceId
+          ? { ...item, [field]: Number(value), changed: true }
+          : item
+      )
+    );
+  };
+
+  const handleFileUpload = (serviceId, files) => {
+    const fileArray = Array.from(files).map(file => ({
+      url: URL.createObjectURL(file), // preview only
+      fileObj: file                   // original File object for backend
+    }));
+
+    setConfirmedData(prev =>
+      prev.map(item =>
+        item._id === serviceId
+          ? { ...item, newFiles: [...(item.newFiles || []), ...fileArray], changed: true }
+          : item
+      )
+    );
+  };
+  const handleSave = async (serviceId) => {
+    const service = confirmedData.find(s => s._id === serviceId);
+    if (!service || !service.changed) {
+      alert("No changes to save");
+      return;
+    }
+
+    const formData = new FormData();
+
+    if (service.paidAmount !== undefined) formData.append("paidAmount", service.paidAmount);
+    if (service.unpaidAmount !== undefined) formData.append("unpaidAmount", service.unpaidAmount);
+
+    (service.newFiles || []).forEach(file => formData.append("files", file.fileObj));
+
+    try {
+      await axios.put(
+        `${base_URL}lead/confirmed/${leadDetail._id}/${service._id}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      alert("Service updated successfully");
+
+      // reset changed flag and newFiles
+      setConfirmedData(prev =>
+        prev.map(item =>
+          item._id === serviceId ? { ...item, newFiles: [], changed: false } : item
+        )
+      );
+
+      // optional: refetch leadDetail to get fresh data from backend
+    } catch (err) {
+      console.error(err);
+      alert("Update failed");
+    }
+  };
   return (
     <CompanyLayout >
       <div className="max-w-5xl border-2 border-gray-500 mx-auto px-6 py-0 my-4 rounded-lg shadow-xl/30 space-y-2">
@@ -334,24 +413,25 @@ function LeadUpdate() {
                   <tr>
 
 
-                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Service</th>
-                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Description</th>
-                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total</th>
-                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Paid</th>
-                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Unpaid</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Service</th> 
+                <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Description</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total Amt</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Paid Amt</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Unpaid Amt</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Contact</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Date</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Added By</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Docs</th>
                     {(isAdmin || /manager/i.test(employeeData?.role)) && (<th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Status</th>)}
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total Time</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Action</th>
                   </tr>
                 </thead>
 
                 {/* Table Body */}
                 <tbody>
-                  {leadDetail?.OnConfirmed?.map((item) => {
-
+                  {/* {leadDetail?.OnConfirmed?.map((item) => { */}
+                  {confirmedData?.map((item) => {
                     const lastStatus = item?.status?.at(-1)?.label;
 
                     return (
@@ -368,23 +448,40 @@ function LeadUpdate() {
                         <td className="border border-gray-500 px-2 py-1 font-semibold">
                           ₹ {item.totalAmount}
                         </td>
-
+                        {/* 
                         <td className="border border-gray-500 px-2 py-1 text-green-600 font-medium">
                           ₹ {item.paidAmount}
-                        </td>
-
+                        </td> */}
+                        {/* Paid Amount */}
                         <td className="border border-gray-500 px-2 py-1 text-red-500 font-medium">
-                          ₹ {item.unpaidAmount}
+                          <input
+                            type="number"
+                            value={item.paidAmount}
+                            onChange={(e) => handleAmountChange(item._id, "paidAmount", e.target.value)}
+                            className="border rounded px-1 py-1 text-green-600"
+                          />
                         </td>
 
-                        <td className="border border-gray-500 px-2 py-1">
+                        {/* <td className="border border-gray-500 px-2 py-1 text-red-500 font-medium">
+                          ₹ {item.unpaidAmount}
+                        </td> */}
+                        <td className="border border-gray-500 px-2 py-1 text-red-500 font-medium">
+                          <input
+                            type="number"
+                            value={item.unpaidAmount || ""}
+                            onChange={(e) => handleAmountChange(item._id, "unpaidAmount", e.target.value)}
+                            className="border rounded px-1 py-1 text-red-500"
+                          />
+                        </td>
+
+                      <td className="border border-gray-500 px-2 py-1">
                           <div className="flex flex-col text-xs">
                             <span>{item.contact?.name}</span>
                             <span className="text-xs text-gray-500">
                               {item.contact?.phone}
                             </span>
                           </div>
-                        </td>
+                        </td> 
 
                         <td className="border border-gray-500 px-2 py-1">
                           {item.date ? new Date(item.date).toLocaleDateString() : "-"}
@@ -395,7 +492,7 @@ function LeadUpdate() {
                         </td>
 
                         {/* Files */}
-                        <td className="border border-gray-500 px-2 py-1">
+                        {/* <td className="border border-gray-500 px-2 py-1">
                           <div className="flex gap-1 flex-wrap">
                             {[...(item.files || []), ...(item.OnConfirmedFiles || [])]
                               ?.filter(file => file?.url)
@@ -408,6 +505,27 @@ function LeadUpdate() {
                                   onClick={() => window.open(file.url, "_blank")}
                                 />
                               ))}
+                          </div>
+                        </td> */}
+                        <td className="border border-gray-500 px-2 py-1 text-gray-500 font-medium">
+                          <div className="flex flex-col">
+                            <div className="flex gap-1">
+                              {[...(item.OnConfirmedFiles || []), ...(item.newFiles || [])].map((file, idx) => (
+                                <img
+                                  key={idx}
+                                  src={file.url}
+                                  alt="file"
+                                  className="w-11 h-11 object-cover rounded border cursor-pointer hover:scale-110"
+                                  onClick={() => window.open(file.url, "_blank")}
+                                />
+                              ))}
+                            </div>
+                            <input
+                              type="file"
+                              multiple
+                              onChange={(e) => handleFileUpload(item._id, e.target.files)}
+                              className="text-xs mt-1"
+                            />
                           </div>
                         </td>
 
@@ -463,7 +581,14 @@ function LeadUpdate() {
                                 ? "Not started"
                                 : "-"}
                         </td>
-
+                        <td><div className="flex justify-end mt-4">
+                          <button
+                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                            onClick={() => handleSave(item._id)}  // ✅ pass current service ID
+                          >
+                            Save
+                          </button>
+                        </div></td>
                       </tr>
                     );
                   })}
@@ -595,7 +720,7 @@ function LeadUpdate() {
               <p className="px-4 text-xs font-medium">{new Date(a?.assignedAt).toLocaleString()}</p>
               {(isAdmin || permissionArray.includes("ldassign")) && (
                 <button
-                  onClick={() => handleRemoveAssignment(a?.assignedTo._id)}
+                  // onClick={() => handleRemoveAssignment(a?.assignedTo._id)}
                   className="text-xs text-red-600 hover:underline"
                 >
                   Remove

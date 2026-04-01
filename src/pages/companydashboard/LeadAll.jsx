@@ -167,7 +167,7 @@ function LeadAll() {
       for (let i = start; i <= end; i++) pages.push(i);
     }
 
-    return pages;
+    return pages                                                                                                                                       ;
   };
   const changePage = (newPage) => {
     setPage(newPage); // update state
@@ -415,7 +415,7 @@ function LeadAll() {
             </button>
 
             <div className="flex items-center gap-2">
-              {getVisiblePages().map((pageNumber) => (
+              {getVisiblePages().slice(1,6).map((pageNumber) => (
                 <button
                   key={pageNumber}
                   onClick={() => changePage(pageNumber)}
