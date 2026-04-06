@@ -65,35 +65,37 @@
 
 
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
-import { Edit, Trash2, Eye, MapPin, Calendar, Search, Plus } from 'lucide-react'
+import { Edit, Trash2, Eye, MapPin, Calendar, Search, Plus, FileDiff, BadgeIndianRupee , NotebookPen} from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAllCamp } from '../../../redux/slice/campslice'
 
-const data = [
-  { id: 1, name: 'Yoga Retreat',       location: 'Bali',     date: '2026-04-15' },
-  { id: 2, name: 'Mindfulness Camp',   location: 'Thailand', date: '2026-05-10' },
-  { id: 3, name: 'Adventure Re-Treat', location: 'Nepal',    date: '2026-06-01' },
-]
 
 function ReTreatCamp() {
+  const dispatch = useDispatch()
   const [search, setSearch] = useState('')
 
-  const filtered = data.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.location.toLowerCase().includes(search.toLowerCase())
-  )
-
+  // const filtered = data.filter(
+  //   (c) =>
+  //     c.name.toLowerCase().includes(search.toLowerCase()) ||
+  //     c.location.toLowerCase().includes(search.toLowerCase())
+  // )
+  const { AllCamp } = useSelector((state) => state.reducer.camp)
+  useEffect(() => {
+    dispatch(getAllCamp())
+  }, [])
+  console.log(AllCamp, "ppopop")
   return (
-    <CompanyLayout pageTitle="Re-Treat">
+    <CompanyLayout pageTitle="Registered">
       <div className="p-6 space-y-5">
 
         {/* ── Header bar ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-slate-800">Re-Treat Camps</h2>
-            <p className="text-xs text-slate-500 mt-0.5">{data.length} camps registered</p>
+            <h2 className="text-lg font-bold text-slate-800">All Clients List</h2>
+            <p className="text-xs text-slate-500 mt-0.5">{ } camps registered</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -109,12 +111,12 @@ function ReTreatCamp() {
             </div>
 
             {/* Add button */}
-            <Link
+            {/* <Link
               to="/company/re-treat/create"
               className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow shadow-indigo-300 whitespace-nowrap"
             >
               <Plus size={14} /> Add Camp
-            </Link>
+            </Link> */}
           </div>
         </div>
 
@@ -122,26 +124,22 @@ function ReTreatCamp() {
         <div className="bg-white shadow-sm ring-1 ring-slate-300 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-slate-100 border-b-2 border-slate-200">
-                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">#</th>
+              <tr className="bg-slate-100 border-b-2 border-slate-200 ">
+                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">S.No</th>
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Name</th>
-                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Location</th>
-                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Date</th>
-                <th className="px-5 py-3.5 text-right text-xs font-bold uppercase tracking-wider text-slate-600">Actions</th>
+                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Email</th>
+                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Service</th>
+                <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Due Amt.</th>
+                <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Created</th>
+                <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Action</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-sm font-medium text-slate-400">
-                    No camps found
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((camp, i) => (
+              {
+                AllCamp?.data?.map((camp, i) => (
                   <tr
-                    key={camp.id}
-                    className="border-b border-slate-200 last:border-0 hover:bg-slate-50 transition-colors"
+                    key={camp._id}
+                    className="border-b text-start border-slate-200 last:border-0 hover:bg-slate-50 transition-colors"
                   >
                     {/* Index */}
                     <td className="px-5 py-4">
@@ -153,19 +151,34 @@ function ReTreatCamp() {
                       <span className="font-semibold text-slate-800">{camp.name}</span>
                     </td>
 
-                    {/* Location */}
+                    {/* email*/}
                     <td className="px-5 py-4">
                       <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
                         <MapPin size={13} className="text-slate-400" />
-                        {camp.location}
+                        {camp.email}
                       </span>
                     </td>
+                         {/* service*/}
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+                        <MapPin size={13} className="text-slate-400" />
+                        {camp.service}
+                      </span>
+                    </td>
+                              {/* unpaidAmount*/}
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+                        < BadgeIndianRupee size={13} className="text-slate-400" />
+                        {camp.unpaidAmount}
+                      </span>
+                    </td>
+
 
                     {/* Date */}
                     <td className="px-5 py-4">
                       <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
                         <Calendar size={13} className="text-slate-400" />
-                        {new Date(camp.date).toLocaleDateString('en-IN', {
+                        {new Date(camp.createdAt).toLocaleDateString('en-IN', {
                           day: 'numeric', month: 'short', year: 'numeric',
                         })}
                       </span>
@@ -174,32 +187,36 @@ function ReTreatCamp() {
                     {/* Actions */}
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1.5">
-                    
 
                         <Link
-                          to={`/company/re-treat/update/${camp.id}`}
+                         to={`/company/service/addon/${camp._id}`}
+                          title="Add-On New Services"
+                          className="p-2 rounded-lg text-green-300  hover:bg-emerald-200 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
+                        >< NotebookPen size={15}/></Link>
+                        <Link
+                          to={`/company/re-treat/update/${camp._id}`}
                           title="Edit"
-                          className="p-2 rounded-lg text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
+                          className="p-2 rounded-lg text-green-300  hover:bg-emerald-200 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
                         >
-                          <Edit size={15} />
+                          <Edit size={15}  />
                         </Link>
 
                       </div>
                     </td>
                   </tr>
                 ))
-              )}
+              }
             </tbody>
           </table>
 
           {/* Footer */}
-          {filtered.length > 0 && (
+          {/* {filtered.length > 0 && (
             <div className="px-5 py-3 bg-slate-50 border-t-2 border-slate-200 flex items-center justify-between">
               <p className="text-xs font-semibold text-slate-500">
                 Showing {filtered.length} of {data.length} camps
               </p>
             </div>
-          )}
+          )} */}
         </div>
 
       </div>

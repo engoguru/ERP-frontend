@@ -1,270 +1,6 @@
-// import React, { useEffect, useState } from 'react'
-// import { useParams, useNavigate } from 'react-router-dom'
-// import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
-
-// function UpdateRetreat() {
-//   const { id } = useParams()
-//   const navigate = useNavigate()
-
-//   const [formData, setFormData] = useState({
-//     name: '',
-//     email: '',
-//     contact: '',
-//     source: '',
-//     service: '',
-//     totalAmount: '',
-//     paidAmount: '',
-//     unpaidAmount: 0,
-//     status: '',
-//   })
-
-//   const [feedback, setFeedback] = useState([])
-//   const [newFeedback, setNewFeedback] = useState('')
-//   const [action, setAction] = useState('Pending')
-
-//   useEffect(() => {
-//     const mock = {
-//       name: 'Yoga Retreat',
-//       email: 'test@mail.com',
-//       contact: '9876543210',
-//       source: 'Instagram',
-//       service: 'Wellness',
-//       totalAmount: 1000,
-//       paidAmount: 400,
-//       status: 'Processing',
-//       feedback: [
-//         { message: 'Client contacted', action: 'Processing', date: new Date() }
-//       ]
-//     }
-
-//     setFormData({
-//       ...mock,
-//       unpaidAmount: mock.totalAmount - mock.paidAmount
-//     })
-
-//     setFeedback(mock.feedback)
-//   }, [id])
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target
-
-//     setFormData((prev) => {
-//       const updated = { ...prev, [name]: value }
-//       updated.unpaidAmount =
-//         Number(updated.totalAmount || 0) - Number(updated.paidAmount || 0)
-//       return updated
-//     })
-//   }
-
-//   const handleAddFeedback = () => {
-//     if (!newFeedback) return
-
-//     setFeedback((prev) => [
-//       ...prev,
-//       {
-//         message: newFeedback,
-//         action,
-//         date: new Date(),
-//       },
-//     ])
-
-//     setNewFeedback('')
-//     setAction('Pending')
-//   }
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault()
-
-//     const finalData = {
-//       ...formData,
-//       feedback,
-//     }
-
-//     console.log(finalData)
-//     alert('Updated Successfully')
-
-//     navigate('/company/re-treat')
-//   }
-
-//   return (
-//     <CompanyLayout pageTitle="Update Retreat">
-//       <div className="p-6 space-y-6">
-
-//         {/* 🔹 FORM TABLE */}
-//         <div className="bg-white shadow rounded-lg overflow-hidden">
-//           <h2 className="text-lg font-semibold p-4 border-b">
-//             Retreat Details
-//           </h2>
-
-//           <table className="w-full text-sm">
-//             <tbody>
-//               {[
-//                 ['Name', 'name'],
-//                 ['Email', 'email'],
-//                 ['Contact', 'contact'],
-//                 ['Source', 'source'],
-//                 ['Service', 'service'],
-//               ].map(([label, key]) => (
-//                 <tr key={key} className="border-b">
-//                   <td className="p-3 font-medium bg-gray-50 w-1/3">{label}</td>
-//                   <td className="p-3">
-//                     <input
-//                       name={key}
-//                       value={formData[key]}
-//                       onChange={handleChange}
-//                       className="w-full border px-3 py-2 rounded"
-//                     />
-//                   </td>
-//                 </tr>
-//               ))}
-
-//               {/* Amounts */}
-//               <tr className="border-b">
-//                 <td className="p-3 font-medium bg-gray-50">Total Amount</td>
-//                 <td className="p-3">
-//                   <input
-//                     type="number"
-//                     name="totalAmount"
-//                     value={formData.totalAmount}
-//                     onChange={handleChange}
-//                     className="w-full border px-3 py-2 rounded"
-//                   />
-//                 </td>
-//               </tr>
-
-//               <tr className="border-b">
-//                 <td className="p-3 font-medium bg-gray-50">Paid Amount</td>
-//                 <td className="p-3">
-//                   <input
-//                     type="number"
-//                     name="paidAmount"
-//                     value={formData.paidAmount}
-//                     onChange={handleChange}
-//                     className="w-full border px-3 py-2 rounded"
-//                   />
-//                 </td>
-//               </tr>
-
-//               <tr className="border-b">
-//                 <td className="p-3 font-medium bg-gray-50">Unpaid Amount</td>
-//                 <td className="p-3">
-//                   <input
-//                     value={formData.unpaidAmount}
-//                     readOnly
-//                     className="w-full border px-3 py-2 rounded bg-gray-100"
-//                   />
-//                 </td>
-//               </tr>
-
-//               {/* Status */}
-//               <tr>
-//                 <td className="p-3 font-medium bg-gray-50">Status</td>
-//                 <td className="p-3">
-//                   <select
-//                     name="status"
-//                     value={formData.status}
-//                     onChange={handleChange}
-//                     className="w-full border px-3 py-2 rounded"
-//                   >
-//                     <option value="">Select</option>
-//                     <option>Pending</option>
-//                     <option>Processing</option>
-//                     <option>Complete</option>
-//                   </select>
-//                 </td>
-//               </tr>
-//             </tbody>
-//           </table>
-
-//           <div className="p-4 flex justify-end gap-3">
-//             <button
-//               onClick={() => navigate('/company/re-treat')}
-//               className="px-4 py-2 bg-gray-200 rounded"
-//             >
-//               Cancel
-//             </button>
-//             <button
-//               onClick={handleSubmit}
-//               className="px-4 py-2 bg-blue-500 text-white rounded"
-//             >
-//               Update
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* 🔹 FEEDBACK TABLE */}
-//         <div className="bg-white shadow rounded-lg overflow-hidden">
-//           <h2 className="text-lg font-semibold p-4 border-b">
-//             Feedback History
-//           </h2>
-
-//           {/* Add */}
-//           <div className="p-4 flex gap-2">
-//             <input
-//               value={newFeedback}
-//               onChange={(e) => setNewFeedback(e.target.value)}
-//               placeholder="Enter feedback"
-//               className="flex-1 border px-3 py-2 rounded"
-//             />
-
-//             <select
-//               value={action}
-//               onChange={(e) => setAction(e.target.value)}
-//               className="border px-2 rounded"
-//             >
-//               <option>Pending</option>
-//               <option>Processing</option>
-//               <option>Complete</option>
-//             </select>
-
-//             <button
-//               onClick={handleAddFeedback}
-//               className="bg-green-500 text-white px-4 rounded"
-//             >
-//               Add
-//             </button>
-//           </div>
-
-//           {/* Table */}
-//           <table className="w-full text-sm border-t">
-//             <thead className="bg-gray-100">
-//               <tr>
-//                 <th className="p-3 text-left">Message</th>
-//                 <th className="p-3">Action</th>
-//                 <th className="p-3">Date</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {feedback.map((fb, i) => (
-//                 <tr key={i} className="border-t">
-//                   <td className="p-3">{fb.message}</td>
-//                   <td className="p-3 text-center">{fb.action}</td>
-//                   <td className="p-3 text-center">
-//                     {new Date(fb.date).toLocaleDateString()}
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-
-//       </div>
-//     </CompanyLayout>
-//   )
-// }
-
-// export default UpdateRetreat
-
-
-import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
+import React, { useEffect, useState } from "react";
+import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
 import {
-  Plus,
-  CheckCircle2,
-  Clock,
-  TrendingUp,
-  MessageSquarePlus,
   User,
   Mail,
   Phone,
@@ -274,289 +10,275 @@ import {
   Wallet,
   AlertCircle,
   Activity,
-} from 'lucide-react'
+  Plus
+} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampOne, updateCamp } from "../../../redux/slice/campslice";
+import { useParams } from "react-router-dom";
 
-// ── Status Badge ──────────────────────────────────────────────────────────────
-
-const statusStyles = {
-  Pending:    'bg-amber-100 text-amber-800 border border-amber-300',
-  Processing: 'bg-blue-100 text-blue-800 border border-blue-300',
-  Complete:   'bg-emerald-100 text-emerald-800 border border-emerald-300',
-}
-
-const statusIcons = {
-  Pending:    <Clock size={11} />,
-  Processing: <TrendingUp size={11} />,
-  Complete:   <CheckCircle2 size={11} />,
-}
-
-function StatusBadge({ status }) {
+// ── Floating Field ─────────────────────────────
+function Field({ icon: Icon, value, label, type = "text", onChange, name, children }) {
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${statusStyles[status] || statusStyles['Pending']}`}>
-      {statusIcons[status] || statusIcons['Pending']}
-      {status}
-    </span>
-  )
-}
-
-// ── Field Row ─────────────────────────────────────────────────────────────────
-
-function FieldRow({ icon: Icon, label, children }) {
-  return (
-    <div className="flex items-stretch border-b border-slate-200 last:border-0">
-      <div className="w-48 shrink-0 flex items-center gap-2.5 px-5 py-4 bg-slate-100 border-r border-slate-200">
-        <Icon size={14} className="text-slate-500 shrink-0" />
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-600">{label}</span>
+    <div className="relative w-full group">
+      <div className="absolute left-3 top-3 text-slate-400 group-focus-within:text-indigo-500 transition">
+        <Icon size={16} />
       </div>
-      <div className="flex-1 px-4 py-3.5 flex items-center">
-        {children}
-      </div>
+
+      <input
+        type={type}
+        value={value || ""}
+        name={name}
+        onChange={onChange}
+        placeholder=" "
+        className="peer w-full pl-10 pr-3 pt-5 pb-2 text-sm rounded-xl border border-slate-300 bg-white/70 backdrop-blur-md
+        focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition"
+      />
+
+      {children}
+
+      <label className="absolute left-10 top-2 text-xs text-slate-400 
+        peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm 
+        peer-focus:top-2 peer-focus:text-xs peer-focus:text-indigo-600 transition-all">
+        {label}
+      </label>
     </div>
-  )
+  );
 }
-
-// ── Main ──────────────────────────────────────────────────────────────────────
 
 function UpdateRetreat() {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const { id } = useParams();
+const[wait,setWait]=useState(false)
+  const { oneCamp } = useSelector((state) => state.reducer.camp);
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    contact: '',
-    source: '',
-    service: '',
-    totalAmount: '',
-    paidAmount: '',
+    name: "",
+    email: "",
+    contact: "",
+    source: "",
+    status: "Pending",
+    totalAmount: 0,
+    paidAmount: 0,
     unpaidAmount: 0,
-    status: '',
-  })
+    service: "Retreat Camp",
+  });
 
-  const [feedback, setFeedback] = useState([])
-  const [newFeedback, setNewFeedback] = useState('')
-  const [action, setAction] = useState('Pending')
+  const [paidPercentage, setPaidPercentage] = useState(0);
+  const [feedback, setFeedback] = useState([]);
+  const [newFeedback, setNewFeedback] = useState("");
+  const [action, setAction] = useState("Pending");
+  const [documents, setDocuments] = useState([]);
+  const [newDocs, setNewDocs] = useState([]);
 
   useEffect(() => {
-    const mock = {
-      name: 'Yoga Retreat',
-      email: 'test@mail.com',
-      contact: '9876543210',
-      source: 'Instagram',
-      service: 'Wellness',
-      totalAmount: 1000,
-      paidAmount: 400,
-      status: 'Processing',
-      feedback: [
-        { message: 'Client contacted', action: 'Processing', date: new Date() }
-      ]
+    dispatch(getCampOne(id));
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    if (oneCamp?.data) {
+      setFormData({
+        name: oneCamp.data.name || "",
+        email: oneCamp.data.email || "",
+        contact: oneCamp.data.contact || "",
+        source: oneCamp.data.source || "",
+        status: oneCamp.data.status || "Pending",
+        totalAmount: oneCamp.data.totalAmount || 0,
+        paidAmount: oneCamp.data.paidAmount || 0,
+        unpaidAmount:
+          (oneCamp.data.totalAmount || 0) -
+          (oneCamp.data.paidAmount || 0),
+        service: oneCamp.data.service || "",
+      });
+      setPaidPercentage(
+        oneCamp.data.totalAmount
+          ? Math.round(
+              (oneCamp.data.paidAmount * 100) / oneCamp.data.totalAmount
+            )
+          : 0
+      );
+      setFeedback(oneCamp.data.feedback || []);
+      setDocuments(oneCamp?.data.docs || []);
     }
-    setFormData({ ...mock, unpaidAmount: mock.totalAmount - mock.paidAmount })
-    setFeedback(mock.feedback)
-  }, [id])
+  }, [oneCamp]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => {
-      const updated = { ...prev, [name]: value }
-      updated.unpaidAmount = Number(updated.totalAmount || 0) - Number(updated.paidAmount || 0)
-      return updated
-    })
-  }
+      const updated = { ...prev, [name]: value };
+      updated.unpaidAmount =
+        Number(updated.totalAmount || 0) - Number(updated.paidAmount || 0);
+      return updated;
+    });
+
+    if (name === "totalAmount" || name === "paidAmount") {
+      const total = name === "totalAmount" ? Number(value) : Number(formData.totalAmount);
+      const paid = name === "paidAmount" ? Number(value) : Number(formData.paidAmount);
+      setPaidPercentage(total > 0 ? Math.round((paid * 100) / total) : 0);
+    }
+  };
 
   const handleAddFeedback = () => {
-    if (!newFeedback) return
-    setFeedback((prev) => [...prev, { message: newFeedback, action, date: new Date() }])
-    setNewFeedback('')
-    setAction('Pending')
+    if (!newFeedback) return;
+    setFeedback((prev) => [
+      ...prev,
+      { message: newFeedback, action, date: new Date() },
+    ]);
+    setNewFeedback("");
+    setAction("Pending");
+  };
+
+  const handleDocUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const previews = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+      _id: Math.random().toString(36).substr(2, 9),
+    }));
+    setNewDocs((prev) => [...prev, ...previews]);
+  };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+setWait(true)
+
+    // Prepare form data 
+    const updatedData = {
+      ...formData,
+      feedback,                  // include feedback array
+      // combine existing and newly added docs
+    };
+         if (newDocs.length > 0) {
+      // Append new docs
+      updatedData.docs.push(...newDocs);
+    }
+
+// console.log(updatedData,id)
+    // Dispatch the update action
+   // Dispatch the thunk
+    await dispatch(updateCamp({ id, finalData: updatedData })).unwrap();
+
+    // Clear new docs after successful update
+    setNewDocs([]);
+
+    alert("Updated Successfully");
+    setWait(false)
+  } catch (error) {
+    console.error("Update failed:", error);
+    alert("Failed to update. Please try again.");
   }
+};
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const finalData = { ...formData, feedback }
-    console.log(finalData)
-    alert('Updated Successfully')
-    navigate('/company/re-treat')
-  }
+  const inputCls =
+    "w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-white/70 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition";
 
-  const inputCls = 'w-full text-sm rounded-lg border-2 border-slate-200 bg-white px-3 py-2.5 text-slate-900 font-medium placeholder:text-slate-400 placeholder:font-normal outline-none transition-all hover:border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100'
-  const readonlyCls = 'w-full text-sm rounded-lg border-2 border-slate-200 bg-slate-100 px-3 py-2.5 text-slate-700 font-semibold outline-none cursor-default'
-  const selectCls = 'w-full text-sm rounded-lg border-2 border-slate-200 bg-white px-3 py-2.5 text-slate-900 font-medium outline-none transition-all hover:border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 cursor-pointer'
-
-  const paidPct = formData.totalAmount > 0
-    ? Math.min(100, Math.round((Number(formData.paidAmount) / Number(formData.totalAmount)) * 100))
-    : 0
+  const getFileName = (publicId) => publicId?.split("/").pop() || "Document";
 
   return (
     <CompanyLayout pageTitle="Update Retreat">
       <div className="p-6 space-y-6">
 
-        {/* ── FORM ── */}
-        <div className="bg-white shadow-sm ring-1 ring-slate-300 rounded-xl overflow-hidden">
-
-          {/* Card header */}
-          <div className="flex items-center justify-between px-5 py-4 bg-white border-b-2 border-slate-200">
-            <h2 className="text-base font-bold text-slate-800">Retreat Details</h2>
-            <StatusBadge status={formData.status || 'Pending'} />
+        {/* ── RETREAT DETAILS ── */}
+        <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-xl shadow-xl p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-800">Details</h2>
+            <span className="px-3 py-1 text-xs font-bold rounded-full bg-indigo-100 text-indigo-700">
+              {formData.status}
+            </span>
           </div>
 
-          {/* Fields */}
-          <div className="divide-y-0">
-            <FieldRow icon={User} label="Name">
-              <input name="name" value={formData.name} onChange={handleChange} className={inputCls} placeholder="Enter name" />
-            </FieldRow>
-            <FieldRow icon={Mail} label="Email">
-              <input name="email" value={formData.email} onChange={handleChange} className={inputCls} placeholder="Enter email" type="email" />
-            </FieldRow>
-            <FieldRow icon={Phone} label="Contact">
-              <input name="contact" value={formData.contact} onChange={handleChange} className={inputCls} placeholder="Enter contact" />
-            </FieldRow>
-            <FieldRow icon={Globe} label="Source">
-              <input name="source" value={formData.source} onChange={handleChange} className={inputCls} placeholder="e.g. Instagram" />
-            </FieldRow>
-            <FieldRow icon={Briefcase} label="Service">
-              <input name="service" value={formData.service} onChange={handleChange} className={inputCls} placeholder="e.g. Wellness" />
-            </FieldRow>
-
-            <FieldRow icon={CreditCard} label="Total Amount">
-              <div className="relative w-full">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-sm select-none">₹</span>
-                <input type="number" name="totalAmount" value={formData.totalAmount} onChange={handleChange} className={inputCls + ' pl-8'} placeholder="0" />
-              </div>
-            </FieldRow>
-
-            <FieldRow icon={Wallet} label="Paid Amount">
-              <div className="relative w-full">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-sm select-none">₹</span>
-                <input type="number" name="paidAmount" value={formData.paidAmount} onChange={handleChange} className={inputCls + ' pl-8'} placeholder="0" />
-              </div>
-            </FieldRow>
-
-            <FieldRow icon={AlertCircle} label="Unpaid Amount">
-              <div className="w-full space-y-2">
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-sm select-none">₹</span>
-                  <input value={formData.unpaidAmount} readOnly className={readonlyCls + ' pl-8'} />
-                </div>
-                {/* Progress */}
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-emerald-700">{paidPct}% paid</span>
-                    <span className="text-rose-600">₹{Number(formData.unpaidAmount).toLocaleString()} due</span>
-                  </div>
-                  <div className="h-2 w-full rounded-full bg-slate-200 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-500"
-                      style={{ width: `${paidPct}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </FieldRow>
-
-            <FieldRow icon={Activity} label="Status">
-              <select name="status" value={formData.status} onChange={handleChange} className={selectCls}>
-                <option value="">Select status</option>
-                <option>Pending</option>
-                <option>Processing</option>
-                <option>Complete</option>
-              </select>
-            </FieldRow>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <Field icon={User} label="Name" value={formData.name} name="name" onChange={handleChange}/>
+            <Field icon={Mail} label="Email" value={formData.email} name="email" onChange={handleChange}/>
+            <Field icon={Phone} label="Contact" value={formData.contact} name="contact" onChange={handleChange}/>
+            <Field icon={Globe} label="Source" value={formData.source} name="source" onChange={handleChange}/>
+            <Field icon={Briefcase} label="Service" value={formData.service} name="service" onChange={handleChange}/>
+            <Field icon={Activity} label="Status" value={formData.status} name="status" onChange={handleChange}/>
+            <Field icon={CreditCard} label="Total Amount" type="number" value={formData.totalAmount} name="totalAmount" onChange={handleChange}/>
+            <Field icon={Wallet} label="Paid Amount" type="number" value={formData.paidAmount} name="paidAmount" onChange={handleChange}/>
           </div>
 
-          {/* Footer */}
-          <div className="px-5 py-4 border-t-2 border-slate-200 bg-slate-50 flex justify-end gap-3">
-            <button
-              onClick={() => navigate('/company/re-treat')}
-              className="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border-2 border-slate-300 rounded-lg hover:bg-slate-100 hover:border-slate-400 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow shadow-indigo-300"
-            >
-              Update
-            </button>
+          {/* Unpaid + Docs + Progress */}
+          <div className="space-y-3">
+            <div className="flex flex-col md:flex-row gap-4 items-start">
+              <div className="flex-1 relative">
+                <Field icon={AlertCircle} label="Unpaid Amount" value={formData.unpaidAmount} readOnly/>
+              </div>
+
+              {/* Documents preview beside unpaid */}
+              <div className="flex flex-wrap gap-2">
+                {[...documents, ...newDocs].map((doc) => (
+                  <div key={doc._id} className="w-20 h-20 border rounded-lg overflow-hidden cursor-pointer">
+                    <img src={doc.url} alt={getFileName(doc.publicId)} className="w-full h-full object-cover" onClick={() => window.open(doc.url, '_blank')}/>
+                  </div>
+                ))}
+
+                <label className="w-20 h-20 flex items-center justify-center border rounded-lg cursor-pointer text-indigo-500 hover:bg-indigo-50">
+                  <Plus size={24} />
+                  <input type="file" multiple className="hidden" onChange={handleDocUpload}/>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-semibold mb-1">
+                <span className="text-emerald-600">{paidPercentage}% Paid</span>
+                <span className="text-rose-500">₹{formData.unpaidAmount} Due</span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all"
+                  style={{ width: `${paidPercentage}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <button className="px-5 py-2.5 text-sm font-semibold rounded-xl border border-slate-300 hover:bg-slate-100 transition">Cancel</button>
+            <button onClick={handleSubmit} className="px-6 py-2.5 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition">{wait===true?<>Processing...</>:<>Update</>}</button>
           </div>
         </div>
 
         {/* ── FEEDBACK ── */}
-        <div className="bg-white shadow-sm ring-1 ring-slate-300 rounded-xl overflow-hidden">
-
-          {/* Card header */}
-          <div className="flex items-center gap-2.5 px-5 py-4 border-b-2 border-slate-200">
-            <MessageSquarePlus size={16} className="text-indigo-600" />
-            <h2 className="text-base font-bold text-slate-800">Feedback History</h2>
-            <span className="ml-auto bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold px-2.5 py-0.5 rounded-full">
-              {feedback.length}
-            </span>
-          </div>
-
-          {/* Add feedback */}
-          <div className="p-4 bg-slate-50 border-b-2 border-slate-200 flex gap-3">
-            <input
-              value={newFeedback}
-              onChange={(e) => setNewFeedback(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddFeedback()}
-              placeholder="Write a feedback note…"
-              className={inputCls + ' flex-1'}
-            />
-            <select
-              value={action}
-              onChange={(e) => setAction(e.target.value)}
-              className="text-sm rounded-lg border-2 border-slate-200 bg-white px-3 py-2.5 text-slate-900 font-medium outline-none transition-all hover:border-slate-300 focus:border-indigo-500 cursor-pointer"
-            >
+        <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-xl shadow-xl p-6 space-y-5">
+          <h2 className="text-lg font-bold text-slate-800">Feedback History</h2>
+          <div className="flex flex-col md:flex-row gap-3">
+            <input value={newFeedback} onChange={(e)=>setNewFeedback(e.target.value)} placeholder="Write feedback..." className={`${inputCls} flex-1`} onKeyDown={(e)=>e.key==='Enter'&&handleAddFeedback()}/>
+            <select value={action} onChange={(e)=>setAction(e.target.value)} className="text-sm border border-slate-300 rounded-xl px-4 py-2.5">
               <option>Pending</option>
               <option>Processing</option>
               <option>Complete</option>
             </select>
-            <button
-              onClick={handleAddFeedback}
-              className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow shadow-indigo-300 whitespace-nowrap"
-            >
-              <Plus size={14} /> Add
-            </button>
+            <button onClick={handleAddFeedback} className="px-5 py-2.5 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition">Add</button>
           </div>
-
-          {/* Table */}
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-100 border-b-2 border-slate-200">
-                <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Message</th>
-                <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-slate-600">Action</th>
-                <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-slate-600">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {feedback.length === 0 ? (
+          <div className="overflow-hidden rounded-xl border border-slate-300">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-100 text-slate-600 text-xs uppercase">
                 <tr>
-                  <td colSpan={3} className="py-12 text-center text-sm font-medium text-slate-400">
-                    No feedback yet
-                  </td>
+                  <th className="p-3 text-left">Message</th>
+                  <th className="p-3 text-center">Action</th>
+                  <th className="p-3 text-center">Date</th>
                 </tr>
-              ) : (
-                feedback.map((fb, i) => (
-                  <tr key={i} className="border-b border-slate-200 last:border-0 hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3.5 text-slate-800 font-medium">{fb.message}</td>
-                    <td className="px-4 py-3.5 text-center">
-                      <StatusBadge status={fb.action} />
-                    </td>
-                    <td className="px-4 py-3.5 text-center text-xs font-semibold text-slate-500">
-                      {new Date(fb.date).toLocaleDateString('en-IN', {
-                        day: 'numeric', month: 'short', year: 'numeric'
-                      })}
-                    </td>
+              </thead>
+              <tbody>
+                {feedback.length===0?<tr><td colSpan={3} className="py-12 text-center text-slate-400">No feedback yet</td></tr>:feedback.map((fb,i)=>(
+                  <tr key={i} className="hover:bg-slate-50 transition">
+                    <td className="p-3 font-medium">{fb.message}</td>
+                    <td className="p-3 text-center"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">{fb.action}</span></td>
+                    <td className="p-3 text-center text-xs text-slate-500">{new Date(fb.date).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
+           <button onClick={handleSubmit} className="px-6 py-2.5 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition">{wait===true?<>Processing...</>:<>Update Feedback</>}</button>
         </div>
 
       </div>
     </CompanyLayout>
-  )
+  );
 }
 
-export default UpdateRetreat
+export default UpdateRetreat;

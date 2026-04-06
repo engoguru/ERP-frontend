@@ -185,29 +185,35 @@ function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 lg:py-28 bg-gray-500 text-white text-center mb-5">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform HR?</h2>
-          <p className="text-lg max-w-2xl mx-auto mb-8">
-            Empower your HR team and streamline employee management like never before.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/login"
-              className="px-6 py-3 bg-white text-green-400 rounded font-semibold hover:bg-gray-100 transition"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/register"
-              className="px-6 py-3 border border-white rounded text-white hover:bg-white hover:text-green-400 transition"
-            >
-              Request Demo
-            </Link>
-          </div>
-        </div>
-      </section>
+{/* Modern CTA Section */}
+<section className="py-20 lg:py-28 bg-gradient-to-r from-green-500 via-green-600 to-teal-500 text-white text-center relative overflow-hidden">
+  <div className="container mx-auto px-4 relative z-10">
+    <h2 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
+      Ready to Transform HR?
+    </h2>
+    <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 text-white/90">
+      Empower your HR team and streamline employee management like never before.
+    </p>
+    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <Link
+        to="/login"
+        className="px-8 py-4 bg-white text-green-600 font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+      >
+        Sign In
+      </Link>
+      <Link
+        to="/register"
+        className="px-8 py-4 border-2 border-white rounded-lg text-white font-semibold hover:bg-white hover:text-green-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+      >
+        Request Demo
+      </Link>
+    </div>
+  </div>
+
+  {/* Decorative Background Circles */}
+  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/10 rounded-full mix-blend-soft-light filter blur-3xl animate-pulse"></div>
+  <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] bg-white/10 rounded-full mix-blend-soft-light filter blur-2xl animate-pulse"></div>
+</section>
 
 
 

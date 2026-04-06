@@ -53,20 +53,23 @@
 import React, { useEffect, useState } from 'react'
 import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { fetchOneLead } from '../../../redux/slice/leadSlice'
+import { registerCamp } from '../../../redux/slice/campslice'
 
 function RegisterCamp() {
     const dispatch = useDispatch()
     const location = useLocation()
+    const navigate=useNavigate()
     const query = new URLSearchParams(location.search)
     const id = query.get("id")
-
+    const [waitforSubmit, setWaitforSubmit] = useState(true)
     const { leadDetail, loading } = useSelector(state => state.reducer.lead)
 
     const isManual = !id
 
     const [form, setForm] = useState({
+        leadId: "",
         name: "",
         email: "",
         contact: "",
@@ -88,15 +91,16 @@ function RegisterCamp() {
     // Prefill
     useEffect(() => {
         if (leadDetail && id) {
-            const sourceText = leadDetail?.source?.toLowerCase() || ""
-
-            let treatCamp = ""
+            const sourceText = leadDetail?.source?.toLowerCase() || "";
+            let treatCamp = "";
             if (sourceText.includes("seminar")) {
-                const city = sourceText.replace("seminar", "").trim()
-                treatCamp = `${city}-re-treat-camp`
+                const city = sourceText.replace("seminar", "").trim();
+                treatCamp = `${city}-re-treat-camp`;
             }
 
-            setForm({
+            setForm(prev => ({
+                ...prev,          // keep any existing fields
+                leadId: id,       // attach the lead id
                 name: leadDetail?.fields?.Name || "",
                 email: leadDetail?.fields?.Email || "",
                 contact: leadDetail?.fields?.Contact || "",
@@ -106,9 +110,9 @@ function RegisterCamp() {
                 unpaidAmount: 0,
                 totalAmount: 0,
                 service: "Retreat Camp"
-            })
+            }));
         }
-    }, [leadDetail, id])
+    }, [leadDetail, id]);
 
     // Handle change
     const handleChange = (e) => {
@@ -121,7 +125,14 @@ function RegisterCamp() {
 
         setForm(prev => ({ ...prev, [name]: value }))
     }
+    // handle file
+    const handleFile = (e) => {
+        const { name, files } = e.target;
 
+        setForm((pre) => ({
+            ...pre, [name]: Array.from(files)
+        }))
+    }
     // Auto unpaid calculation
     useEffect(() => {
         setForm(prev => ({
@@ -130,44 +141,77 @@ function RegisterCamp() {
         }))
     }, [form.totalAmount, form.paidAmount])
 
-    // Submit
-    const handleSubmit = (e) => {
-        e.preventDefault()
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-        const finalService =
-            form.service === "Others" ? customService : form.service
+        try {
+            setWaitforSubmit(false)
+            // Determine the service value
+            const finalService = form.service === "Others" ? customService : form.service;
 
-        if (form.service === "Others" && !customService.trim()) {
-            alert("Please enter custom service")
-            return
+            if (form.service === "Others" && !customService.trim()) {
+                alert("Please enter custom service");
+                return;
+            }
+
+
+            // Create FormData
+            const formData = new FormData();
+
+            // Add all text fields
+            Object.keys(form).forEach((key) => {
+                if (key !== "docs") {
+                    formData.append(key, key === "service" ? finalService : form[key]);
+                }
+            });
+
+            // Add files
+            if (form.docs) {
+                if (Array.isArray(form.docs)) {
+                    form.docs.forEach((file) => formData.append("docs", file));
+                } else {
+                    formData.append("docs", form.docs); // single file
+                }
+            }
+
+            // Optional: log FormData entries
+            for (let pair of formData.entries()) console.log(pair[0], pair[1]);
+
+            // Dispatch thunk
+            const res = await dispatch(registerCamp(formData));
+
+            if (res.payload?.success) {
+               alert("Registered Successfully !")
+               setForm()
+                setCustomService("")
+                navigate("/company/re-treat")
+                // Reset form or redirect if needed
+            } else {
+                console.error("Registration failed:", res.payload?.message);
+            }
+            setWaitforSubmit(true)
+        } catch (error) {
+            console.error("Error submitting form:", error);
         }
-
-        const payload = {
-            ...form,
-            service: finalService
-        }
-
-        console.log("Final Payload:", payload)
-    }
-
+    };
     return (
-        <CompanyLayout pageTitle={"Re-Treat Camp"}>
+        <CompanyLayout pageTitle={"Services Camp"}>
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
                 <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8">
 
                     {/* Header */}
                     <div className="mb-6">
                         <h2 className="text-3xl font-semibold text-gray-800">
-                            Register Retreat Camp
+                            Register For Services
                         </h2>
 
                         {isManual ? (
                             <p className="text-yellow-600 text-sm mt-1">
-                                ⚠️ Manual Entry Mode (No Lead Selected)
+                                Manual Entry Mode (No Lead Selected)
                             </p>
                         ) : (
                             <p className="text-green-600 text-sm mt-1">
-                                ✅ Lead Data Loaded
+                                Lead Data Loaded
                             </p>
                         )}
                     </div>
@@ -259,19 +303,17 @@ function RegisterCamp() {
                                 className="mt-1 w-full p-3 border bg-gray-100 rounded-lg"
                             />
                         </div>
-
                         <div>
-                            <label className="text-sm text-gray-600">Status</label>
-                            <select
-                                name="status"
-                                value={form.status}
-                                onChange={handleChange}
-                                className="mt-1 w-full p-3 border rounded-lg"
-                            >
-                                <option>Pending</option>
-                                <option>Processing</option>
-                                <option>Complete</option>
-                            </select>
+                            <label className="text-sm text-gray-600">Payment Proof Docs</label>
+                            <input
+                                type="file"
+                                name="docs"
+                                className="mt-1 w-full p-3 border bg-gray-100 rounded-lg"
+                                multiple
+                                accept=".pdf,image/*"
+                                required
+                                onChange={handleFile}
+                            />
                         </div>
 
                         <div>
@@ -283,8 +325,8 @@ function RegisterCamp() {
                                 className="mt-1 w-full p-3 border rounded-lg"
                             >
                                 <option>Retreat Camp</option>
-                                <option>Review</option>
-                                <option>Meeting</option>
+                                <option>Review Meeting</option>
+                                <option>Advance Classes</option>
                                 <option>Others</option>
                             </select>
                         </div>
@@ -308,7 +350,7 @@ function RegisterCamp() {
                                 type="submit"
                                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-lg hover:opacity-90"
                             >
-                                Submit Registration
+                                {waitforSubmit === false ? <>Submitting</> : <> Submit Registration</>}
                             </button>
                         </div>
 

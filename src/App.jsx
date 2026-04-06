@@ -44,6 +44,9 @@ import SeminarData from './pages/companydashboard/seminar/SeminarData';
 import ReTreatCamp from './pages/companydashboard/re-treatCamp/ReTreatCamp';
 import RegisterCamp from './pages/companydashboard/re-treatCamp/RegisterCamp';
 import UpdateRetreat from './pages/companydashboard/re-treatCamp/UpdateRetreat';
+import AddonTreat from './pages/companydashboard/re-treatCamp/AddonTreat';
+import AddonNew from './pages/companydashboard/re-treatCamp/AddonNew';
+import AddonEdit from './pages/companydashboard/re-treatCamp/AddonEdit';
 
 
 function App() {
@@ -94,6 +97,11 @@ function App() {
           <Route path="/company/re-treat" element={<ReTreatCamp/>}/>
           <Route path="/company/re-treat/register" element={<RegisterCamp/>}/>
           <Route path="/company/re-treat/update/:id" element={<UpdateRetreat/>}/>
+          <Route path="/company/service/addon/:id" element={<AddonTreat/>}/>
+          <Route path="/company/service/addon/new/:id" element={<AddonNew/>}/>
+            <Route path="/company/service/addon/edit/:id" element={<AddonEdit/>}/>
+
+
 
           <Route path="/company/lead/update/:id" element={<LeadUpdate />} />
 

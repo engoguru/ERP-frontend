@@ -10,7 +10,8 @@ import ipReducer from "../slice/employee/ipSlice";
 import dashboardReducer from "../slice/dashbaordSlice";
 import leaveReducer from "../slice/employee/leaveSlice";
 import issueReducer from "../slice/employee/issueSlice"
-
+import campReducer from "../slice/campslice"
+import serviceReducer from "../slice/serviceAddSlice"
 
 const rootReducer = combineReducers({
   company: companyReducer, 
@@ -23,7 +24,11 @@ const rootReducer = combineReducers({
   ip:ipReducer,
   dashbaord:dashboardReducer,
   leaves:leaveReducer,
-  issueData:issueReducer
+  issueData:issueReducer,
+
+  camp:campReducer,
+  service:serviceReducer
+
 });
 
 export default rootReducer;
