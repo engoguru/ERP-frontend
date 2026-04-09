@@ -67,7 +67,7 @@
 
 import React, { useEffect, useState } from 'react'
 import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
-import { Edit, Trash2, Eye, MapPin, Calendar, Search, Plus, FileDiff, BadgeIndianRupee , NotebookPen} from 'lucide-react'
+import { Edit, Trash2, Eye, MapPin, Calendar, Search, Plus, FileDiff, BadgeIndianRupee, NotebookPen } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllCamp } from '../../../redux/slice/campslice'
@@ -76,6 +76,7 @@ import { getAllCamp } from '../../../redux/slice/campslice'
 function ReTreatCamp() {
   const dispatch = useDispatch()
   const [search, setSearch] = useState('')
+  const [seminar, setSeminar] = useState()
 
   // const filtered = data.filter(
   //   (c) =>
@@ -86,19 +87,35 @@ function ReTreatCamp() {
   useEffect(() => {
     dispatch(getAllCamp())
   }, [])
-  console.log(AllCamp, "ppopop")
+  console.log(seminar, "ppopop")
   return (
-    <CompanyLayout pageTitle="Registered">
+    <CompanyLayout pageTitle="Services">
       <div className="p-6 space-y-5">
 
         {/* ── Header bar ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-slate-800">All Clients List</h2>
+            <h2 className="text-lg font-bold text-slate-800">All List</h2>
             <p className="text-xs text-slate-500 mt-0.5">{ } camps registered</p>
           </div>
 
           <div className="flex items-center gap-3">
+            <select name="" id="" onChange={(e) => setSeminar(e.target.value)}>
+              <option value="" disabled>Select</option>
+              <option value="Mumbai Seminar">Mumbai Seminar</option>
+              <option value="Delhi Seminar">Delhi Seminar</option>
+              <option value="Indore Seminar">Indore Seminar</option>
+              <option value="Lucknow Seminar">Lucknow Seminar</option>
+              <option value="Patna Seminar">Patna Seminar</option>
+            </select>
+            {seminar &&
+              <select name="" id="">
+                <option value="Retreat Camp">Retreat Camp</option>
+                <option value="Review Meeting">Review Meeting</option>
+                <option value="Advance Classes">Advance Classes</option>
+
+              </select>
+            }
             {/* Search */}
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -158,14 +175,14 @@ function ReTreatCamp() {
                         {camp.email}
                       </span>
                     </td>
-                         {/* service*/}
+                    {/* service*/}
                     <td className="px-5 py-4">
                       <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
                         <MapPin size={13} className="text-slate-400" />
                         {camp.service}
                       </span>
                     </td>
-                              {/* unpaidAmount*/}
+                    {/* unpaidAmount*/}
                     <td className="px-5 py-4">
                       <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
                         < BadgeIndianRupee size={13} className="text-slate-400" />
@@ -189,16 +206,16 @@ function ReTreatCamp() {
                       <div className="flex items-center justify-end gap-1.5">
 
                         <Link
-                         to={`/company/service/addon/${camp._id}`}
+                          to={`/company/service/addon/${camp._id}`}
                           title="Add-On New Services"
                           className="p-2 rounded-lg text-green-300  hover:bg-emerald-200 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
-                        >< NotebookPen size={15}/></Link>
+                        >< NotebookPen size={15} /></Link>
                         <Link
                           to={`/company/re-treat/update/${camp._id}`}
                           title="Edit"
                           className="p-2 rounded-lg text-green-300  hover:bg-emerald-200 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
                         >
-                          <Edit size={15}  />
+                          <Edit size={15} />
                         </Link>
 
                       </div>

@@ -40,12 +40,12 @@ function AttendanceAll() {
   ) || [];
 
   return (
-    <CompanyLayout pageTitle="Attendance Records">
+    <CompanyLayout pageTitle="Attendance">
       <div className="mx-auto max-w-6xl p-6 space-y-6">
 
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">All Employees Attendance</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Employee Attendance</h2>
         </div>
 
         {/* Search */}

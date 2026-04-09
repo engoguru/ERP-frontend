@@ -167,7 +167,7 @@ function LeadAll() {
       for (let i = start; i <= end; i++) pages.push(i);
     }
 
-    return pages                                                                                                                                       ;
+    return pages;
   };
   const changePage = (newPage) => {
     setPage(newPage); // update state
@@ -191,12 +191,12 @@ function LeadAll() {
   };
 
   return (
-    <CompanyLayout>
+    <CompanyLayout pageTitle={"Leads"}>
       <div className="mx-auto w-full p-6 space-y-6">
         {/* HEADER */}
         <div className="flex items-center justify-start gap-3 mb-4">
           {/* Header */}
-          <h2 className="text-xl font-bold text-gray-800">All Leads</h2>
+          <h2 className="text-xl font-bold text-gray-800">Query List</h2>
 
           {/* Items per page selector */}
           <div className="flex items-center gap-2">
@@ -336,15 +336,15 @@ function LeadAll() {
           <table className="min-w-[100px] text-left text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-3">#</th>
+                <th className="px-2.5 py-3">S.No</th>
                 {leadSchema.map((field) => (
                   <th key={field.fieldKey} className="px-4 py-3">
                     {field.label}
                   </th>
                 ))}
-                <th className="px-4 py-3">Source</th>
-                <th className="px-4 py-3">Created</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-3 py-3">Source</th>
+                <th className="px-3 py-3">Created</th>
+                <th className="px-2 py-3 text-center">Actions</th>
               </tr>
             </thead>
 
@@ -357,8 +357,8 @@ function LeadAll() {
                 </tr>
               ) : (
                 leadAll.map((lead, index) => (
-                  <tr key={lead._id} className="border-t hover:bg-gray-50">
-                    <td className="px-3 py-3">
+                  <tr key={lead._id} className="border-t hover:bg-gray-300   ">
+                    <td className="ps-2 py-3">
                       {assignedFilter === "unassigned" ? (
                         <CheckCircle
                           onClick={() => toggleLeadSelection(lead._id)}
@@ -373,11 +373,20 @@ function LeadAll() {
                     </td>
 
                     {leadSchema.map((field) => (
+
                       <td
                         key={field.fieldKey}
-                        className="px-2 text-left py-3 text-xs font-medium"
+                        className="px-1.5 text-left py-3.5 text-xs font-semibold "
                       >
-                        {lead.fields?.[field.fieldKey] ?? "-"}
+                        {field.fieldKey === "city" || field.fieldKey === "state" ? (
+                          <>
+                            {String(lead.fields?.[field.fieldKey] ?? "-").slice(0, 13)}
+                          </>
+                        ) : (
+                          <>
+                            {lead.fields?.[field.fieldKey] ?? "-"}
+                          </>
+                        )}
                       </td>
                     ))}
 
@@ -415,7 +424,7 @@ function LeadAll() {
             </button>
 
             <div className="flex items-center gap-2">
-              {getVisiblePages().slice(1,6).map((pageNumber) => (
+              {getVisiblePages().slice(1, 6).map((pageNumber) => (
                 <button
                   key={pageNumber}
                   onClick={() => changePage(pageNumber)}

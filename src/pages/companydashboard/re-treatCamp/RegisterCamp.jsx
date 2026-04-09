@@ -187,6 +187,7 @@ function RegisterCamp() {
                 navigate("/company/re-treat")
                 // Reset form or redirect if needed
             } else {
+                alert(res.payload?.message)
                 console.error("Registration failed:", res.payload?.message);
             }
             setWaitforSubmit(true)

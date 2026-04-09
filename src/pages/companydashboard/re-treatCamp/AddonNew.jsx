@@ -10,13 +10,15 @@ function AddonNew() {
 
   const { id } = useParams()
 
-  const [formData, setFormData] = useState({
-    serviceName: '',
-    paidAmount: '',
-    totalAmount: '',
-    unpaidAmount: 0,
-    docs: []
-  });
+const [formData, setFormData] = useState({
+  serviceName: '',
+  customServiceName: '', // 👈 for "Others"
+  totalAmount: '',
+  paidAmount: '',
+  unpaidAmount: 0,
+  docs: [],
+  existingDocs: []
+});
   // handle input
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,11 +56,16 @@ function AddonNew() {
 
     const payload = new FormData();
 
-    Object.keys(formData).forEach((key) => {
-      if (key !== "docs") {
-        payload.append(key, formData[key]);
-      }
-    });
+  // ✅ Decide final service name
+  const finalServiceName =
+    formData.serviceName === "Others"
+      ? formData.customServiceName
+      : formData.serviceName;
+
+  payload.append("serviceName", finalServiceName);
+  payload.append("totalAmount", formData.totalAmount);
+  payload.append("paidAmount", formData.paidAmount);
+  payload.append("unpaidAmount", formData.unpaidAmount);
 
     for (let i = 0; i < formData.docs.length; i++) {
       payload.append("docs", formData.docs[i]);
@@ -85,7 +92,7 @@ function AddonNew() {
 
   return (
     <CompanyLayout pageTitle={"Add New Service"}>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gray-300 flex items-center justify-center p-6 ">
 
         <form
           onSubmit={handleSubmit}
@@ -95,66 +102,85 @@ function AddonNew() {
             Create Service
           </h2>
 
-          {/* Service Name */}
-          <div>
-            <label className="text-sm text-gray-600">Service Name</label>
-            <input
-              type="text"
-              name="serviceName"
-              value={formData.serviceName}
-              onChange={handleChange}
-              placeholder="Enter service name"
-              className="mt-1 w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
-              required
-            />
-          </div>
+      <div>
+  <label className="text-sm text-gray-600">Service Name</label>
+
+  {/* Select Box */}
+  <select
+    name="serviceName"
+    value={formData.serviceName}
+    onChange={handleChange}
+    className="mt-1 w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+    required
+  >
+    <option value="">Select Service</option>
+    <option value="Web Development">Web Development</option>
+    <option value="App Development">App Development</option>
+    <option value="SEO">SEO</option>
+    <option value="Marketing">Marketing</option>
+    <option value="Others">Others</option>
+  </select>
+
+  {/* Show only when Others is selected */}
+  {formData.serviceName === "Others" && (
+    <input
+      type="text"
+      name="customServiceName"
+      placeholder="Enter custom service"
+      value={formData.customServiceName}
+      onChange={handleChange}
+      className="mt-3 w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+      required
+    />
+  )}
+</div>
 
           {/* Total Amount */}
           <div>
-            <label className="text-sm text-gray-600">Total Amount</label>
+            <label className="text-sm flex text-gray-600">Total Amount</label>
             <input
               type="number"
               name="totalAmount"
               value={formData.totalAmount}
               onChange={handleChange}
               placeholder="Enter total amount"
-              className="mt-1 w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="mt-1 w-full border rounded-lg p-1 text-sm focus:ring-1 focus:ring-blue-300 outline-none"
               required
             />
           </div>
 
           {/* Paid Amount */}
           <div>
-            <label className="text-sm text-gray-600">Paid Amount</label>
+            <label className="text-sm  flex text-gray-600">Paid Amount</label>
             <input
               type="number"
               name="paidAmount"
               value={formData.paidAmount}
               onChange={handleChange}
               placeholder="Enter paid amount"
-              className="mt-1 w-full border rounded-lg p-3 focus:ring-2 focus:ring-green-500 outline-none"
+              className="mt-1 w-full border rounded-lg p-1 focus:ring-1 text-sm focus:ring-green-300 outline-none"
             />
           </div>
 
           {/* Unpaid Amount (Auto) */}
           <div>
-            <label className="text-sm text-gray-600">Unpaid Amount</label>
+            <label className="text-sm flex text-gray-600">Unpaid Amount</label>
             <input
               type="number"
               value={formData.unpaidAmount}
               readOnly
-              className="mt-1 w-full border rounded-lg p-3 bg-gray-100 text-gray-700 font-semibold"
+              className="mt-1 w-full border rounded-lg p-1 text-sm bg-gray-100 text-gray-700 font-medium"
             />
           </div>
 
           {/* File Upload */}
           <div>
-            <label className="text-sm text-gray-600">Upload Documents</label>
+            <label className="text-sm flex text-gray-600">Upload Documents</label>
             <input
               type="file"
               multiple
               onChange={handleFileChange}
-              className="mt-1 w-full border rounded-lg p-3 file:bg-blue-600 file:text-white file:px-4 file:py-2 file:rounded-md"
+              className="mt-1 w-full border border-gray-500 rounded-lg p-1 file:bg-blue-400 file:text-white file:px-2 file:py-1 file:rounded-md file:text-xs"
             />
           </div>
 

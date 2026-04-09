@@ -104,66 +104,66 @@ function AddonEdit() {
 
   return (
     <CompanyLayout pageTitle="Edit Service">
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gray-300 flex items-center justify-center p-6">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8 space-y-6"
+          className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 space-y-4"
         >
           <h2 className="text-2xl font-semibold text-gray-800">Edit Service</h2>
 
           {/* Service Name */}
           <div>
-            <label className="text-sm text-gray-600">Service Name</label>
+            <label className="text-sm text-gray-600 flex">Service Name</label>
             <input
               type="text"
               name="serviceName"
               value={formData.serviceName}
               onChange={handleChange}
-              className="mt-1 w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="mt-1 w-full border rounded-lg p-2 focus:ring-1 focus:ring-blue-500 outline-none"
               required
             />
           </div>
 
           {/* Total Amount */}
           <div>
-            <label className="text-sm text-gray-600">Total Amount</label>
+            <label className="text-sm text-gray-600 flex">Total Amount</label>
             <input
               type="number"
               name="totalAmount"
               value={formData.totalAmount}
               onChange={handleChange}
-              className="mt-1 w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="mt-1 w-full border rounded-lg p-2 focus:ring-1 focus:ring-blue-500 outline-none"
               required
             />
           </div>
 
           {/* Paid Amount */}
           <div>
-            <label className="text-sm text-gray-600">Paid Amount</label>
+            <label className="text-sm text-gray-600 flex">Paid Amount</label>
             <input
               type="number"
               name="paidAmount"
               value={formData.paidAmount}
               onChange={handleChange}
-              className="mt-1 w-full border rounded-lg p-3 focus:ring-2 focus:ring-green-500 outline-none"
+              className="mt-1 w-full border rounded-lg p-2 focus:ring-1 focus:ring-green-500 outline-none"
             />
           </div>
 
           {/* Unpaid Amount */}
           <div>
-            <label className="text-sm text-gray-600">Unpaid Amount</label>
+            <label className="text-sm text-gray-600 flex">Unpaid Amount</label>
             <input
               type="number"
               value={formData.unpaidAmount}
               readOnly
-              className="mt-1 w-full border rounded-lg p-3 bg-gray-100 font-semibold"
+              className="mt-1 w-full border rounded-lg p-2 bg-gray-100 font-semibold"
             />
           </div>
 
           {/* Existing Documents */}
           <div>
-            <label className="text-sm text-gray-600">Existing Documents</label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <label className="text-sm text-gray-600 flex">Existing Documents</label>
+            <div className="flex flex-wrap gap-2 mt-1">
               {formData.existingDocs.map((doc, index) => (
                 <div key={index} className="relative">
                   <a href={doc.url} target="_blank" rel="noopener noreferrer">
@@ -173,13 +173,13 @@ function AddonEdit() {
                       className="w-16 h-16 object-cover border rounded"
                     />
                   </a>
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => removeExistingDoc(index)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
+                    className="absolute-top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
                   >
                     ✕
-                  </button>
+                  </button> */}
                 </div>
               ))}
             </div>
@@ -187,8 +187,8 @@ function AddonEdit() {
 
           {/* New Uploads Preview */}
           <div>
-            <label className="text-sm text-gray-600">New Uploads</label>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <label className="text-sm text-gray-600 flex">New Uploads</label>
+            <div className="flex flex-wrap gap-2 mt-1">
               {formData.docs.map((file, index) => (
                 <div key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
                   {file.name}
@@ -199,12 +199,12 @@ function AddonEdit() {
 
           {/* File Upload */}
           <div>
-            <label className="text-sm text-gray-600">Update Documents</label>
+            <label className="text-sm text-gray-600 flex">Update Documents</label>
             <input
               type="file"
               multiple
               onChange={handleFileChange}
-              className="mt-1 w-full border rounded-lg p-3 file:bg-indigo-600 file:text-white file:px-4 file:py-2 file:rounded-md"
+              className="mt-1 w-full border rounded-lg p-2 file:bg-indigo-600 file:text-white file:px-2 file:py-1 file:rounded-md"
             />
           </div>
 

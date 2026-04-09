@@ -15,6 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getCampOne, updateCamp } from "../../../redux/slice/campslice";
 import { useParams } from "react-router-dom";
+import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 
 // ── Floating Field ─────────────────────────────
 function Field({ icon: Icon, value, label, type = "text", onChange, name, children }) {
@@ -50,6 +51,11 @@ function UpdateRetreat() {
   const { id } = useParams();
 const[wait,setWait]=useState(false)
   const { oneCamp } = useSelector((state) => state.reducer.camp);
+ // Grab state
+  const { employeeData, loading, initialized } = useSelector(
+    (state) => state.reducer.login
+  );
+
 
   const [formData, setFormData] = useState({
     name: "",
@@ -61,6 +67,7 @@ const[wait,setWait]=useState(false)
     paidAmount: 0,
     unpaidAmount: 0,
     service: "Retreat Camp",
+    docs:[]
   });
 
   const [paidPercentage, setPaidPercentage] = useState(0);
@@ -68,8 +75,14 @@ const[wait,setWait]=useState(false)
   const [newFeedback, setNewFeedback] = useState("");
   const [action, setAction] = useState("Pending");
   const [documents, setDocuments] = useState([]);
-  const [newDocs, setNewDocs] = useState([]);
-
+  // const [newDocs, setNewDocs] = useState([]);
+  // Fetch employee details only if not initialized
+  useEffect(() => {
+    if (!initialized) {
+      dispatch(employeeDetails());
+   
+    }
+  }, [dispatch, initialized]);
   useEffect(() => {
     dispatch(getCampOne(id));
   }, [id, dispatch]);
@@ -88,6 +101,7 @@ const[wait,setWait]=useState(false)
           (oneCamp.data.totalAmount || 0) -
           (oneCamp.data.paidAmount || 0),
         service: oneCamp.data.service || "",
+        docs: Array.isArray(oneCamp?.data?.docs) ? oneCamp.data.docs : []
       });
       setPaidPercentage(
         oneCamp.data.totalAmount
@@ -121,55 +135,89 @@ const[wait,setWait]=useState(false)
     if (!newFeedback) return;
     setFeedback((prev) => [
       ...prev,
-      { message: newFeedback, action, date: new Date() },
+      { message: newFeedback, action, date: new Date() ,submittedBy:employeeData.id},
     ]);
     setNewFeedback("");
     setAction("Pending");
   };
 
-  const handleDocUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const previews = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      _id: Math.random().toString(36).substr(2, 9),
-    }));
-    setNewDocs((prev) => [...prev, ...previews]);
-  };
+const handleDocUpload = (e) => {
+  setFormData((prev) => ({
+    ...prev,
+    docs: [...(prev.docs || []), ...Array.from(e.target.files)]
+  }));
+};
+
+// const handleSubmit = async (e) => {
+//   e.preventDefault();
+
+//   try {
+// setWait(true)
+
+//     // Prepare form data 
+//     const updatedData = {
+//       ...formData,
+//       feedback,                  // include feedback array
+//       // combine existing and newly added docs
+//     };
+
+//      // Append new files
+//     formData.docs.forEach((file) => payload.append("docs", file));
+
+// // console.log(updatedData,id)
+//     // Dispatch the update action
+//    // Dispatch the thunk
+//     await dispatch(updateCamp({ id, finalData: updatedData })).unwrap();
+
+//     // Clear new docs after successful update
+//     setNewDocs([]);
+
+//     alert("Updated Successfully");
+//     setWait(false)
+//   } catch (error) {
+//     console.error("Update failed:", error);
+//     alert("Failed to update. Please try again.");
+//   }
+// };
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-setWait(true)
+    setWait(true);
 
-    // Prepare form data 
-    const updatedData = {
-      ...formData,
-      feedback,                  // include feedback array
-      // combine existing and newly added docs
-    };
-         if (newDocs.length > 0) {
-      // Append new docs
-      updatedData.docs.push(...newDocs);
-    }
+    const payload = new FormData();
 
-// console.log(updatedData,id)
-    // Dispatch the update action
-   // Dispatch the thunk
-    await dispatch(updateCamp({ id, finalData: updatedData })).unwrap();
+    // Append all normal fields except docs
+    Object.keys(formData).forEach((key) => {
+      if (key !== "docs") {
+        payload.append(key, formData[key]);
+      }
+    });
 
-    // Clear new docs after successful update
-    setNewDocs([]);
+    // Append feedback as string
+    payload.append("feedback", JSON.stringify(feedback));
+
+    // Append ONLY new File objects (skip existing doc objects)
+    formData.docs
+      .filter((file) => file instanceof File) // ✅ only real files
+      .forEach((file) => {
+        payload.append("docs", file);
+      });
+
+    // Dispatch
+    await dispatch(updateCamp({ id, finalData: payload })).unwrap();
 
     alert("Updated Successfully");
-    setWait(false)
+    setWait(false);
+
   } catch (error) {
     console.error("Update failed:", error);
     alert("Failed to update. Please try again.");
+    setWait(false);
   }
 };
-
   const inputCls =
     "w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-white/70 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition";
 
@@ -208,7 +256,7 @@ setWait(true)
 
               {/* Documents preview beside unpaid */}
               <div className="flex flex-wrap gap-2">
-                {[...documents, ...newDocs].map((doc) => (
+                {[...documents].map((doc) => (
                   <div key={doc._id} className="w-20 h-20 border rounded-lg overflow-hidden cursor-pointer">
                     <img src={doc.url} alt={getFileName(doc.publicId)} className="w-full h-full object-cover" onClick={() => window.open(doc.url, '_blank')}/>
                   </div>

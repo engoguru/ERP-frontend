@@ -72,12 +72,12 @@ function PayrollAll() {
   );
   // console.log(employeeList,"pp")
   return (
-    <CompanyLayout pageTitle={"Payroll Details"}>
+    <CompanyLayout pageTitle={"Payroll"}>
       <div className="mx-auto max-w-6xl p-6">
 
         {/* HEADER */}
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">All Payrolls</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Employee Pay List</h2>
           <button
             onClick={() => navigate("/company/payroll-form")}
             className="inline-flex items-center gap-2 rounded-lg bg-blue-600  text-sm font-medium text-white hover:bg-blue-700"

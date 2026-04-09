@@ -6,13 +6,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 import { base_URL } from "../../../utils/BaseUrl";
 import { Eye, EyeOff } from "lucide-react"; // Lucide icons
-import { Link } from "react-router-dom";
-const seminar = ["Mumbai Seminar", "Delhi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar","Indore Seminar"];
+import { Link, useNavigate } from "react-router-dom";
+const seminar = ["Mumbai Seminar", "Delhi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar", "Indore Seminar"];
 
 function SeminarData() {
   const dispatch = useDispatch();
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate()
   // separate states for each column
+  const [attendance, setAttendance] = useState()
   const [visibleRows, setVisibleRows] = useState({});
 
   const toggleField = (id, field) => {
@@ -239,10 +241,43 @@ function SeminarData() {
     }
   }
 
+  const handleAttendance = async (leadId, e) => {
+    try {
+      const status = e.target.value;
 
-  const handleDuesDone = (item) => console.log("Dues Done for:", item);
+      setAttendance(status); // optional
+
+      // console.log(status, leadId);
+
+      const response = await axios.put(
+        `${base_URL}lead/attendance/${leadId}`,
+        { status },
+        { withCredentials: true }
+      );
+
+
+
+      if (response.status === 200) {
+        alert("Attendance Done !")
+        const unpaidAmount =
+          response?.data?.data?.OnConfirmed?.[0]?.unpaidAmount;
+
+        if (unpaidAmount === 0 && status === "Present") {
+          const params = new URLSearchParams({ id: leadId });
+
+          navigate(`/company/re-treat/register?${params.toString()}`);
+        } else if (unpaidAmount > 0 && status === "Present") {
+          navigate(`/company/lead/update/${leadId}`);
+        } else if (status === "Leave" || status === "Absent") {
+          navigate(0);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
-    <CompanyLayout>
+    <CompanyLayout pageTitle={"Seminar"}>
       <div className="p-4">
         <div className="text-center">
           <h2 className="text-lg font-semibold mb-4">Seminar Data</h2>
@@ -353,6 +388,8 @@ function SeminarData() {
                   const f = lead.fields || {};
                   const oc = lead.OnConfirmed?.[0] || {};
                   const rowId = lead._id; // ✅ unique id
+                  const atten = lead.attendance
+
 
                   const showTotal = visibleRows[rowId]?.total ?? false;
                   const showPaid = visibleRows[rowId]?.paid ?? false;
@@ -391,30 +428,37 @@ function SeminarData() {
                       </td>
                       <td className="border px-2 py-2 text-red-600 font-semibold">{oc.unpaidAmount || 0}</td>
                       <td className="border-t px-2 py-1 flex gap-2 justify-center">
-                        {oc.unpaidAmount !== 0 &&
-                          // <button onClick={() => handleDuesDone(lead)} className="bg-red-500 border text-white px-1 py-1 rounded font-medium text-xs">Clear Due</button>
-                          <div className="relative group inline-block">
-                            <Link
-                              to={`/company/lead/update/${rowId}`}
-                              className="bg-red-400 text-white px-1 py-1 rounded text-xs font-medium"
-                            >
-                              Clear Due
-                            </Link>
-
-                            {/* Tooltip */}
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 
-                  opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto 
-                  transition-opacity duration-200 
-                  bg-gray-800 text-white text-xs rounded-md px-3 py-2 w-64 
-                  shadow-lg z-50">
-                              Go to <span className="font-semibold text-yellow-400">Leads</span> →
-                              Search the lead → Click <span className="font-semibold text-yellow-400">Edit</span> →
-                              Then update due payment ||
-                              {/* Tooltip Arrow */}
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
-                            </div>
-                          </div>
-                        }
+                        {!atten.status ? (
+                          <select
+                            onChange={(e) => handleAttendance(rowId, e)}
+                           className="text-gray-700 text-xs font-semibold border-b rounded px-1 py-0.5"
+                          >
+                            <option value=""  disabled selected>
+                              Mark Attendance
+                            </option>
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                            <option value="Leave">Leave</option>
+                          </select>
+                        ) : (
+                          // Status as colored button with conditional navigation
+                          <button
+                            className={`px-3 py-1 text-xs rounded font-semibold text-white ${atten.status === "Present"
+                                ? "bg-green-600"
+                                : atten.status === "Absent"
+                                  ? "bg-red-600"
+                                  : "bg-gray-500"
+                              }`}
+                            onClick={() => {
+                              if (atten.status === "Present") {
+                                navigate(`/company/re-treat/register?id=${lead._id}`);
+                              }
+                              // You can add other navigation logic here for Absent or Leave if needed
+                            }}
+                          >
+                            {atten.status}
+                          </button>
+                        )}
                         <button
                           onClick={() => handleSeminarAccessOne(lead._id)}
                           className={`bg-green-500 border text-white px-1 py-1 rounded font-medium text-xs${waitone ? "bg-blue-500" : "bg-gray-400"}`}
@@ -425,8 +469,8 @@ function SeminarData() {
 
                         {oc.unpaidAmount === 0 &&
                           <button onClick={() => handleGenerateCard(lead)} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Certificate</button>}
-                        {oc.unpaidAmount === 0 &&
-                          <Link to={`/company/re-treat/register?id=${lead._id}`} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Camp</Link>}
+                        {/* {oc.unpaidAmount === 0 &&
+                          <Link to={`/company/re-treat/register?id=${lead._id}`} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Camp</Link>} */}
                       </td>
                     </tr>
                   );
