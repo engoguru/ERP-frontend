@@ -64,7 +64,7 @@ function Navbar() {
             {/* <Link to="/dashboard" className="hover:text-green-500 transition">
               Dashboard
             </Link> */}
-            <Link to="/features" className="hover:text-green-500 transition">
+            <Link to="/feature" className="hover:text-green-500 transition">
               Features
             </Link>
             <Link to="/pricing" className="hover:text-green-500 transition">

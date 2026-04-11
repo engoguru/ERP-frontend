@@ -165,7 +165,7 @@ function PermissionConfigure() {
   };
 console.log(permissionList,companyConfigureViewData)
   return (
-    <CompanyLayout>
+    <CompanyLayout pageTitle={"Permission Handle"}>
       <div className="mx-auto max-w-5xl p-6">
         <h2 className="mb-8 text-2xl font-bold text-gray-800">Permission Configuration</h2>
 

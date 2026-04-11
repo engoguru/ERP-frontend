@@ -49,10 +49,15 @@ function Bdreport({ id }) {
           lead.assignedAt || lead.statusRecord?.[0]?.changedAt
         ).getMonth() + 1 === Number(monthFilter)
         : true;
-      const matchText = searchText
-        ? lead.fields?.Name?.toLowerCase().includes(searchText.toLowerCase()) ||
-        lead.fields?.Contact?.toString().includes(searchText)
-        : true;
+   const matchText = searchText
+  ? lead?.fields?.Name
+      ?.toString()
+      ?.toLowerCase()
+      .includes(searchText.toLowerCase()) ||
+    lead?.fields?.Contact
+      ?.toString()
+      ?.includes(searchText)
+  : true;
       return matchMonth && matchText;
     });
 

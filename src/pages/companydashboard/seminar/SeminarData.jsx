@@ -7,7 +7,7 @@ import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 import { base_URL } from "../../../utils/BaseUrl";
 import { Eye, EyeOff } from "lucide-react"; // Lucide icons
 import { Link, useNavigate } from "react-router-dom";
-const seminar = ["Mumbai Seminar", "Delhi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar", "Indore Seminar"];
+const seminar = ["Mumbai Seminar", "Delhi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar", "Indore Seminar","Meeting","website","Trust Registration"];
 
 function SeminarData() {
   const dispatch = useDispatch();
@@ -276,6 +276,7 @@ function SeminarData() {
       console.error(error);
     }
   };
+  const isSeminar = selectedSeminar?.toLowerCase().includes("seminar");
   return (
     <CompanyLayout pageTitle={"Seminar"}>
       <div className="p-4">
@@ -395,7 +396,7 @@ function SeminarData() {
                   const showPaid = visibleRows[rowId]?.paid ?? false;
                   return (
                     <tr key={lead._id} className="text-start hover:bg-red-200">
-                      <td className="border  px-1 py-2">{(page - 1) * limit + idx + 1}</td>
+                      <td className="border text-green-600 px-1 py-2">{(page - 1) * limit + idx + 1}</td>
                       <td className="border px-3 py-2">{f.Name}</td>
                       <td className="border px-1 py-2">{f.Contact}</td>
                       <td className="border px-1 py-2">{f.ngoName}</td>
@@ -427,7 +428,8 @@ function SeminarData() {
                         </div>
                       </td>
                       <td className="border px-2 py-2 text-red-600 font-semibold">{oc.unpaidAmount || 0}</td>
-                      <td className="border-t px-2 py-1 flex gap-2 justify-center">
+                      {isSeminar?
+                         <td className="border-t px-2 py-1 flex gap-2 justify-center">
                         {!atten.status ? (
                           <select
                             onChange={(e) => handleAttendance(rowId, e)}
@@ -471,7 +473,12 @@ function SeminarData() {
                           <button onClick={() => handleGenerateCard(lead)} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Certificate</button>}
                         {/* {oc.unpaidAmount === 0 &&
                           <Link to={`/company/re-treat/register?id=${lead._id}`} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Camp</Link>} */}
-                      </td>
+                      </td>:
+                      <td className="border-t px-2 py-1 flex gap-2 justify-center">
+                     <Link to={`/company/lead/update/${rowId}`}>Update</Link>
+                        </td>
+                        }
+                  
                     </tr>
                   );
                 })

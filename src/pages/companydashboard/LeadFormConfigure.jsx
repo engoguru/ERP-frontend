@@ -97,7 +97,7 @@ function LeadFormConfigure() {
   };
 
   return (
-    <CompanyLayout>
+    <CompanyLayout pageTitle={"Lead Table"}>
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         
         {/* ===== HEADER ===== */}

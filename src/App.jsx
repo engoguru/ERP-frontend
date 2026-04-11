@@ -47,6 +47,11 @@ import UpdateRetreat from './pages/companydashboard/re-treatCamp/UpdateRetreat';
 import AddonTreat from './pages/companydashboard/re-treatCamp/AddonTreat';
 import AddonNew from './pages/companydashboard/re-treatCamp/AddonNew';
 import AddonEdit from './pages/companydashboard/re-treatCamp/AddonEdit';
+import PrivacyPolicy from './pages/client/PrivacyPolicy';
+import TermCondition from './pages/client/TermCondition';
+import Contact from './pages/client/Contact';
+import Feature from './pages/client/Feature';
+import Pricing from './pages/client/Pricing';
 
 
 function App() {
@@ -83,7 +88,11 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path='/login' element={<Login />} />
 
-
+        <Route path="/privacy" element={<PrivacyPolicy />}/>
+        <Route path="/term-condition" element={<TermCondition/>}/>
+        <Route path="/contact" element={<Contact/>}/>
+        <Route path="/feature" element={<Feature/>}/>
+        <Route path="/pricing" element={<Pricing/>}/>
 
 
         <Route element={<ProtectRoute />}>
@@ -94,12 +103,12 @@ function App() {
           <Route path="/company/leadall" element={<LeadAll />} />
 
           <Route path="/company/seminar" element={<SeminarData />} />
-          <Route path="/company/re-treat" element={<ReTreatCamp/>}/>
-          <Route path="/company/re-treat/register" element={<RegisterCamp/>}/>
-          <Route path="/company/re-treat/update/:id" element={<UpdateRetreat/>}/>
-          <Route path="/company/service/addon/:id" element={<AddonTreat/>}/>
-          <Route path="/company/service/addon/new/:id" element={<AddonNew/>}/>
-            <Route path="/company/service/addon/edit/:id" element={<AddonEdit/>}/>
+          <Route path="/company/re-treat" element={<ReTreatCamp />} />
+          <Route path="/company/re-treat/register" element={<RegisterCamp />} />
+          <Route path="/company/re-treat/update/:id" element={<UpdateRetreat />} />
+          <Route path="/company/service/addon/:id" element={<AddonTreat />} />
+          <Route path="/company/service/addon/new/:id" element={<AddonNew />} />
+          <Route path="/company/service/addon/edit/:id" element={<AddonEdit />} />
 
 
 

@@ -48,7 +48,7 @@ function RaisedIssues() {
   };
 
   return (
-    <CompanyLayout>
+    <CompanyLayout pageTitle={"Issues Resolver"}>
       <div className="p-6 max-w-6xl mx-auto">
         {/* HEADER */}
         <div className="flex justify-between items-center mb-6">

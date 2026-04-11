@@ -7,8 +7,9 @@ import { fetchDashboardLeadData, fetchDashboardUserData } from "../../redux/slic
 import { Link } from "react-router-dom";
 import { employeeDetails } from "../../redux/slice/employee/loginSlice";
 import { base_URL } from "../../utils/BaseUrl";
+import axios from "axios";
 
-
+import { ArrowUp } from "lucide-react";
 
 
 /* ─── Animated counter ──────────────────────────────────────── */
@@ -16,7 +17,7 @@ function AnimatedNumber({ target = 0 }) {
   const [val, setVal] = useState(0);
   useEffect(() => {
     let raf, start = null;
-    const ease = t => t < .5 ? 2*t*t : -1+(4-2*t)*t;
+    const ease = t => t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const step = ts => {
       if (!start) start = ts;
       const p = Math.min((ts - start) / 1400, 1);
@@ -46,11 +47,11 @@ function Bar({ pct = 0, color = "#6366f1", h = 5, delay = 0 }) {
 /* ─── Avatar initials ───────────────────────────────────────── */
 function Avatar({ name = "", i = 0, size = 34 }) {
   const palettes = [
-    ["#e0e7ff","#4f46e5"],["#fef3c7","#d97706"],["#d1fae5","#059669"],
-    ["#ffe4e6","#e11d48"],["#e0f2fe","#0284c7"],["#f3e8ff","#9333ea"],["#fce7f3","#be185d"],
+    ["#e0e7ff", "#4f46e5"], ["#fef3c7", "#d97706"], ["#d1fae5", "#059669"],
+    ["#ffe4e6", "#e11d48"], ["#e0f2fe", "#0284c7"], ["#f3e8ff", "#9333ea"], ["#fce7f3", "#be185d"],
   ];
   const [bg, fg] = palettes[i % palettes.length];
-  const ini = name.split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase();
+  const ini = name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
   return (
     <div
       className="font-mono-dm flex items-center justify-center flex-shrink-0 font-bold rounded-full"
@@ -87,46 +88,53 @@ function SectionHeader({ icon, title, accent, animClass = "anim-up-7" }) {
 }
 
 /* ─── Role colors ───────────────────────────────────────────── */
-const ROLE_COLORS = ["#6366f1","#10b981","#f59e0b","#f43f5e","#0ea5e9","#8b5cf6","#06b6d4"];
+const ROLE_COLORS = ["#6366f1", "#10b981", "#f59e0b", "#f43f5e", "#0ea5e9", "#8b5cf6", "#06b6d4"];
 
 /* ─── Main Dashboard ────────────────────────────────────────── */
 function Dashboard() {
   const dispatch = useDispatch();
 
   const { userData } = useSelector((state) => state?.reducer.dashbaord);
-  const { leads }    = useSelector((state) => state?.reducer.dashbaord);
+  const { leads } = useSelector((state) => state?.reducer.dashbaord);
   const { employeeData, initialized } = useSelector((state) => state.reducer.login);
   const [eventData, setEventData] = useState();
 
   const fetchEvents = async () => {
-    const res  = await fetch(`${base_URL}event/upcoming`);
+    const res = await fetch(`${base_URL}event/upcoming`);
     const data = await res.json();
     setEventData(data);
   };
 
   useEffect(() => { if (!initialized) dispatch(employeeDetails()); }, [dispatch, initialized]);
-  useEffect(() => { dispatch(fetchDashboardUserData()); dispatch(fetchDashboardLeadData()); fetchEvents(); }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchDashboardUserData());
+    dispatch(fetchDashboardLeadData());
+    fetchEvents();
+
+  }, [dispatch]);
 
   const permissionArray = employeeData?.permissionArray || [];
   const isAdmin = employeeData?.role === "Admin";
 
-  const totalEmp    = userData?.data?.totalEmployees || 0;
-  const activeEmp   = userData?.data?.license?.activeUser || 0;
+  const totalEmp = userData?.data?.totalEmployees || 0;
+  const activeEmp = userData?.data?.license?.activeUser || 0;
   const inactiveEmp = totalEmp - activeEmp;
-  const activePct   = Math.round((activeEmp / (totalEmp || 1)) * 100);
+  const activePct = Math.round((activeEmp / (totalEmp || 1)) * 100);
   const monthlyEmps = userData?.data?.monthlyEmployees || [];
-  const totalLeads  = leads?.data?.totalleads || 0;
-  const monthLeads  = leads?.data?.monthlyleads || 0;
-  const roleWise    = leads?.data?.roleWise || [];
-  const maxLeads    = Math.max(...roleWise.map(l => l.leads), 1);
+  const totalLeads = leads?.data?.totalleads || 0;
+  const monthLeads = leads?.data?.monthlyleads || 0;
+  const roleWise = leads?.data?.roleWise || [];
+  const sourceWise = leads?.data?.sourceWise || [];
+  const maxLeads = Math.max(...roleWise.map(l => l.leads), 1);
 
-  const now      = new Date();
-  const hour     = now.getHours();
+  const now = new Date();
+  const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  const dateStr  = now.toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+  const dateStr = now.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const [tick, setTick] = useState(new Date());
   useEffect(() => { const id = setInterval(() => setTick(new Date()), 1000); return () => clearInterval(id); }, []);
-  const timeStr = tick.toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+  const timeStr = tick.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
   return (
     <CompanyLayout pageTitle="Dashboard">
@@ -158,9 +166,9 @@ function Dashboard() {
               <h1 className="m-0 font-bold" style={{ fontSize: 27, color: "#fff", letterSpacing: "-0.8px", lineHeight: 1.2 }}>
                 {greeting}{employeeData?.name ? `, ${employeeData.name.split(" ")[0]}` : ""}<span
                   style={{
-    display: "inline-block", // ❗ important
-    animation: "wave 0.6s ease-in-out infinite"
-  }}>👋</span>
+                    display: "inline-block", // ❗ important
+                    animation: "wave 0.6s ease-in-out infinite"
+                  }}>👋</span>
               </h1>
               <p className="mt-2 text-[13px]" style={{ color: "rgba(148,163,184,0.55)" }}>{dateStr}</p>
             </div>
@@ -183,9 +191,9 @@ function Dashboard() {
               >
                 <p className="text-base font-bold m-0" style={{ color: "#f2f3f5" }}>Upcoming Events</p>
                 {eventData?.map((event) => {
-                  const fmtStart = new Date(event?.startDate).toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
-                  const fmtEnd   = new Date(event?.endDate).toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
-                  const single   = event?.totaldays === 1;
+                  const fmtStart = new Date(event?.startDate).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+                  const fmtEnd = new Date(event?.endDate).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+                  const single = event?.totaldays === 1;
                   return (
                     <div key={event._id}>
                       <div className="text-[15px] font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
@@ -214,10 +222,10 @@ function Dashboard() {
           {isAdmin && (
             <div className="relative flex flex-wrap gap-3 mt-7">
               {[
-                { label: "Total Staff",  val: totalEmp,          color: "#818cf8" },
-                { label: "Active Now",   val: activeEmp,         color: "#10b981" },
-                { label: "This Month",   val: monthlyEmps.length,color: "#f59e0b" },
-                { label: "Total Leads",  val: totalLeads,        color: "#f43f5e", hidden: employeeData?.role === "HR" },
+                { label: "Total Staff", val: totalEmp, color: "#818cf8" },
+                { label: "Active Now", val: activeEmp, color: "#10b981" },
+                { label: "This Month", val: monthlyEmps.length, color: "#f59e0b" },
+                { label: "Total Leads", val: totalLeads, color: "#f43f5e", hidden: employeeData?.role === "HR" },
               ].filter(k => !k.hidden).map((k, i) => (
                 <div
                   key={i}
@@ -404,23 +412,58 @@ function Dashboard() {
                 </div>
 
                 {/* Light — By Department mini chart */}
-                <div className="white-card rounded-2xl p-[26px] anim-up-4 overflow-hidden">
+                <div className="white-card border rounded-2xl p-[26px] anim-up-4 overflow-hidden">
                   <div className="flex justify-between items-center mb-[18px]">
-                    <div className="text-sm font-bold" style={{ color: "#0f172a" }}>By Department</div>
-                    <span className="inline-flex items-center text-[10px] font-bold tracking-[0.7px] uppercase px-2.5 py-[3px] rounded-full" style={{ background: "#fefce8", color: "#a16207", border: "1px solid #fde68a" }}>Role-wise</span>
+                    <div className="text-sm font-bold" style={{ color: "#0f172a" }}>By Source</div>
+                    <span className="inline-flex items-center text-[10px] font-bold tracking-[0.7px] uppercase px-2.5 py-[3px] rounded-full" style={{ background: "#fefce8", color: "#a16207", border: "1px solid #fde68a" }}>Source-wise</span>
                   </div>
-                  {isAdmin && roleWise.length > 0
+                  {isAdmin && sourceWise.length > 0
                     ? <div className="flex flex-col gap-2.5">
-                        {roleWise.slice(0, 5).map((lead, idx) => (
-                          <div key={idx}>
-                            <div className="flex justify-between mb-[5px]">
-                              <span className="text-xs font-medium" style={{ color: "#334155" }}>{lead.role}</span>
-                              <span className="font-mono-dm text-xs font-bold" style={{ color: "#0f172a" }}>{lead.leads}</span>
+
+                      {sourceWise.slice(0, 5).map((lead, idx) => {
+                        const totalPct = Math.round((lead.count / lead.count) * 100);
+                        const confirmedPct = Math.round((lead.confirmed / lead.count) * 100);
+                        const ratePct = Math.round(lead.conversionRate); // already %
+
+                        return (
+                          <div key={idx} className="mb-1">
+
+                            {/* Labels */}
+                            <div className="flex justify-between mb-1  font-bold">
+                              <span className="text-slate-700 text-[9px]">{lead._id.toUpperCase()}</span>
+                              <span className="text-green-700 text-[9px]">Confirmed: {lead.confirmed}</span>
+                              <span className="text-orange-600 text-[11px] flex">Rate: {ratePct}%  <ArrowUp size={16} /></span>
+                              <span className="text-blue-700 text-[9px]">Total: {lead.count}</span>
+
+
                             </div>
-                            <Bar pct={Math.round((lead.leads / maxLeads) * 100)} color={ROLE_COLORS[idx % ROLE_COLORS.length]} delay={idx * 80} />
+
+                            {/* BAR STACK */}
+                            <div className="relative w-full h-1 bg-slate-200 rounded">
+
+                              {/* TOTAL BAR (base layer) */}
+                              <div
+                                className="absolute left-0 top-0 h-1 bg-blue-700 rounded"
+                                style={{ width: `${totalPct}%` }}
+                              />
+
+                              {/* CONFIRMED (overlay darker) */}
+                              <div
+                                className="absolute left-0 top-0 h-2 bg-green-700 "
+                                style={{ width: `${confirmedPct}%` }}
+                              />
+
+                              {/* RATE marker line */}
+                              <div
+                                className="absolute top-[-2px] h-3 w-[8px] bg-orange-600 rounded-r-xl transition-transform duration-500 ease-out will-change-transform"
+                                style={{ left: `${ratePct}%` }}
+                              />
+
+                            </div>
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })}
+                    </div>
                     : <div className="text-[13px] text-center py-4" style={{ color: "#94a3b8" }}>No leads data</div>
                   }
                 </div>

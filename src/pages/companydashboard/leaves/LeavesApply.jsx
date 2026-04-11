@@ -120,7 +120,7 @@ const handleUpdate = async (e) => {
   };
  const permissionArray = employeeData?.permissionArray || [];
   return (
-    <CompanyLayout>
+    <CompanyLayout pageTitle={"Leaves Handler"}>
       <div className="p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">

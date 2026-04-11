@@ -90,19 +90,20 @@ function AddonTreat() {
                     <table className="w-full text-sm">
                         <thead className="bg-slate-100 text-slate-600 text-xs uppercase">
                             <tr>
+                                <th className="px-4 py-3 text-left">S.No.</th>
                                 <th className="px-4 py-3 text-left">Service Name</th>
                                 <th className="px-4 py-3 text-center">Total Amt (₹)</th>
                                 <th className="px-4 py-3 text-center">Paid Amt (₹)</th>
                                 <th className="px-4 py-3 text-center">Due Amt (₹)</th>
-                                <th className="px-4 py-3 text-center">Status</th>
+                                <th className="px-4 py-3 text-center">Docs</th>
                                 <th className="px-4 py-3 text-center">Action</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            {AllService?.data?.map((service) => (
+                            {AllService?.data?.map((service, index) => (
                                 <tr key={service.id} className="border-t hover:bg-slate-50 transition">
-
+                                    <td className="px-4 py-3 font-medium">{index + 1}</td>
                                     <td className="px-4 py-3 font-medium">{service.serviceName}</td>
 
                                     <td className="px-4 py-3 text-center">
@@ -125,14 +126,14 @@ function AddonTreat() {
                                     </td> */}
                                     <td className="px-4 py-3 text-center">
                                         {service.docs?.map((url, index) => (
-                                         
-                                                <img
-                                                    src={url.url}
-                                                    alt="doc"
-                                                   onClick={() => window.open(url.url, "_blank")}
-                                                    className="w-12 h-12 object-cover inline-block mx-1 border rounded"
-                                                />
-                                         
+
+                                            <img
+                                                src={url.url}
+                                                alt="doc"
+                                                onClick={() => window.open(url.url, "_blank")}
+                                                className="w-12 h-12 object-cover inline-block mx-1 border rounded"
+                                            />
+
                                         ))}
                                     </td>
 

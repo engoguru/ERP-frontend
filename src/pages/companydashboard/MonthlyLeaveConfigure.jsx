@@ -84,7 +84,7 @@ function MonthlyLeaveConfigure() {
   };
 
   return (
-    <CompanyLayout>
+    <CompanyLayout pageTitle={"Company  Leave Chart"}>
       <div className="mx-auto max-w-4xl p-6 space-y-8">
         <h2 className="text-2xl font-bold text-gray-800">
           Monthly Leave & Weekly Off Configuration
