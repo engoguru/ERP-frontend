@@ -102,7 +102,7 @@ function TermCondition() {
       {/* Cards */}
       <section className="py-8">
         <div className="max-w-3xl mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-start">
 
             {sections.map((s) => (
               <Card key={s.title} {...s} />
