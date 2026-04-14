@@ -87,7 +87,7 @@ function ReTreatCamp() {
   useEffect(() => {
     dispatch(getAllCamp())
   }, [])
-  console.log(seminar, "ppopop")
+  // console.log(seminar, "ppopop")
   return (
     <CompanyLayout pageTitle="Services">
       <div className="p-6 space-y-5">

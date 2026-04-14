@@ -61,16 +61,19 @@ function SeminarData() {
   }, [dispatch, initialized]);
 
   // Allowed seminars
-  const allowedSeminars = isAdmin
-    ? seminar
-    : seminar.filter((s) =>
-      employeeData?.permissionArray?.includes(s)
+const allowedSeminars = isAdmin
+  ? seminar
+  : seminar.filter((s) =>
+      employeeData?.permissionArray?.some(
+        (p) =>
+          p?.toLowerCase?.() === s?.toLowerCase?.()
+      )
     );
 
   useEffect(() => {
     if (allowedSeminars.length > 0) setSelectedSeminar(allowedSeminars[0]);
   }, [employeeData]);
-
+// console.log(allowedSeminars,"op")
   // Debounce filters
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -279,8 +282,8 @@ function SeminarData() {
   const isSeminar = selectedSeminar?.toLowerCase().includes("seminar");
   return (
     <CompanyLayout pageTitle={"Seminar"}>
-      <div className="p-4">
-        <div className="text-center">
+      <div className="p-4 ">
+        <div className="text-center mb-3">
           <h2 className="text-lg font-semibold mb-4">Seminar Data</h2>
 
           <div className="flex justify-center gap-6">

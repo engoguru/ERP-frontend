@@ -95,7 +95,7 @@ function RegisterCamp() {
             let treatCamp = "";
             if (sourceText.includes("seminar")) {
                 const city = sourceText.replace("seminar", "").trim();
-                treatCamp = `${city}-re-treat-camp`;
+                treatCamp = `${city} seminar`;
             }
 
             setForm(prev => ({
@@ -197,12 +197,12 @@ function RegisterCamp() {
     };
     return (
         <CompanyLayout pageTitle={"Services Camp"}>
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+            <div className="min-h-screen bg-gray-300 flex items-center justify-center p-6">
                 <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8">
 
                     {/* Header */}
                     <div className="mb-6">
-                        <h2 className="text-3xl font-semibold text-gray-800">
+                        <h2 className="text-2xl font-semibold text-gray-700">
                             Register For Services
                         </h2>
 
