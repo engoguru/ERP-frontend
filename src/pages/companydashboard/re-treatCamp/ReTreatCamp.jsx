@@ -65,28 +65,60 @@
 
 
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
 import { Edit, Trash2, Eye, MapPin, Calendar, Search, Plus, FileDiff, BadgeIndianRupee, NotebookPen } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllCamp } from '../../../redux/slice/campslice'
-
+import debounce from "lodash.debounce";
 
 function ReTreatCamp() {
   const dispatch = useDispatch()
   const [search, setSearch] = useState('')
   const [seminar, setSeminar] = useState()
+  const [service, SetService] = useState()
+  const [page, setPage] = useState(1)
+  const [itemsPerPage, setItemPerPage] = useState(10)
 
-  // const filtered = data.filter(
-  //   (c) =>
-  //     c.name.toLowerCase().includes(search.toLowerCase()) ||
-  //     c.location.toLowerCase().includes(search.toLowerCase())
-  // )
+  const [totalPages, setTotalPages] = useState()
+
   const { AllCamp } = useSelector((state) => state.reducer.camp)
   useEffect(() => {
-    dispatch(getAllCamp())
-  }, [])
+    dispatch(getAllCamp({ page, itemsPerPage, seminar, service }))
+  }, [dispatch, page, itemsPerPage, seminar, service])
+  // setTOtal pages
+  useEffect(() => {
+    if (AllCamp?.data) {
+      setTotalPages(AllCamp?.totalPages)
+    }
+  }, [AllCamp])
+
+  const fetchData = (query) => {
+    dispatch(getAllCamp({ search: query }));
+  };
+
+  const debouncedSearch = useMemo(() => {
+    return debounce((query) => {
+      fetchData(query);
+    }, 500);
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    const trimmed = search.trim();
+
+    debouncedSearch(trimmed);
+  }, [search, debouncedSearch]);
+
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+
   // console.log(seminar, "ppopop")
   return (
     <CompanyLayout pageTitle="Services">
@@ -99,9 +131,17 @@ function ReTreatCamp() {
             <p className="text-xs text-slate-500 mt-0.5">{ } camps registered</p>
           </div>
 
+
+
           <div className="flex items-center gap-3">
-            <select name="" id="" onChange={(e) => setSeminar(e.target.value)}>
-              <option value="" disabled>Select</option>
+            <select name="" className='border border-gray-400 rounded-lg px-2 py-1' onChange={(e) => setItemPerPage(e.target.value)}>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <select name=""  className='border border-gray-400 rounded-lg px-2 py-1' id="" onChange={(e) => setSeminar(e.target.value)}>
+              <option value="" className=''>Select Source</option>
               <option value="Mumbai Seminar">Mumbai Seminar</option>
               <option value="Delhi Seminar">Delhi Seminar</option>
               <option value="Indore Seminar">Indore Seminar</option>
@@ -109,7 +149,8 @@ function ReTreatCamp() {
               <option value="Patna Seminar">Patna Seminar</option>
             </select>
             {seminar &&
-              <select name="" id="">
+              <select name="" id="" className='border border-gray-400 rounded-lg px-2 py-1' onChange={(e) => SetService(e.target.value)}>
+                   <option value="" className=''>Select Service</option>
                 <option value="Retreat Camp">Retreat Camp</option>
                 <option value="Review Meeting">Review Meeting</option>
                 <option value="Advance Classes">Advance Classes</option>
@@ -123,7 +164,7 @@ function ReTreatCamp() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search camps…"
-                className="pl-8 pr-4 py-2.5 text-sm rounded-lg border-2 border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 outline-none transition-all hover:border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 w-52"
+                className="pl-8 pr-4 py-2 text-sm rounded-lg border-2 border-slate-300 bg-white text-slate-800 placeholder:text-slate-400 outline-none transition-all hover:border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 w-52"
               />
             </div>
 
@@ -145,6 +186,7 @@ function ReTreatCamp() {
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">S.No</th>
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Name</th>
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Email</th>
+                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Contact</th>
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Service</th>
                 <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Due Amt.</th>
                 <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Created</th>
@@ -173,6 +215,13 @@ function ReTreatCamp() {
                       <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
                         <MapPin size={13} className="text-slate-400" />
                         {camp.email}
+                      </span>
+                    </td>
+                    {/* contact*/}
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+                        <MapPin size={13} className="text-slate-400" />
+                        {camp.contact}
                       </span>
                     </td>
                     {/* service*/}
@@ -236,6 +285,17 @@ function ReTreatCamp() {
           )} */}
         </div>
 
+        {/* pagination */}
+        <div className="">
+          <button className={`border border-gray-400 px-2 mx-2 rounded-lg hover:bg-red-300 hover:border-0 disabled:opacity-50`} disabled={page <= 1} onClick={(e) => setPage(e => Math.max(e - 11, 1))} >
+            Prev
+          </button>
+          <span>{page} of {totalPages}</span>
+
+          <button disabled={page >= totalPages} className='border border-gray-400 px-2 mx-2 rounded-lg hover:bg-red-300 hover:border-0  disabled:opacity-50' onClick={(e) => setPage(e => Math.min(e + 1, totalPages))}>
+            Next
+          </button>
+        </div>
       </div>
     </CompanyLayout>
   )

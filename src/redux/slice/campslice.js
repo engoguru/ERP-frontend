@@ -30,9 +30,17 @@ export const registerCamp = createAsyncThunk(
 
 export const getAllCamp = createAsyncThunk(
     "camp/getAll",
-    async (_, { rejectWithValue }) => {
+    async ({ search, page, itemPerPage,seminar,service }, { rejectWithValue }) => {
         try {
+            // console.log(search, page, itemPerPage)
             const response = await axios.get(`${base_URL}treat/getAll`, {
+                params: {
+                    search: search || "",
+                    page: page || 1,
+                    itemPerPage: itemPerPage || 10,
+                    seminar:seminar||"",
+                    service:service||""
+                },
                 withCredentials: true
             })
 
@@ -63,20 +71,20 @@ export const getCampOne = createAsyncThunk(
 )
 
 export const updateCamp = createAsyncThunk(
-  "camp/update",
-  async ({ id, finalData }, { rejectWithValue }) => {
-    try {
-     
-      // Send the actual object instead of wrapping in { finalData }
-      const response = await axios.put(`${base_URL}treat/update/${id}`, finalData);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(
-        error.response?.data || { success: false, message: "Something went wrong" }
-      );
+    "camp/update",
+    async ({ id, finalData }, { rejectWithValue }) => {
+        try {
+
+            // Send the actual object instead of wrapping in { finalData }
+            const response = await axios.put(`${base_URL}treat/update/${id}`, finalData);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            return rejectWithValue(
+                error.response?.data || { success: false, message: "Something went wrong" }
+            );
+        }
     }
-  }
 );
 
 

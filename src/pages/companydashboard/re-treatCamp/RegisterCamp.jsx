@@ -145,6 +145,7 @@ function RegisterCamp() {
         e.preventDefault();
 
         try {
+            // console.log(form,"jfj")
             setWaitforSubmit(false)
             // Determine the service value
             const finalService = form.service === "Others" ? customService : form.service;
@@ -175,9 +176,10 @@ function RegisterCamp() {
             }
 
             // Optional: log FormData entries
-            for (let pair of formData.entries()) console.log(pair[0], pair[1]);
+            // for (let pair of formData.entries()) console.log(pair[0], pair[1]);
 
             // Dispatch thunk
+            // registerCamp(formData)
             const res = await dispatch(registerCamp(formData));
 
             if (res.payload?.success) {

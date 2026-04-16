@@ -7,7 +7,7 @@ import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 import { base_URL } from "../../../utils/BaseUrl";
 import { Eye, EyeOff } from "lucide-react"; // Lucide icons
 import { Link, useNavigate } from "react-router-dom";
-const seminar = ["Mumbai Seminar", "Delhi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar", "Indore Seminar","Meeting","website","Trust Registration"];
+const seminar = ["Mumbai Seminar", "Delhi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar", "Indore Seminar", "Meeting", "website", "Trust Registration"];
 
 function SeminarData() {
   const dispatch = useDispatch();
@@ -61,9 +61,9 @@ function SeminarData() {
   }, [dispatch, initialized]);
 
   // Allowed seminars
-const allowedSeminars = isAdmin
-  ? seminar
-  : seminar.filter((s) =>
+  const allowedSeminars = isAdmin
+    ? seminar
+    : seminar.filter((s) =>
       employeeData?.permissionArray?.some(
         (p) =>
           p?.toLowerCase?.() === s?.toLowerCase?.()
@@ -73,7 +73,7 @@ const allowedSeminars = isAdmin
   useEffect(() => {
     if (allowedSeminars.length > 0) setSelectedSeminar(allowedSeminars[0]);
   }, [employeeData]);
-// console.log(allowedSeminars,"op")
+  // console.log(allowedSeminars,"op")
   // Debounce filters
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -283,38 +283,39 @@ const allowedSeminars = isAdmin
   return (
     <CompanyLayout pageTitle={"Seminar"}>
       <div className="p-4 ">
-        <div className="text-center mb-3">
-          <h2 className="text-lg font-semibold mb-4">Seminar Data</h2>
+        {isAdmin &&
 
-          <div className="flex justify-center gap-6">
+          <div className="text-center mb-3">
+            <h2 className="text-lg font-semibold mb-4">Seminar Data</h2>
 
+            <div className="flex justify-center gap-6">
 
+              <input
+                type="date"
+                value={seminarDate}
+                onChange={(e) => setSeminarDate(e.target.value)}
+                className="border rounded px-2 py-0.4 text-xs"
+              />
 
+              <div className="flex flex-col items-center gap-4">
 
-            <input
-              type="date"
-              value={seminarDate}
-              onChange={(e) => setSeminarDate(e.target.value)}
-              className="border rounded px-2 py-0.4 text-xs"
-            />
+                <button
+                  onClick={handleSeminarAccess}
+                  disabled={!seminarDate || !waitAccess}
+                  className={`px-4 py-1 text-xs rounded text-white ${waitAccess ? "bg-blue-500" : "bg-gray-400"}`}
+                >
+                  {waitAccess
+                    ? `Download Seminar Access Card${data?.length ? ` - ${data.length}` : ""}`
+                    : "Please wait..."}
+                </button>
+              </div>
 
-            <div className="flex flex-col items-center gap-4">
-
-              <button
-                onClick={handleSeminarAccess}
-                disabled={!seminarDate || !waitAccess}
-                className={`px-4 py-1 text-xs rounded text-white ${waitAccess ? "bg-blue-500" : "bg-gray-400"}`}
-              >
-                {waitAccess
-                  ? `Download Seminar Access Card${data?.length ? ` - ${data.length}` : ""}`
-                  : "Please wait..."}
-              </button>
+              <button onClick={handleSeminarAccessblank} className={`px-4  text-xs rounded text-white ${waitblank ? "bg-blue-500" : "bg-gray-400"}`}
+              >Download Seminar Access Card - Blank</button>
             </div>
-
-            <button onClick={handleSeminarAccessblank} className={`px-4  text-xs rounded text-white ${waitblank ? "bg-blue-500" : "bg-gray-400"}`}
-            >Download Seminar Access Card - Blank</button>
           </div>
-        </div>
+        }
+
 
 
 
@@ -431,57 +432,57 @@ const allowedSeminars = isAdmin
                         </div>
                       </td>
                       <td className="border px-2 py-2 text-red-600 font-semibold">{oc.unpaidAmount || 0}</td>
-                      {isSeminar?
-                         <td className="border-t px-2 py-1 flex gap-2 justify-center">
-                        {!atten.status ? (
-                          <select
-                            onChange={(e) => handleAttendance(rowId, e)}
-                           className="text-gray-700 text-xs font-semibold border-b rounded px-1 py-0.5"
-                          >
-                            <option value=""  disabled selected>
-                              Mark Attendance
-                            </option>
-                            <option value="Present">Present</option>
-                            <option value="Absent">Absent</option>
-                            <option value="Leave">Leave</option>
-                          </select>
-                        ) : (
-                          // Status as colored button with conditional navigation
-                          <button
-                            className={`px-3 py-1 text-xs rounded font-semibold text-white ${atten.status === "Present"
+                      {isSeminar ?
+                        <td className="border-t px-2 py-1 flex gap-2 justify-center">
+                          {!atten.status ? (
+                            <select
+                              onChange={(e) => handleAttendance(rowId, e)}
+                              className="text-gray-700 text-xs font-semibold border-b rounded px-1 py-0.5"
+                            >
+                              <option value="k" disabled selected>
+                                Mark Attendance
+                              </option>
+                              <option value="Present">Present</option>
+                              <option value="Absent">Absent</option>
+                              <option value="Leave">Leave</option>
+                            </select>
+                          ) : (
+                            // Status as colored button with conditional navigation
+                            <button
+                              className={`px-3 py-1 text-xs rounded font-semibold text-white ${atten.status === "Present"
                                 ? "bg-green-600"
                                 : atten.status === "Absent"
                                   ? "bg-red-600"
                                   : "bg-gray-500"
-                              }`}
-                            onClick={() => {
-                              if (atten.status === "Present") {
-                                navigate(`/company/re-treat/register?id=${lead._id}`);
-                              }
-                              // You can add other navigation logic here for Absent or Leave if needed
-                            }}
+                                }`}
+                              onClick={() => {
+                                if (atten.status === "Present") {
+                                  navigate(`/company/re-treat/register?id=${lead._id}`);
+                                }
+                                // You can add other navigation logic here for Absent or Leave if needed
+                              }}
+                            >
+                              {atten.status}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleSeminarAccessOne(lead._id)}
+                            className={`bg-green-500 border text-white px-1 py-1 rounded font-medium text-xs${waitone ? "bg-blue-500" : "bg-gray-400"}`}
                           >
-                            {atten.status}
+                            Card
                           </button>
-                        )}
-                        <button
-                          onClick={() => handleSeminarAccessOne(lead._id)}
-                          className={`bg-green-500 border text-white px-1 py-1 rounded font-medium text-xs${waitone ? "bg-blue-500" : "bg-gray-400"}`}
-                        >
-                          Card
-                        </button>
 
 
-                        {oc.unpaidAmount === 0 &&
-                          <button onClick={() => handleGenerateCard(lead)} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Certificate</button>}
-                        {/* {oc.unpaidAmount === 0 &&
+                          {oc.unpaidAmount === 0 &&
+                            <button onClick={() => handleGenerateCard(lead)} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Certificate</button>}
+                          {/* {oc.unpaidAmount === 0 &&
                           <Link to={`/company/re-treat/register?id=${lead._id}`} className="bg-green-700 hover:bg-green-900 text-white px-1 py-1 rounded text-xs">Camp</Link>} */}
-                      </td>:
-                      <td className="border-t px-2 py-1 flex gap-2 justify-center">
-                     <Link to={`/company/lead/update/${rowId}`}>Update</Link>
+                        </td> :
+                        <td className="border-t px-2 py-1 flex gap-2 justify-center">
+                          <Link to={`/company/lead/update/${rowId}`}>Update</Link>
                         </td>
-                        }
-                  
+                      }
+
                     </tr>
                   );
                 })
