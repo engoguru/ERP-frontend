@@ -262,9 +262,9 @@ const handleSubmit = async (e) => {
                   </div>
                 ))}
 
-                <label className="w-20 h-20 flex items-center justify-center border rounded-lg cursor-pointer text-indigo-500 hover:bg-indigo-50">
+                <label className="w-50 h-20 flex-wrap  items-center justify-center border rounded-lg cursor-pointer text-indigo-500 hover:bg-indigo-50 text-xs">
                   <Plus size={24} />
-                  <input type="file" multiple className="hidden" onChange={handleDocUpload}/>
+                  <input type="file" multiple className="" onChange={handleDocUpload}/>
                 </label>
               </div>
             </div>
