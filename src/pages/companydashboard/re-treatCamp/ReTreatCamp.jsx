@@ -1,66 +1,4 @@
-// import React from 'react'
-// import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
-// import { Edit, Trash2, Eye } from 'lucide-react' // React Lucide icons
-// import { Link } from 'react-router-dom'
 
-// const data = [
-//   { id: 1, name: 'Yoga Retreat', location: 'Bali', date: '2026-04-15' },
-//   { id: 2, name: 'Mindfulness Camp', location: 'Thailand', date: '2026-05-10' },
-//   { id: 3, name: 'Adventure Re-Treat', location: 'Nepal', date: '2026-06-01' },
-// ]
-
-// function ReTreatCamp() {
-//   return (
-//     <CompanyLayout pageTitle="Re-Treat">
-//       <div className="p-6 bg-white shadow rounded-lg">
-//         <h2 className="text-xl font-semibold mb-4">Re-Treat Camps</h2>
-//         <table className="min-w-full divide-y divide-gray-200">
-//           <thead className="bg-gray-50">
-//             <tr>
-//               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Name
-//               </th>
-//               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Location
-//               </th>
-//               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Date
-//               </th>
-//               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Actions
-//               </th>
-//             </tr>
-//           </thead>
-//           <tbody className="bg-white divide-y divide-gray-200">
-//             {data.map((camp) => (
-//               <tr key={camp.id}>
-//                 <td className="px-6 py-4 whitespace-nowrap">{camp.name}</td>
-//                 <td className="px-6 py-4 whitespace-nowrap">{camp.location}</td>
-//                 <td className="px-6 py-4 whitespace-nowrap">{camp.date}</td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
-//                   <button className="text-blue-500 hover:text-blue-700">
-//                     <Eye size={18} />
-//                   </button>
-//                   <Link
-//                     to={`/company/re-treat/update/${1}`}
-//                     className="text-green-500 hover:text-green-700"
-//                   >
-//                     <Edit size={18} />
-//                   </Link>
-//                   <button className="text-red-500 hover:text-red-700">
-//                     <Trash2 size={18} />
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </CompanyLayout>
-//   )
-// }
-
-// export default ReTreatCamp
 
 
 
@@ -140,7 +78,7 @@ function ReTreatCamp() {
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <select name=""  className='border border-gray-400 rounded-lg px-2 py-1' id="" onChange={(e) => setSeminar(e.target.value)}>
+            <select name="" className='border border-gray-400 rounded-lg px-2 py-1' id="" onChange={(e) => setSeminar(e.target.value)}>
               <option value="" className=''>Select Source</option>
               <option value="Mumbai Seminar">Mumbai Seminar</option>
               <option value="Delhi Seminar">Delhi Seminar</option>
@@ -150,7 +88,7 @@ function ReTreatCamp() {
             </select>
             {seminar &&
               <select name="" id="" className='border border-gray-400 rounded-lg px-2 py-1' onChange={(e) => SetService(e.target.value)}>
-                   <option value="" className=''>Select Service</option>
+                <option value="" className=''>Select Service</option>
                 <option value="Retreat Camp">Retreat Camp</option>
                 <option value="Review Meeting">Review Meeting</option>
                 <option value="Advance Classes">Advance Classes</option>
@@ -188,6 +126,7 @@ function ReTreatCamp() {
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Email</th>
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Contact</th>
                 <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Service</th>
+                <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Source</th>
                 <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Due Amt.</th>
                 <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Created</th>
                 <th className="px-5 py-3.5 text-start text-xs font-bold uppercase tracking-wider text-slate-600">Action</th>
@@ -198,28 +137,37 @@ function ReTreatCamp() {
                 AllCamp?.data?.map((camp, i) => (
                   <tr
                     key={camp._id}
-                    className="border-b text-start border-slate-200 last:border-0 hover:bg-slate-50 transition-colors"
+                    className={`border-b text-start border-slate-200 last:border-0 hover:bg-slate-50 transition-colors
+`}
+
                   >
                     {/* Index */}
-                    <td className="px-5 py-4">
-                      <span className="text-xs font-bold text-slate-400">{String(i + 1).padStart(2, '0')}</span>
+                    <td
+                      className={`px-2 py-4 `}
+                    >
+                      <span className={`text-xs font-bold ${camp?.attendance?.mark === "Absent"
+                        ? "bg-red-600 text-white px-3"
+                        : camp?.attendance?.mark === "Present"
+                          ? "bg-green-600 text-white px-3"
+                          : "bg-white text-slate-900"
+                        }`}>{String(i + 1).padStart(2, '0')}</span>
                     </td>
 
                     {/* Name */}
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-4">
                       <span className="font-semibold text-slate-800">{camp.name}</span>
                     </td>
 
                     {/* email*/}
-                    <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+                    <td className="px-3 py-4">
+                      <span className="inline-flex text-xs items-center gap-1 text-slate-600 font-medium">
                         <MapPin size={13} className="text-slate-400" />
                         {camp.email}
                       </span>
                     </td>
                     {/* contact*/}
-                    <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+                    <td className="px-3 py-4">
+                      <span className="inline-flex items-center gap-1 text-slate-600 font-medium">
                         <MapPin size={13} className="text-slate-400" />
                         {camp.contact}
                       </span>
@@ -231,8 +179,15 @@ function ReTreatCamp() {
                         {camp.service}
                       </span>
                     </td>
+                    {/* source*/}
+                    <td className="px-3 py-4">
+                      <span className="inline-flex text-xs items-center gap-1.5 text-slate-600 font-medium">
+                        <MapPin size={13} className="text-slate-400" />
+                        {camp.source}
+                      </span>
+                    </td>
                     {/* unpaidAmount*/}
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-4">
                       <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
                         < BadgeIndianRupee size={13} className="text-slate-400" />
                         {camp.unpaidAmount}
@@ -241,8 +196,8 @@ function ReTreatCamp() {
 
 
                     {/* Date */}
-                    <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+                    <td className="px-3 py-4">
+                      <span className="inline-flex items-center gap-1.5 text-slate-900 text-xs font-medium">
                         <Calendar size={13} className="text-slate-400" />
                         {new Date(camp.createdAt).toLocaleDateString('en-IN', {
                           day: 'numeric', month: 'short', year: 'numeric',
@@ -251,14 +206,24 @@ function ReTreatCamp() {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-4">
                       <div className="flex items-center justify-end gap-1.5">
 
-                        <Link
-                          to={`/company/service/addon/${camp._id}`}
-                          title="Add-On New Services"
-                          className="p-2 rounded-lg text-green-300  hover:bg-emerald-200 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
-                        >< NotebookPen size={15} /></Link>
+                        {camp.service === !"Retreat Camp" &&
+                          <Link
+                            to={`/company/service/addon/${camp._id}`}
+                            title="Add-On New Services"
+                            className="p-2 rounded-lg text-green-300  hover:bg-emerald-200 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
+                          >< NotebookPen size={15} />
+                          </Link>
+                        }
+                        {camp.service === "Retreat Camp" &&
+                          <Link
+                            to={`/company/re-treat/update/${camp._id}?attendance=attendance`}
+                            title="Attendance"
+                            className="p-2 rounded-lg text-green-300  hover:bg-emerald-200 hover:text-emerald-600 border border-transparent hover:border-emerald-200 transition-all"
+                          >< NotebookPen size={15} /></Link>
+                        }
                         <Link
                           to={`/company/re-treat/update/${camp._id}`}
                           title="Edit"

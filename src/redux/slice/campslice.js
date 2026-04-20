@@ -76,7 +76,9 @@ export const updateCamp = createAsyncThunk(
         try {
 
             // Send the actual object instead of wrapping in { finalData }
-            const response = await axios.put(`${base_URL}treat/update/${id}`, finalData);
+            const response = await axios.put(`${base_URL}treat/update/${id}`, finalData,{
+                withCredentials:true
+            });
             return response.data;
         } catch (error) {
             console.log(error);

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCampOne, updateCamp } from "../../../redux/slice/campslice";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 
 // ── Floating Field ─────────────────────────────
@@ -26,10 +26,10 @@ function Field({ icon: Icon, value, label, type = "text", onChange, name, childr
       </div>
 
       <input
-        type={type}
+        type={type || ""}
         value={value || ""}
         name={name}
-        onChange={onChange}
+        onChange={onChange || (() => { })}
         placeholder=" "
         className="peer w-full pl-10 pr-3 pt-5 pb-2 text-sm rounded-xl border border-slate-300 bg-white/70 backdrop-blur-md
         focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition"
@@ -49,13 +49,17 @@ function Field({ icon: Icon, value, label, type = "text", onChange, name, childr
 function UpdateRetreat() {
   const dispatch = useDispatch();
   const { id } = useParams();
-const[wait,setWait]=useState(false)
+  const [wait, setWait] = useState(false)
+  const [searchParams] = useSearchParams();
+  const attendance = searchParams.get("attendance");
+
+
   const { oneCamp } = useSelector((state) => state.reducer.camp);
- // Grab state
+  // Grab state
   const { employeeData, loading, initialized } = useSelector(
     (state) => state.reducer.login
   );
-
+  console.log(attendance, "opop")
 
   const [formData, setFormData] = useState({
     name: "",
@@ -67,9 +71,12 @@ const[wait,setWait]=useState(false)
     paidAmount: 0,
     unpaidAmount: 0,
     service: "Retreat Camp",
-    docs:[]
+    attendance: {
+      mark: "",
+    },
+    docs: []
   });
-
+  // console.log(formData)
   const [paidPercentage, setPaidPercentage] = useState(0);
   const [feedback, setFeedback] = useState([]);
   const [newFeedback, setNewFeedback] = useState("");
@@ -80,7 +87,7 @@ const[wait,setWait]=useState(false)
   useEffect(() => {
     if (!initialized) {
       dispatch(employeeDetails());
-   
+
     }
   }, [dispatch, initialized]);
   useEffect(() => {
@@ -97,6 +104,9 @@ const[wait,setWait]=useState(false)
         status: oneCamp.data.status || "Pending",
         totalAmount: oneCamp.data.totalAmount || 0,
         paidAmount: oneCamp.data.paidAmount || 0,
+        attendance: {
+          mark: oneCamp.data.attendance.mark,
+        },
         unpaidAmount:
           (oneCamp.data.totalAmount || 0) -
           (oneCamp.data.paidAmount || 0),
@@ -106,8 +116,8 @@ const[wait,setWait]=useState(false)
       setPaidPercentage(
         oneCamp.data.totalAmount
           ? Math.round(
-              (oneCamp.data.paidAmount * 100) / oneCamp.data.totalAmount
-            )
+            (oneCamp.data.paidAmount * 100) / oneCamp.data.totalAmount
+          )
           : 0
       );
       setFeedback(oneCamp.data.feedback || []);
@@ -135,89 +145,103 @@ const[wait,setWait]=useState(false)
     if (!newFeedback) return;
     setFeedback((prev) => [
       ...prev,
-      { message: newFeedback, action, date: new Date() ,submittedBy:employeeData.id},
+      { message: newFeedback, action, date: new Date(), submittedBy: employeeData.id },
     ]);
     setNewFeedback("");
     setAction("Pending");
   };
 
-const handleDocUpload = (e) => {
-  setFormData((prev) => ({
-    ...prev,
-    docs: [...(prev.docs || []), ...Array.from(e.target.files)]
-  }));
-};
+  const handleDocUpload = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      docs: [...(prev.docs || []), ...Array.from(e.target.files)]
+    }));
+  };
 
-// const handleSubmit = async (e) => {
-//   e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-//   try {
-// setWait(true)
+    try {
+      setWait(true);
 
-//     // Prepare form data 
-//     const updatedData = {
-//       ...formData,
-//       feedback,                  // include feedback array
-//       // combine existing and newly added docs
-//     };
+      const payload = new FormData();
 
-//      // Append new files
-//     formData.docs.forEach((file) => payload.append("docs", file));
+      Object.keys(formData).forEach((key) => {
+        if (key === "docs") return;
 
-// // console.log(updatedData,id)
-//     // Dispatch the update action
-//    // Dispatch the thunk
-//     await dispatch(updateCamp({ id, finalData: updatedData })).unwrap();
-
-//     // Clear new docs after successful update
-//     setNewDocs([]);
-
-//     alert("Updated Successfully");
-//     setWait(false)
-//   } catch (error) {
-//     console.error("Update failed:", error);
-//     alert("Failed to update. Please try again.");
-//   }
-// };
-
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    setWait(true);
-
-    const payload = new FormData();
-
-    // Append all normal fields except docs
-    Object.keys(formData).forEach((key) => {
-      if (key !== "docs") {
-        payload.append(key, formData[key]);
-      }
-    });
-
-    // Append feedback as string
-    payload.append("feedback", JSON.stringify(feedback));
-
-    // Append ONLY new File objects (skip existing doc objects)
-    formData.docs
-      .filter((file) => file instanceof File) // ✅ only real files
-      .forEach((file) => {
-        payload.append("docs", file);
+        // ✅ handle nested object
+        if (key === "attendance") {
+          payload.append("attendance", JSON.stringify(formData.attendance));
+        } else {
+          payload.append(key, formData[key]);
+        }
       });
+      if (newFeedback.length > 0) {
+        payload.append("feedback", JSON.stringify(newFeedback));
+      }
+      // payload.append("feedback", JSON.stringify(feedback));
 
-    // Dispatch
-    await dispatch(updateCamp({ id, finalData: payload })).unwrap();
+      formData.docs
+        .filter((file) => file instanceof File)
+        .forEach((file) => {
+          payload.append("docs", file);
+        });
 
-    alert("Updated Successfully");
-    setWait(false);
+      await dispatch(updateCamp({ id, finalData: payload })).unwrap();
 
-  } catch (error) {
-    console.error("Update failed:", error);
-    alert("Failed to update. Please try again.");
-    setWait(false);
-  }
-};
+      alert("Updated Successfully");
+      dispatch(getCampOne(id));
+      setWait(false);
+      
+    } catch (error) {
+      console.error("Update failed:", error);
+      alert("Failed to update. Please try again.");
+      setWait(false);
+    }
+  };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     setWait(true);
+
+  //     const payload = new FormData();
+
+  //     // Append all normal fields except docs
+  //     Object.keys(formData).forEach((key) => {
+  //       if (key !== "docs") {
+  //         payload.append(key, formData[key]);
+  //       }
+  //       if (key === "attendance") {
+  //       payload.append("attendance", JSON.stringify(formData.attendance));
+  //     } else {
+  //       payload.append(key, formData[key]);
+  //     }
+  //     });
+
+  //     // Append feedback as string
+  //     payload.append("feedback", JSON.stringify(feedback));
+
+  //     // Append ONLY new File objects (skip existing doc objects)
+  //     formData.docs
+  //       .filter((file) => file instanceof File) // ✅ only real files
+  //       .forEach((file) => {
+  //         payload.append("docs", file);
+  //       });
+
+  //     // Dispatch
+  //     await dispatch(updateCamp({ id, finalData: payload })).unwrap();
+
+  //     alert("Updated Successfully");
+  //     setWait(false);
+
+  //   } catch (error) {
+  //     console.error("Update failed:", error);
+  //     alert("Failed to update. Please try again.");
+  //     setWait(false);
+  //   }
+  // };
   const inputCls =
     "w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-white/70 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition";
 
@@ -229,42 +253,68 @@ const handleSubmit = async (e) => {
 
         {/* ── RETREAT DETAILS ── */}
         <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-xl shadow-xl p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-800">Details</h2>
-            <span className="px-3 py-1 text-xs font-bold rounded-full bg-indigo-100 text-indigo-700">
-              {formData.status}
-            </span>
-          </div>
+          <div className="relative group ">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-slate-800">Details</h2>
+              <span className="px-3 py-1 text-xs font-bold rounded-full bg-indigo-100 text-indigo-700">
+                {formData.status}
+              </span>
+              {attendance && (
+                <select
+                  value={formData?.attendance?.mark || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      attendance: {
+                        ...formData.attendance,
+                        mark: e.target.value
+                      }
+                    })
+                  }
+                  className="px-3 py-1 text-xs font-bold rounded-full bg-indigo-100 text-indigo-700 outline-none"
+                >
+                  <option value="" disabled>Mark Attendance</option>
+                  <option value="Present">Present</option>
+                  <option value="Absent">Absent</option>
+                </select>
+              )}
+            </div>
+            {/*  Tooltip */}
+            {formData?.unpaidAmount > 0 && (
+              <div className="absolute left-9/10 -translate-x-1/2 -top-6 hidden group-hover:block group-focus-within:block bg-red-600 text-white text-xs px-3 py-1 rounded shadow-xl whitespace-nowrap">
+                ⚠️ Unpaid amount pending
+              </div>
+            )}</div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Field icon={User} label="Name" value={formData.name} name="name" onChange={handleChange}/>
-            <Field icon={Mail} label="Email" value={formData.email} name="email" onChange={handleChange}/>
-            <Field icon={Phone} label="Contact" value={formData.contact} name="contact" onChange={handleChange}/>
-            <Field icon={Globe} label="Source" value={formData.source} name="source" onChange={handleChange}/>
-            <Field icon={Briefcase} label="Service" value={formData.service} name="service" onChange={handleChange}/>
-            <Field icon={Activity} label="Status" value={formData.status} name="status" onChange={handleChange}/>
-            <Field icon={CreditCard} label="Total Amount" type="number" value={formData.totalAmount} name="totalAmount" onChange={handleChange}/>
-            <Field icon={Wallet} label="Paid Amount" type="number" value={formData.paidAmount} name="paidAmount" onChange={handleChange}/>
+            <Field icon={User} label="Name" value={formData.name} name="name" onChange={handleChange} />
+            <Field icon={Mail} label="Email" value={formData.email} name="email" onChange={handleChange} />
+            <Field icon={Phone} label="Contact" value={formData.contact} name="contact" onChange={handleChange} />
+            <Field icon={Globe} label="Source" value={formData.source} name="source" onChange={handleChange} />
+            <Field icon={Briefcase} label="Service" value={formData.service} name="service" onChange={handleChange} />
+            <Field icon={Activity} label="Status" value={formData.status} name="status" onChange={handleChange} />
+            <Field icon={CreditCard} label="Total Amount" type="number" value={formData.totalAmount} name="totalAmount" onChange={handleChange} />
+            <Field icon={Wallet} label="Paid Amount" type="number" value={formData.paidAmount} name="paidAmount" onChange={handleChange} />
           </div>
 
           {/* Unpaid + Docs + Progress */}
           <div className="space-y-3">
             <div className="flex flex-col md:flex-row gap-4 items-start">
               <div className="flex-1 relative">
-                <Field icon={AlertCircle} label="Unpaid Amount" value={formData.unpaidAmount} readOnly/>
+                <Field icon={AlertCircle} label="Unpaid Amount" value={formData.unpaidAmount} readOnly />
               </div>
 
               {/* Documents preview beside unpaid */}
               <div className="flex flex-wrap gap-2">
                 {[...documents].map((doc) => (
                   <div key={doc._id} className="w-20 h-20 border rounded-lg overflow-hidden cursor-pointer">
-                    <img src={doc.url} alt={getFileName(doc.publicId)} className="w-full h-full object-cover" onClick={() => window.open(doc.url, '_blank')}/>
+                    <img src={doc.url} alt={getFileName(doc.publicId)} className="w-full h-full object-cover" onClick={() => window.open(doc.url, '_blank')} />
                   </div>
                 ))}
 
                 <label className="w-50 h-20 flex-wrap  items-center justify-center border rounded-lg cursor-pointer text-indigo-500 hover:bg-indigo-50 text-xs">
                   <Plus size={24} />
-                  <input type="file" multiple className="" onChange={handleDocUpload}/>
+                  <input type="file" multiple className="" onChange={handleDocUpload} />
                 </label>
               </div>
             </div>
@@ -285,7 +335,7 @@ const handleSubmit = async (e) => {
 
           <div className="flex justify-end gap-3 pt-4">
             <button className="px-5 py-2.5 text-sm font-semibold rounded-xl border border-slate-300 hover:bg-slate-100 transition">Cancel</button>
-            <button onClick={handleSubmit} className="px-6 py-2.5 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition">{wait===true?<>Processing...</>:<>Update</>}</button>
+            <button onClick={handleSubmit} className="px-6 py-2.5 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition">{wait === true ? <>Processing...</> : <>Update</>}</button>
           </div>
         </div>
 
@@ -293,8 +343,8 @@ const handleSubmit = async (e) => {
         <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-xl shadow-xl p-6 space-y-5">
           <h2 className="text-lg font-bold text-slate-800">Feedback History</h2>
           <div className="flex flex-col md:flex-row gap-3">
-            <input value={newFeedback} onChange={(e)=>setNewFeedback(e.target.value)} placeholder="Write feedback..." className={`${inputCls} flex-1`} onKeyDown={(e)=>e.key==='Enter'&&handleAddFeedback()}/>
-            <select value={action} onChange={(e)=>setAction(e.target.value)} className="text-sm border border-slate-300 rounded-xl px-4 py-2.5">
+            <input value={newFeedback} onChange={(e) => setNewFeedback(e.target.value)} placeholder="Write feedback..." className={`${inputCls} flex-1`} onKeyDown={(e) => e.key === 'Enter' && handleAddFeedback()} />
+            <select value={action} onChange={(e) => setAction(e.target.value)} className="text-sm border border-slate-300 rounded-xl px-4 py-2.5">
               <option>Pending</option>
               <option>Processing</option>
               <option>Complete</option>
@@ -311,17 +361,17 @@ const handleSubmit = async (e) => {
                 </tr>
               </thead>
               <tbody>
-                {feedback.length===0?<tr><td colSpan={3} className="py-12 text-center text-slate-400">No feedback yet</td></tr>:feedback.map((fb,i)=>(
+                {feedback.length === 0 ? <tr><td colSpan={3} className="py-12 text-center text-slate-400">No feedback yet</td></tr> : feedback.map((fb, i) => (
                   <tr key={i} className="hover:bg-slate-50 transition">
                     <td className="p-3 font-medium">{fb.message}</td>
                     <td className="p-3 text-center"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">{fb.action}</span></td>
-                    <td className="p-3 text-center text-xs text-slate-500">{new Date(fb.date).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</td>
+                    <td className="p-3 text-center text-xs text-slate-500">{new Date(fb.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-           <button onClick={handleSubmit} className="px-6 py-2.5 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition">{wait===true?<>Processing...</>:<>Update Feedback</>}</button>
+          <button onClick={handleSubmit} className="px-6 py-2.5 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 transition">{wait === true ? <>Processing...</> : <>Update Feedback</>}</button>
         </div>
 
       </div>

@@ -52,6 +52,12 @@ import TermCondition from './pages/client/TermCondition';
 import Contact from './pages/client/Contact';
 import Feature from './pages/client/Feature';
 import Pricing from './pages/client/Pricing';
+import AllSnc from './pages/companydashboard/superNgoClub/AllSnc';
+import SncUpdate from './pages/companydashboard/superNgoClub/SncUpdate';
+import SncCreate from './pages/companydashboard/superNgoClub/SncCreate';
+import SncMemberAddOnService from './pages/companydashboard/superNgoClub/SncMemberAddOnService';
+import SncMemberAddOnServiceCreate from './pages/companydashboard/superNgoClub/SncMemberAddOnServiceCreate';
+import SncMemberAddOnServiceEdit from './pages/companydashboard/superNgoClub/SncMemberAddOnServiceEdit';
 
 
 function App() {
@@ -88,11 +94,11 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path='/login' element={<Login />} />
 
-        <Route path="/privacy" element={<PrivacyPolicy />}/>
-        <Route path="/term-condition" element={<TermCondition/>}/>
-        <Route path="/contact" element={<Contact/>}/>
-        <Route path="/feature" element={<Feature/>}/>
-        <Route path="/pricing" element={<Pricing/>}/>
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/term-condition" element={<TermCondition />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/feature" element={<Feature />} />
+        <Route path="/pricing" element={<Pricing />} />
 
 
         <Route element={<ProtectRoute />}>
@@ -140,6 +146,14 @@ function App() {
 
           <Route path="/company/event" element={<EventMain />} />
 
+          {/* SNC routes */}
+          <Route path="/company/allsnc" element={<AllSnc />} />
+          <Route path="/company/updatesnc/:id" element={<SncUpdate/>}/>
+          <Route path="/company/createsnc" element={<SncCreate/>}/>
+          <Route path="/company/addon/service/:id" element={<SncMemberAddOnService/>}/>
+           <Route path="/company/addon/service/create" element={<SncMemberAddOnServiceCreate/>}/>
+           <Route path="/company/addon/service/edit/:id" element={<SncMemberAddOnServiceEdit/>}/>
+           
 
 
           {/* used for company info edit  */}

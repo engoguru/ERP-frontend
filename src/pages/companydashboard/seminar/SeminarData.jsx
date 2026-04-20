@@ -381,7 +381,9 @@ function SeminarData() {
                 <th className="border px-1 py-2">Total</th>
                 <th className="border px-1 py-2 text-green-600">Paid</th>
                 <th className="border px-1 py-2 text-red-600">Unpaid</th>
-                <th className="border px-1 py-2">Actions</th>
+                <th className="border px-1 py-2">Actions
+                   <Link to="/company/re-treat/register" className="px-2 text-[12px] mx-2 text-red-800 border">New Regis.</Link>
+                   </th>
               </tr>
             </thead>
 

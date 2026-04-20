@@ -236,8 +236,12 @@ function Sidebar({ isMobile }) {
     ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "Confirmed Lead", path: "/company/seminar", icon: Briefcase, group: "main" }]
       : []),
+     
        ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "Services", path: "/company/re-treat", icon: Briefcase, group: "main" }]
+      : []),
+        ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
+      ? [{ label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" }]
       : []),
 
     { label: "Apply Leaves",  path: "/company/applyLeave", icon: Briefcase, group: "personal" },
