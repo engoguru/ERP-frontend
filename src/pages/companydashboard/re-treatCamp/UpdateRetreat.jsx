@@ -97,15 +97,15 @@ function UpdateRetreat() {
   useEffect(() => {
     if (oneCamp?.data) {
       setFormData({
-        name: oneCamp.data.name || "",
-        email: oneCamp.data.email || "",
+        name: oneCamp.data?.name || "",
+        email: oneCamp.data?.email || "",
         contact: oneCamp.data.contact || "",
         source: oneCamp.data.source || "",
         status: oneCamp.data.status || "Pending",
         totalAmount: oneCamp.data.totalAmount || 0,
         paidAmount: oneCamp.data.paidAmount || 0,
         attendance: {
-          mark: oneCamp.data.attendance.mark,
+          mark: oneCamp.data?.attendance?.mark,
         },
         unpaidAmount:
           (oneCamp.data.totalAmount || 0) -

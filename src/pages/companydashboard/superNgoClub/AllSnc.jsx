@@ -1,42 +1,97 @@
-import React from 'react'
-import CompanyLayout from '../../../components/layout/companydashboard/CompanyLayout'
-import { Link } from 'react-router-dom'
+import React from "react";
+import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
+import { Link } from "react-router-dom";
 
 function AllSnc() {
+    const members = [
+        {
+            id: 1,
+            name: "Amit",
+            email: "amit@gmail.com",
+            contact: "6307131152",
+        },
+    ];
+
     return (
-        <>
-            <CompanyLayout pageTitle={"SNC"}>
-                <h1 className='text-xl font-bold text-center pt-5 pb-8'>All Super NGO Club Members</h1>
-                <div className="w-full max-w-10xl overflow-hidden mx-auto grid gap-1 p-4 text-center">
+        <CompanyLayout pageTitle={"SNC"}>
+            <div className="max-w-6xl mx-auto px-4 py-6">
 
-                    <table>
-                        <thead className="border-b-2 border-t-2 rounded-lg border-gray-300">
-                            <tr className='mx-2 py-2 text-left'>
-                                <th className='px-2 py-2'>S.No</th>
-                                <th className='px-2 py-2'>Name</th>
-                                <th className='px-2 py-2'>Email</th>
-                                <th className='px-2 py-2'>contact</th>
-                                <th className='px-2 py-2'>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className='text-left border-b border-gray-300 hover:bg-gray-300'>
-                            <td className='px-2 py-2'>1</td>
-                            <td className='px-2 py-2'>Amit</td>
-                            <td className='px-2 py-2'>amit@gmail.com</td>
-                            <td className='px-2 py-2'>6307131152</td>
-                            <td className='px-2 py-2 flex flex-row gap-2'>
-                                <Link to={`/company/createsnc?id=${1}`} className='px-4 py-1 bg-green-700 text-white text-sm rounded-lg '>Club+</Link>
-                                     <Link to={`/company/addon/service/${1}`} className='px-4 py-1 bg-green-700 text-white text-sm rounded-lg '>Add-On</Link>
-                                <Link to={`/company/updatesnc/${1}`} className='px-4 py-1 bg-blue-600 text-white rounded-lg text-sm'>Edit</Link>
+                {/* Heading */}
+                <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
+                    All Super NGO Club Members
+                </h1>
 
-                            </td>
-                        </tbody>
+                {/* Table Container */}
+                <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-200">
 
-                    </table>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm text-left">
+
+                            {/* Table Head */}
+                            <thead className="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
+                                <tr>
+                                    <th className="px-4 py-3">S.No</th>
+                                    <th className="px-4 py-3">Name</th>
+                                    <th className="px-4 py-3">Email</th>
+                                    <th className="px-4 py-3">Contact</th>
+                                    <th className="px-4 py-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+
+                            {/* Table Body */}
+                            <tbody className="divide-y divide-gray-200">
+                                {members.map((m, index) => (
+                                    <tr
+                                        key={m.id}
+                                        className="hover:bg-gray-50 transition"
+                                    >
+                                        <td className="px-4 py-3">{index + 1}</td>
+                                        <td className="px-4 py-3 font-medium text-gray-800">
+                                            {m.name}
+                                        </td>
+                                        <td className="px-4 py-3 text-gray-600">
+                                            {m.email}
+                                        </td>
+                                        <td className="px-4 py-3 text-gray-600">
+                                            {m.contact}
+                                        </td>
+
+                                        {/* Actions */}
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-wrap gap-2 justify-center">
+
+                                                <Link
+                                                    to={`/company/createsnc?id=${m.id}`}
+                                                    className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg shadow-sm"
+                                                >
+                                                    Club+
+                                                </Link>
+
+                                                <Link
+                                                    to={`/company/addon/service/${m.id}`}
+                                                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg shadow-sm"
+                                                >
+                                                    Add-On
+                                                </Link>
+
+                                                <Link
+                                                    to={`/company/updatesnc/${m.id}`}
+                                                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg shadow-sm"
+                                                >
+                                                    Edit
+                                                </Link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+
+                        </table>
+                    </div>
                 </div>
-            </CompanyLayout>
-        </>
-    )
+            </div>
+        </CompanyLayout>
+    );
 }
 
-export default AllSnc
+export default AllSnc;

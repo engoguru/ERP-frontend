@@ -58,6 +58,7 @@ import SncCreate from './pages/companydashboard/superNgoClub/SncCreate';
 import SncMemberAddOnService from './pages/companydashboard/superNgoClub/SncMemberAddOnService';
 import SncMemberAddOnServiceCreate from './pages/companydashboard/superNgoClub/SncMemberAddOnServiceCreate';
 import SncMemberAddOnServiceEdit from './pages/companydashboard/superNgoClub/SncMemberAddOnServiceEdit';
+import SncMemberAddOnServiceView from './pages/companydashboard/superNgoClub/SncMemberAddOnServiceView';
 
 
 function App() {
@@ -153,8 +154,8 @@ function App() {
           <Route path="/company/addon/service/:id" element={<SncMemberAddOnService/>}/>
            <Route path="/company/addon/service/create" element={<SncMemberAddOnServiceCreate/>}/>
            <Route path="/company/addon/service/edit/:id" element={<SncMemberAddOnServiceEdit/>}/>
+           <Route path="/company/addon/service/view/:id" element={<SncMemberAddOnServiceView/>}/>
            
-
 
           {/* used for company info edit  */}
           <Route path='/company/edit' element={<CompanyEdit />} />
