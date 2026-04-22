@@ -17,7 +17,7 @@ function ReTreatCamp() {
   const [seminar, setSeminar] = useState()
   const [service, SetService] = useState()
   const [page, setPage] = useState(1)
-  const [itemsPerPage, setItemPerPage] = useState(10)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const [totalPages, setTotalPages] = useState()
 
@@ -57,7 +57,7 @@ function ReTreatCamp() {
   }, [debouncedSearch]);
 
 
-  // console.log(seminar, "ppopop")
+  // console.log(itemsPerPage, "ppopop")
   return (
     <CompanyLayout pageTitle="Services">
       <div className="p-6 space-y-5">
@@ -72,7 +72,7 @@ function ReTreatCamp() {
 
 
           <div className="flex items-center gap-3">
-            <select name="" className='border border-gray-400 rounded-lg px-2 py-1' onChange={(e) => setItemPerPage(e.target.value)}>
+            <select name="" className='border border-gray-400 rounded-lg px-2 py-1' onChange={(e) => setItemsPerPage(e.target.value)}>
               <option value="10">10</option>
               <option value="20">20</option>
               <option value="50">50</option>
@@ -150,7 +150,7 @@ function ReTreatCamp() {
                         : camp?.attendance?.mark === "Present"
                           ? "bg-green-600 text-white px-3"
                           : "bg-white text-slate-900"
-                        }`}>{String(i + 1).padStart(2, '0')}</span>
+                        }`}> {String(i + 1 + (page * 10 - 10)).padStart(2, "0")} </span>
                     </td>
 
                     {/* Name */}
@@ -251,13 +251,22 @@ function ReTreatCamp() {
         </div>
 
         {/* pagination */}
-        <div className="">
-          <button className={`border border-gray-400 px-2 mx-2 rounded-lg hover:bg-red-300 hover:border-0 disabled:opacity-50`} disabled={page <= 1} onClick={(e) => setPage(e => Math.max(e - 11, 1))} >
+        <div>
+          <button
+            className="border border-gray-400 px-2 mx-2 rounded-lg hover:bg-red-300 hover:border-0 disabled:opacity-50"
+            disabled={page <= 1}
+            onClick={() => setPage(p => Math.max(p - 1, 1))}
+          >
             Prev
           </button>
+
           <span>{page} of {totalPages}</span>
 
-          <button disabled={page >= totalPages} className='border border-gray-400 px-2 mx-2 rounded-lg hover:bg-red-300 hover:border-0  disabled:opacity-50' onClick={(e) => setPage(e => Math.min(e + 1, totalPages))}>
+          <button
+            className="border border-gray-400 px-2 mx-2 rounded-lg hover:bg-red-300 hover:border-0 disabled:opacity-50"
+            disabled={page >= totalPages}
+            onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+          >
             Next
           </button>
         </div>

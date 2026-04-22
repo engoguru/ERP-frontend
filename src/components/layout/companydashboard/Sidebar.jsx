@@ -194,12 +194,12 @@ function NavGroup({ label }) {
 
 /* ─── Main Sidebar ──────────────────────────────────────────── */
 function Sidebar({ isMobile }) {
-  const location  = useLocation();
-  const dispatch  = useDispatch();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
   /* ── Same selectors / effects as original ── */
   const { employeeData, loading, initialized } = useSelector(state => state.reducer.login);
-  const { companyDetailSpecific }              = useSelector(state => state?.reducer?.company);
+  const { companyDetailSpecific } = useSelector(state => state?.reducer?.company);
 
   useEffect(() => {
     if (!initialized) dispatch(employeeDetails());
@@ -208,11 +208,11 @@ function Sidebar({ isMobile }) {
   useEffect(() => { dispatch(companyDetailData()); }, []);
 
   /* ── Same logic as original ── */
-  const companyName  = companyDetailSpecific?.data?.companyName;
-  const role         = employeeData?.role;
+  const companyName = companyDetailSpecific?.data?.companyName;
+  const role = employeeData?.role;
   const permissionArray = employeeData?.permissionArray || [];
 
-  const allowedSeminars = ["mumbai seminar","delhi seminar","chennai seminar","kolkata seminar"];
+  const allowedSeminars = ["mumbai seminar", "delhi seminar", "chennai seminar", "kolkata seminar"];
   const isAdmin = role === "Admin";
 
   const menu = [
@@ -236,30 +236,30 @@ function Sidebar({ isMobile }) {
     ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "Confirmed Lead", path: "/company/seminar", icon: Briefcase, group: "main" }]
       : []),
-     
-       ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
+
+    ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "Services", path: "/company/re-treat", icon: Briefcase, group: "main" }]
       : []),
-        ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
+    ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" }]
       : []),
 
-    { label: "Apply Leaves",  path: "/company/applyLeave", icon: Briefcase, group: "personal" },
-    { label: "Raised Issues", path: "/company/raised",     icon: Briefcase, group: "personal" },
-
+    { label: "Apply Leaves", path: "/company/applyLeave", icon: Briefcase, group: "personal" },
+    { label: "Raised Issues", path: "/company/raised", icon: Briefcase, group: "personal" },
+    { label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" },
     ...(isAdmin ? [
-      { label: "Lead-form Configure",  path: "/company/form-configure",        icon: FileText,  group: "admin" },
-      { label: "Role Configure",        path: "/company/role-configure",         icon: Briefcase, group: "admin" },
-      { label: "Permission Configure",  path: "/company/permission-configure",   icon: Settings,  group: "admin" },
-      { label: "Leave Configure",       path: "/company/leave-configure",        icon: Settings,  group: "admin" },
+      { label: "Lead-form Configure", path: "/company/form-configure", icon: FileText, group: "admin" },
+      { label: "Role Configure", path: "/company/role-configure", icon: Briefcase, group: "admin" },
+      { label: "Permission Configure", path: "/company/permission-configure", icon: Settings, group: "admin" },
+      { label: "Leave Configure", path: "/company/leave-configure", icon: Settings, group: "admin" },
     ] : []),
   ];
 
   /* Group items */
   const groups = [
-    { key: "main",     label: "Workspace" },
-    { key: "personal", label: "Personal"  },
-    { key: "admin",    label: "Admin"     },
+    { key: "main", label: "Workspace" },
+    { key: "personal", label: "Personal" },
+    { key: "admin", label: "Admin" },
   ];
 
   const firstNameChar = employeeData?.name?.charAt(0) || "U";
@@ -303,8 +303,8 @@ function Sidebar({ isMobile }) {
         />
       </div>
 
-   
-    
+
+
 
       {/* ── Navigation ── */}
       <nav className="sb-nav flex-1 overflow-y-auto px-2 pb-2">
@@ -316,7 +316,7 @@ function Sidebar({ isMobile }) {
               <NavGroup label={group.label} />
               {items.map((item) => {
                 const isActive = location.pathname === item.path;
-                const Icon     = item.icon;
+                const Icon = item.icon;
                 return (
                   <Link
                     key={item.path}
@@ -380,7 +380,7 @@ function Sidebar({ isMobile }) {
               style={{ background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.2)" }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
             </div>
             <div>

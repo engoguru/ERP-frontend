@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { allSncEligible } from "../../../redux/slice/snc/sncregisterSlice";
 
 function AllSnc() {
+    const dispatch=useDispatch()
     const members = [
         {
             id: 1,
@@ -12,6 +15,11 @@ function AllSnc() {
         },
     ];
 
+    const{sncEligibleData}=useSelector((state)=>state.snc)
+useEffect(()=>{
+    dispatch(allSncEligible())
+})
+console.log(sncEligibleData,"pp")
     return (
         <CompanyLayout pageTitle={"SNC"}>
             <div className="max-w-6xl mx-auto px-4 py-6">

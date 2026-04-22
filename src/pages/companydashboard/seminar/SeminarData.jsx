@@ -355,11 +355,11 @@ function SeminarData() {
               </select>
             )}
             {/* Admin seminar select */}
-            {isAdmin && (
+       
               <select value={selectedSeminar} onChange={(e) => { setSelectedSeminar(e.target.value); setPage(1); }} className="border px-2 py-0.5 rounded">
                 {seminar.map((s) => <option key={s}>{s}</option>)}
               </select>
-            )}
+     
           </div>
         </div>
 

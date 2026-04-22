@@ -30,14 +30,14 @@ export const registerCamp = createAsyncThunk(
 
 export const getAllCamp = createAsyncThunk(
     "camp/getAll",
-    async ({ search, page, itemPerPage,seminar,service }, { rejectWithValue }) => {
+    async ({ search, page, itemsPerPage,seminar,service }, { rejectWithValue }) => {
         try {
             // console.log(search, page, itemPerPage)
             const response = await axios.get(`${base_URL}treat/getAll`, {
                 params: {
                     search: search || "",
                     page: page || 1,
-                    itemPerPage: itemPerPage || 10,
+                    itemsPerPage: itemsPerPage || 10,
                     seminar:seminar||"",
                     service:service||""
                 },

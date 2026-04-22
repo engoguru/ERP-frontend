@@ -380,7 +380,7 @@ function LeadAll() {
                       >
                         {field.fieldKey === "city" || field.fieldKey === "state" ? (
                           <>
-                            {String(lead.fields?.[field.fieldKey] ?? "-").slice(0, 13)}
+                            {String(lead.fields?.[field.fieldKey] ?? "-").slice(0, 20)}
                           </>
                         ) : (
                           <>
