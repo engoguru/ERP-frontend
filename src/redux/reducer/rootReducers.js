@@ -14,6 +14,7 @@ import campReducer from "../slice/campslice"
 import serviceReducer from "../slice/serviceAddSlice"
 
 import sncReducer from "../slice/snc/sncregisterSlice"
+import sncServiceReducer from '../slice/snc/sncserviceSlice';
 
 const rootReducer = combineReducers({
   company: companyReducer, 
@@ -31,7 +32,9 @@ const rootReducer = combineReducers({
   camp:campReducer,
   service:serviceReducer,
 
-  snc:sncReducer
+  snc:sncReducer,
+
+  sncService:sncServiceReducer
 
 
 });

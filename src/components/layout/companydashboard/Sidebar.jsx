@@ -246,7 +246,7 @@ function Sidebar({ isMobile }) {
 
     { label: "Apply Leaves", path: "/company/applyLeave", icon: Briefcase, group: "personal" },
     { label: "Raised Issues", path: "/company/raised", icon: Briefcase, group: "personal" },
-    { label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" },
+    // { label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" },
     ...(isAdmin ? [
       { label: "Lead-form Configure", path: "/company/form-configure", icon: FileText, group: "admin" },
       { label: "Role Configure", path: "/company/role-configure", icon: Briefcase, group: "admin" },

@@ -34,7 +34,7 @@ function SncCreate() {
             const total = Number(updated.totalServiceAmount) || 0;
             const paid = Number(updated.paidAmount) || 0;
 
-            updated.unpaidAmount = total - paid;
+            updated.unpaidAmount = total - paid ||"";
 
             return updated;
         });
@@ -73,9 +73,9 @@ function SncCreate() {
 
             console.log(formData, "Submitting form...");
             const res=dispatch(sncRegister(form))
-            console.log(res)
-
-
+            // console.log(res)
+            alert("Member Created !")
+            setFormData()
         } catch (error) {
             console.log(error);
         }

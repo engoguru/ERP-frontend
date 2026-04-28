@@ -152,7 +152,7 @@ function App() {
           <Route path="/company/updatesnc/:id" element={<SncUpdate/>}/>
           <Route path="/company/createsnc" element={<SncCreate/>}/>
           <Route path="/company/addon/service/:id" element={<SncMemberAddOnService/>}/>
-           <Route path="/company/addon/service/create" element={<SncMemberAddOnServiceCreate/>}/>
+           <Route path="/company/addon/service/create/:id" element={<SncMemberAddOnServiceCreate/>}/>
            <Route path="/company/addon/service/edit/:id" element={<SncMemberAddOnServiceEdit/>}/>
            <Route path="/company/addon/service/view/:id" element={<SncMemberAddOnServiceView/>}/>
            

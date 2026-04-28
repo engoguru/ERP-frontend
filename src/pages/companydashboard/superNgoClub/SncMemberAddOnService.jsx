@@ -1,11 +1,33 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
-import { Link } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux';
+import { sncServiceCreate, sncServiceViewAllByUser, sncUserDetail } from '../../../redux/slice/snc/sncserviceSlice';
+import { sncViewOne } from '../../../redux/slice/snc/sncregisterSlice';
 
 function SncMemberAddOnService() {
-    const type = "Amit-SNC-A"; // dynamic value
+    const dispatch = useDispatch()
+    const { id } = useParams();
+
+
 
     let colorClass = "";
+
+    const { sncUserData ,sncServiceOne} = useSelector((state) => state.reducer.sncService)
+    const { sncViewOneDetail } = useSelector((state) => state.reducer.snc)
+    //   useSelector
+    // useEffect
+
+    // Fetch data
+    useEffect(() => {
+        //    sncViewOneDetail
+        dispatch(sncViewOne(id))
+        dispatch(sncUserDetail(id))
+    }, [dispatch, id])
+
+
+
+    const type = `${sncUserData?.data?.name}-${sncViewOneDetail?.data?.sncType}`; // dynamic value
 
     if (type.endsWith("A")) {
         colorClass = "text-green-600";
@@ -27,7 +49,15 @@ function SncMemberAddOnService() {
             status: "Pending"
         }
     ];
+    useEffect(() => {
+        let id = sncViewOneDetail?.data?._id
+        if (id) {
+        
+            dispatch(sncServiceViewAllByUser(id))
+        }
 
+    }, [sncViewOneDetail?.data?._id])
+   
     return (
         <CompanyLayout pageTitle={"SNC Add-On"}>
             <div className="w-full bg-white shadow-md rounded-xl p-4">
@@ -41,7 +71,7 @@ function SncMemberAddOnService() {
                         </span>
                     </h1>
 
-                    <Link to={"/company/addon/service/create"}>
+                    <Link to={`/company/addon/service/create/${id}`}>
                         <button className="bg-green-600 hover:bg-green-700 transition text-white text-sm px-4 py-1 rounded-lg shadow-sm">
                             + Add New Service
                         </button>
@@ -67,42 +97,42 @@ function SncMemberAddOnService() {
                         </thead>
 
                         <tbody>
-                            {services.map((service, index) => (
+                            {sncServiceOne?.data?.map((service, index) => (
                                 <tr
-                                    key={service.id}
+                                    key={service._id}
                                     className="border-b hover:bg-gray-50 transition"
                                 >
                                     <td className="px-4 py-3">{index + 1}</td>
                                     <td className="px-4 py-3 font-medium text-gray-800">
-                                        {service.name}
+                                        {service.serviceName}
                                     </td>
-                                    <td className="px-4 py-3">₹{service.total}</td>
+                                    <td className="px-4 py-3">₹{service.totalAmount}</td>
                                     <td className="px-4 py-3 text-green-600 font-medium">
-                                        ₹{service.paid}
+                                        ₹{service.paidAmount}
                                     </td>
                                     <td className="px-4 py-3 text-red-500 font-medium">
-                                        ₹{service.due}
+                                        ₹{service.unpaidAmount}
                                     </td>
-                                    <td className="px-4 py-3">₹{service.other}</td>
-                                    <td className="px-4 py-3">₹{service.gst}</td>
+                                    <td className="px-4 py-3">₹{service.otherExpanses}</td>
+                                    <td className="px-4 py-3">₹{service.gstAmount}</td>
                                     <td className="px-4 py-3">{service.status}</td>
                                     <td className="px-4 py-3 flex gap-2 justify-center">
                                         <Link
-                                            to={`/company/addon/service/edit/${service.id}`}
+                                            to={`/company/addon/service/edit/${service._id}`}
                                             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-xs"
                                         >
                                             Edit
                                         </Link>
 
                                         <Link
-                                            to={`/company/addon/service/view/${service.id}`}
+                                            to={`/company/addon/service/view/${service._id}`}
                                             className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 rounded-md text-xs"
                                         >
                                             View
                                         </Link>
                                     </td>
                                 </tr>
-                            ))}
+                            ))}  
 
                             {services.length === 0 && (
                                 <tr>
