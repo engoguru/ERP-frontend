@@ -58,7 +58,7 @@ export const getAllService=createAsyncThunk(
     }
 )
 
-
+ 
 export const updateServices=createAsyncThunk(
     "service/update",
     async({id,data},{rejectWithValue})=>{

@@ -6,6 +6,7 @@ export const sncRegister = createAsyncThunk(
   "snc/register",
   async (formData, { rejectWithValue }) => {
     try {
+      
       const response = await axios.post(`${base_URL}sncregister/register`, formData, {
         withCredentials: true
       });

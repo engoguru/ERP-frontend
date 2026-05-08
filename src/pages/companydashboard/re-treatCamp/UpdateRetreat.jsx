@@ -59,8 +59,9 @@ function UpdateRetreat() {
   const { employeeData, loading, initialized } = useSelector(
     (state) => state.reducer.login
   );
-  console.log(attendance, "opop")
-
+  // console.log(attendance, "opop")
+const [feedback, setFeedback] = useState([]);
+  const [newFeedback, setNewFeedback] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -78,8 +79,7 @@ function UpdateRetreat() {
   });
   // console.log(formData)
   const [paidPercentage, setPaidPercentage] = useState(0);
-  const [feedback, setFeedback] = useState([]);
-  const [newFeedback, setNewFeedback] = useState("");
+  
   const [action, setAction] = useState("Pending");
   const [documents, setDocuments] = useState([]);
   // const [newDocs, setNewDocs] = useState([]);
@@ -158,8 +158,11 @@ function UpdateRetreat() {
     }));
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+ const comment = feedback[feedback.length-1];
 
     try {
       setWait(true);
@@ -176,8 +179,9 @@ function UpdateRetreat() {
           payload.append(key, formData[key]);
         }
       });
-      if (newFeedback.length > 0) {
-        payload.append("feedback", JSON.stringify(newFeedback));
+      if (comment) {
+       
+        payload.append("feedback", JSON.stringify(comment));
       }
       // payload.append("feedback", JSON.stringify(feedback));
 

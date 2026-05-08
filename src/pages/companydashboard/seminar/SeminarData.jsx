@@ -280,6 +280,7 @@ function SeminarData() {
     }
   };
   const isSeminar = selectedSeminar?.toLowerCase().includes("seminar");
+
   return (
     <CompanyLayout pageTitle={"Seminar"}>
       <div className="p-4 ">
@@ -338,6 +339,7 @@ function SeminarData() {
               ))}
             </select>
             entries
+            {/* <span className="border text-xs px-2 py-1 rounded-lg bg-red-700 text-white">download Excel</span> */}
           </div>
 
           <div className="flex flex-wrap gap-1.5 items-center">
