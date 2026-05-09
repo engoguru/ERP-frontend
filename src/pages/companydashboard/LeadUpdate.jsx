@@ -53,19 +53,19 @@ function LeadUpdate() {
   const [statusRecord, setStatusRecord] = useState([])
   const permissionArray = employeeData?.permissionArray;
   const isAdmin = employeeData?.role === "Admin";
-    const [confirmedData, setConfirmedData] = useState(
+  const [confirmedData, setConfirmedData] = useState(
   ); // OnConfirmed modal states
-  useEffect(()=>{
-    if(leadDetail?.OnConfirmed){
-         setConfirmedData( leadDetail?.OnConfirmed?.map(item => ({
-      ...item,
-      paidAmount: item.paidAmount || 0,
-      unpaidAmount: item.unpaidAmount || 0,
-      newFiles: [],       // files added during this session
-      changed: false      // track if this service is edited
-    })) || [])
+  useEffect(() => {
+    if (leadDetail?.OnConfirmed) {
+      setConfirmedData(leadDetail?.OnConfirmed?.map(item => ({
+        ...item,
+        paidAmount: item.paidAmount || 0,
+        unpaidAmount: item.unpaidAmount || 0,
+        newFiles: [],       // files added during this session
+        changed: false      // track if this service is edited
+      })) || [])
     }
-  },[leadDetail])
+  }, [leadDetail])
   const { viewAllRole } = useSelector((state) => state.reducer.company);
   const { viewAllDepartment } = useSelector((state) => state.reducer.company);
   useEffect(() => {
@@ -413,8 +413,8 @@ function LeadUpdate() {
                   <tr>
 
 
-                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Service</th> 
-                <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Description</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Service</th>
+                    <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Description</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Total Amt</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Paid Amt</th>
                     <th className="border-2 border-gray-600 text-gray-900 px-2 py-1">Unpaid Amt</th>
@@ -474,14 +474,14 @@ function LeadUpdate() {
                           />
                         </td>
 
-                      <td className="border border-gray-500 px-2 py-1">
+                        <td className="border border-gray-500 px-2 py-1">
                           <div className="flex flex-col text-xs">
                             <span>{item.contact?.name}</span>
                             <span className="text-xs text-gray-500">
                               {item.contact?.phone}
                             </span>
                           </div>
-                        </td> 
+                        </td>
 
                         <td className="border border-gray-500 px-2 py-1">
                           {item.date ? new Date(item.date).toLocaleDateString() : "-"}
@@ -520,11 +520,37 @@ function LeadUpdate() {
                                 />
                               ))}
                             </div>
-                            <input
+                            {/* <input
                               type="file"
                               multiple
                               onChange={(e) => handleFileUpload(item._id, e.target.files)}
                               className="text-xs mt-1"
+                              capture="environment" 
+                            /> */}
+                            <button onClick={() => document.getElementById("gallery").click()}>
+                              Upload Photos
+                            </button>
+
+                            <button onClick={() => document.getElementById("camera").click()}>
+                              Take Photo
+                            </button>
+
+                            <input
+                              id="gallery"
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              hidden
+                              onChange={(e) => handleFileUpload(item._id, e.target.files)}
+                            />
+
+                            <input
+                              id="camera"
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              hidden
+                              onChange={(e) => handleFileUpload(item._id, e.target.files)}
                             />
                           </div>
                         </td>

@@ -55,11 +55,11 @@ function UpdateRetreat() {
 
 
   const { oneCamp } = useSelector((state) => state.reducer.camp);
-  // Grab state
+  // Grab state for data
   const { employeeData, loading, initialized } = useSelector(
     (state) => state.reducer.login
   );
-  // console.log(attendance, "opop")
+
 const [feedback, setFeedback] = useState([]);
   const [newFeedback, setNewFeedback] = useState("");
   const [formData, setFormData] = useState({
@@ -172,7 +172,7 @@ const [feedback, setFeedback] = useState([]);
       Object.keys(formData).forEach((key) => {
         if (key === "docs") return;
 
-        // ✅ handle nested object
+        
         if (key === "attendance") {
           payload.append("attendance", JSON.stringify(formData.attendance));
         } else {
@@ -204,48 +204,7 @@ const [feedback, setFeedback] = useState([]);
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
 
-  //   try {
-  //     setWait(true);
-
-  //     const payload = new FormData();
-
-  //     // Append all normal fields except docs
-  //     Object.keys(formData).forEach((key) => {
-  //       if (key !== "docs") {
-  //         payload.append(key, formData[key]);
-  //       }
-  //       if (key === "attendance") {
-  //       payload.append("attendance", JSON.stringify(formData.attendance));
-  //     } else {
-  //       payload.append(key, formData[key]);
-  //     }
-  //     });
-
-  //     // Append feedback as string
-  //     payload.append("feedback", JSON.stringify(feedback));
-
-  //     // Append ONLY new File objects (skip existing doc objects)
-  //     formData.docs
-  //       .filter((file) => file instanceof File) // ✅ only real files
-  //       .forEach((file) => {
-  //         payload.append("docs", file);
-  //       });
-
-  //     // Dispatch
-  //     await dispatch(updateCamp({ id, finalData: payload })).unwrap();
-
-  //     alert("Updated Successfully");
-  //     setWait(false);
-
-  //   } catch (error) {
-  //     console.error("Update failed:", error);
-  //     alert("Failed to update. Please try again.");
-  //     setWait(false);
-  //   }
-  // };
   const inputCls =
     "w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-white/70 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition";
 
