@@ -212,7 +212,7 @@ function Sidebar({ isMobile }) {
   const role = employeeData?.role;
   const permissionArray = employeeData?.permissionArray || [];
 
-  const allowedSeminars = ["mumbai seminar", "delhi seminar", "chennai seminar", "kolkata seminar"];
+  const allowedSeminars = ["mumbai seminar","kolkata seminar" ,"delhi seminar", "chennai seminar", "kolkata seminar"];
   const isAdmin = role === "Admin";
 
   const menu = [

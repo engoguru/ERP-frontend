@@ -5,9 +5,9 @@ import Sidebar from "./Sidebar";
 
 function CompanyLayout({ children ,pageTitle}) {
   return (
-    <div className="flex h-screen">
+    <div className="flex  min-h-screen ">
       <Sidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <Topbar  pageTitle={pageTitle}/>
         <main className="flex-1 overflow-y-auto p-0 bg-gray-50">
           {children}

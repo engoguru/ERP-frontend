@@ -20,7 +20,7 @@ const ACCESS_OPTIONS = [
   { key: "event", label: "Event", actions: ["etView", "etCreate", "etEdit", "etDelete"] },
   { key: "leaves", label: "Leaves", actions: ["leaView", "leaCreate", "leaEdit", "leaDelete"] },
   { key: "leads", label: "Leads", actions: ["ldView", "ldCreate", "ldEdit", "ldDelete", "ldassign", "ldfollowUp", "ldconverter", "ldprocessor"] },
-   { key: "seminar", label: "Seminar Data", actions: ["mumbai seminar", "delhi seminar", "other" ] },
+   { key: "seminar", label: "Seminar Data", actions: ["mumbai seminar", "delhi seminar","Kolkata Seminaar", "other" ] },
    { key: "services", label: "services Data", actions: ["services list", "services add", "services edit" ] },
 ];
   

@@ -348,7 +348,7 @@ function LeadUpdate() {
   };
   return (
     <CompanyLayout >
-      <div className="max-w-5xl border-2 border-gray-500 mx-auto px-6 py-0 my-4 rounded-lg shadow-xl/30 space-y-2">
+      <div className="max-w-7xl border-2 border-gray-500 mx-auto px-6 py-0 my-4 rounded-lg shadow-xl/30 space-y-2">
         <h2 className="text-2xl font-bold">Update Lead</h2>
 
         {/* Dynamic Fields */}
@@ -508,32 +508,27 @@ function LeadUpdate() {
                           </div>
                         </td> */}
                         <td className="border border-gray-500 px-2 py-1 text-gray-500 font-medium">
-                          <div className="flex flex-col">
-                            <div className="flex gap-1">
+                          {/* <div className="flex flex-row">
+                            <div className="flex gap-1 mb-10">
                               {[...(item.OnConfirmedFiles || []), ...(item.newFiles || [])].map((file, idx) => (
                                 <img
                                   key={idx}
                                   src={file.url}
                                   alt="file"
-                                  className="w-11 h-11 object-cover rounded border cursor-pointer hover:scale-110"
+                                  className="w-50 h-10  object-cover rounded border cursor-pointer hover:scale-110"
                                   onClick={() => window.open(file.url, "_blank")}
                                 />
                               ))}
-                            </div>
-                            {/* <input
+                            </div> */}
+                          {/* <input
                               type="file"
                               multiple
                               onChange={(e) => handleFileUpload(item._id, e.target.files)}
                               className="text-xs mt-1"
                               capture="environment" 
                             /> */}
-                            <button onClick={() => document.getElementById("gallery").click()}>
-                              Upload Photos
-                            </button>
-
-                            <button onClick={() => document.getElementById("camera").click()}>
-                              Take Photo
-                            </button>
+                          {/* <div className="flex flex-col">
+                           
 
                             <input
                               id="gallery"
@@ -552,6 +547,71 @@ function LeadUpdate() {
                               hidden
                               onChange={(e) => handleFileUpload(item._id, e.target.files)}
                             />
+                             <button onClick={() => document.getElementById("gallery").click()}>
+                              Upload Photos
+                            </button>
+
+                            <button onClick={() => document.getElementById("camera").click()}>
+                              Take Photo
+                            </button>
+                            </div>
+
+                            
+                          </div> */}
+
+                          <div className="flex flex-col gap-4 w-full">
+                            {/* Images Preview */}
+                            <div className="flex flex-wrap gap-3">
+                              {[...(item.OnConfirmedFiles || []), ...(item.newFiles || [])].map((file, idx) => (
+                                <img
+                                  key={idx}
+                                  src={file.url}
+                                  alt="file"
+                                  className="w-[50px] h-[30px] md:w-[60px] md:h-[60px] object-cover rounded-lg border border-gray-300 shadow-sm cursor-pointer transition-transform duration-200 hover:scale-110"
+                                  onClick={() => window.open(file.url, "_blank")}
+                                />
+                              ))}
+                            </div>
+
+                            {/* Hidden Inputs */}
+                            <input
+                              id={`gallery-${item._id}`}
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              hidden
+                              onChange={(e) => handleFileUpload(item._id, e.target.files)}
+                            />
+
+                            <input
+                              id={`camera-${item._id}`}
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              hidden
+                              onChange={(e) => handleFileUpload(item._id, e.target.files)}
+                            />
+
+                            {/* Buttons */}
+                            <div className="flex gap-3">
+                              <button
+                                onClick={() =>
+                                  document.getElementById(`gallery-${item._id}`).click()
+                                }
+                                className="px-1 py-1 text-xs font-normal text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
+                              >
+                                Upload
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  document.getElementById(`camera-${item._id}`).click()
+                                }
+                                className="px-1 py-1 text-xs font-normal text-white bg-green-600 rounded-lg shadow hover:bg-green-700 transition"
+                              >
+                                Take
+                              </button>
+                            </div>
                           </div>
                         </td>
 

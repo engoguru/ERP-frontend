@@ -81,6 +81,7 @@ function ReTreatCamp() {
             <select name="" className='border border-gray-400 rounded-lg px-2 py-1' id="" onChange={(e) => setSeminar(e.target.value)}>
               <option value="" className=''>Select Source</option>
               <option value="Mumbai Seminar">Mumbai Seminar</option>
+               <option value="Kolkata Seminar">Kolkata Seminar</option>
               <option value="Delhi Seminar">Delhi Seminar</option>
               <option value="Indore Seminar">Indore Seminar</option>
               <option value="Lucknow Seminar">Lucknow Seminar</option>

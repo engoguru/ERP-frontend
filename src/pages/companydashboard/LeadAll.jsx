@@ -267,10 +267,12 @@ function LeadAll() {
               value={source}
               onChange={(e) => setSource(e.target.value)}
               className="w-[100%] border rounded py-2 pl-3 pr-3 text-sm"
-            >meetingWebsite
+            >
+           
               <option value="">Select Source</option>
               <option value="mumbai seminar">Mumbai Seminar</option>
               <option value="delhi seminar">Delhi Seminar</option>
+              <option value="kolkata seminar">Kolkata Seminar</option>
               <option value="mahakumbh">Mahakumbh</option>
               <option value="Trust Registration">Trust Registration</option>
               <option value="meeting">Meeting</option>
