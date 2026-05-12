@@ -9,6 +9,7 @@ import { viewEmployees } from "../../redux/slice/employee/employeeCreateSlice";
 import { employeeDetails } from "../../redux/slice/employee/loginSlice";
 import { base_URL } from "../../utils/BaseUrl";
 import axios from "axios";
+import CameraCapture from "../../components/ui/CameraCapture";
 
 function LeadUpdate() {
   const { id } = useParams();
@@ -144,7 +145,7 @@ function LeadUpdate() {
       console.log("Updated data:", updated);
       return updated;
     });
-    console.log(key, value, formData, "opop")
+    // console.log(key, value, formData, "opop")
     if (key === "status" && employeeData?.roleID && employeeData?.id) {
       const newStatusEntry = {
         roleId: employeeData.roleID,
@@ -339,7 +340,7 @@ function LeadUpdate() {
           item._id === serviceId ? { ...item, newFiles: [], changed: false } : item
         )
       );
-
+ if (id) dispatch(fetchOneLead(id));
       // optional: refetch leadDetail to get fresh data from backend
     } catch (err) {
       console.error(err);
@@ -583,14 +584,18 @@ function LeadUpdate() {
                               onChange={(e) => handleFileUpload(item._id, e.target.files)}
                             />
 
-                            <input
+                            {/* <input
                               id={`camera-${item._id}`}
                               type="file"
                               accept="image/*"
                               capture="environment"
                               hidden
                               onChange={(e) => handleFileUpload(item._id, e.target.files)}
-                            />
+                            /> */}
+                            <CameraCapture
+                              item={item}
+                              handleFileUpload={handleFileUpload}
+                              />
 
                             {/* Buttons */}
                             <div className="flex gap-3">
@@ -603,14 +608,14 @@ function LeadUpdate() {
                                 Upload
                               </button>
 
-                              <button
+                              {/* <button
                                 onClick={() =>
                                   document.getElementById(`camera-${item._id}`).click()
                                 }
                                 className="px-1 py-1 text-xs font-normal text-white bg-green-600 rounded-lg shadow hover:bg-green-700 transition"
                               >
                                 Take
-                              </button>
+                              </button> */}
                             </div>
                           </div>
                         </td>
@@ -1074,3 +1079,7 @@ function LeadUpdate() {
 }
 
 export default LeadUpdate;
+
+
+
+

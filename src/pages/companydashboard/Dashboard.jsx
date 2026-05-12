@@ -45,6 +45,7 @@ function Bar({ pct = 0, color = "#6366f1", h = 5, delay = 0 }) {
 }
 
 /* ─── Avatar initials ───────────────────────────────────────── */
+
 function Avatar({ name = "", i = 0, size = 34 }) {
   const palettes = [
     ["#e0e7ff", "#4f46e5"], ["#fef3c7", "#d97706"], ["#d1fae5", "#059669"],
@@ -98,7 +99,7 @@ function Dashboard() {
   const { leads } = useSelector((state) => state?.reducer.dashbaord);
   const { employeeData, initialized } = useSelector((state) => state.reducer.login);
   const [eventData, setEventData] = useState();
-
+  const [showPopup, setShowPopup] = useState(false);
   const fetchEvents = async () => {
     const res = await fetch(`${base_URL}event/upcoming`);
     const data = await res.json();
@@ -111,7 +112,6 @@ function Dashboard() {
     dispatch(fetchDashboardUserData());
     dispatch(fetchDashboardLeadData());
     fetchEvents();
-
   }, [dispatch]);
 
   const permissionArray = employeeData?.permissionArray || [];
@@ -136,6 +136,21 @@ function Dashboard() {
   useEffect(() => { const id = setInterval(() => setTick(new Date()), 1000); return () => clearInterval(id); }, []);
   const timeStr = tick.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
+
+useEffect(() => {
+  if (!eventData || eventData.length === 0) return;
+
+  const eventName = eventData[0]?.eventName;
+  if (!eventName) return;
+
+  const hasSeenPopup = localStorage.getItem(eventName);
+
+  if (!hasSeenPopup) {
+    setShowPopup(true);
+    localStorage.setItem(eventName, "true");
+  }
+}, [eventData]);
+// console.log(eventData,"pp")
   return (
     <CompanyLayout pageTitle="Dashboard">
 
@@ -170,7 +185,9 @@ function Dashboard() {
                     animation: "wave 0.6s ease-in-out infinite"
                   }}>👋</span>
               </h1>
+
               <p className="mt-2 text-[13px]" style={{ color: "rgba(148,163,184,0.55)" }}>{dateStr}</p>
+
             </div>
 
             {/* Clock + Events */}
@@ -215,7 +232,7 @@ function Dashboard() {
                   );
                 })}
               </div>
-            </div>
+            </div>                
           </div>
 
           {/* KPI strip */}
@@ -520,6 +537,41 @@ function Dashboard() {
 
         </div>
       </div>
+
+
+
+
+      {showPopup &&eventData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
+          <div className="relative w-[90%] max-w-md rounded-2xl bg-white p-6 text-center shadow-2xl animate-[bounce_25s_infinite]">
+            <h2 className="mb-4 text-xl font-bold text-orange-500">
+              🎉 Congratulations, {employeeData?.name}! 🎉
+            </h2>
+
+            <p className="mb-4 text-sm text-gray-800">
+              Delhi Seminar was a great success thanks to your support and participation.
+            </p>
+
+            <div className="my-4 rounded-xl bg-blue-100 py-3 text-xl font-semibold text-blue-700">
+              {
+                eventData[0].eventName
+              }
+              {/* Kolkata Seminar — 7 June 2026  */}
+            </div>
+
+            <p className="mb-6 text-gray-700 text-xs">
+              Looking forward to making the next seminar even more successful together!
+            </p>
+
+            <button
+              onClick={() => setShowPopup(false)}
+              className="rounded-xl bg-orange-500 px-6 py-2 text-white font-medium transition hover:bg-orange-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </CompanyLayout>
   );
 }
