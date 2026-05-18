@@ -83,6 +83,7 @@ function ReTreatCamp() {
               <option value="Mumbai Seminar">Mumbai Seminar</option>
                <option value="Kolkata Seminar">Kolkata Seminar</option>
               <option value="Delhi Seminar">Delhi Seminar</option>
+              <option value="Hyderabad seminar">Hyderabad Seminar</option>
               <option value="Indore Seminar">Indore Seminar</option>
               <option value="Lucknow Seminar">Lucknow Seminar</option>
               <option value="Patna Seminar">Patna Seminar</option>
