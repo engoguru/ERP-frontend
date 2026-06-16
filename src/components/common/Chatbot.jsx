@@ -171,9 +171,9 @@ function Chatbot() {
         message: question,
         userId: userIdRef.current,
       });
-
+      console.log(response, "opop")
       //Clean and shorten the reply
-      const botReply = cleanReply(response.data.reply);
+      const botReply = cleanReply(response.data.answer);
 
       //  Replace the typing placeholder with actual reply
       setMessages((prev) =>
@@ -210,10 +210,10 @@ function Chatbot() {
       </motion.button>
 
       {/* Chat Window */}
-      <AnimatePresence> 
+      <AnimatePresence>
         {isOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}   
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed bottom-10 right-6 z-100 w-[340px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-5xl border border-gray-300 overflow-hidden"

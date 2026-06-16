@@ -7,7 +7,7 @@ import { employeeDetails } from "../../../redux/slice/employee/loginSlice";
 import { base_URL } from "../../../utils/BaseUrl";
 import { Eye, EyeOff } from "lucide-react"; // Lucide icons
 import { Link, useNavigate } from "react-router-dom";
-const seminar = ["Mumbai Seminar", "Delhi Seminar","Kolkata Seminar","Hyderabad seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar", "Indore Seminar", "Meeting", "website", "Trust Registration"];
+const seminar = ["Mumbai Seminar", "Delhi Seminar","Kolkata Seminar","Hyderabad seminar","Ranchi Seminar", "Patna Seminar", "Ahmedabad Seminar", "Lucknow Seminar", "Indore Seminar", "Meeting", "website", "Trust Registration"];
 
 function SeminarData() {
   const dispatch = useDispatch();

@@ -274,6 +274,7 @@ function LeadAll() {
               <option value="delhi seminar">Delhi Seminar</option>
               <option value="kolkata seminar">Kolkata Seminar</option>
               <option value="Hyderabad seminar">Hyderabad Seminar</option>
+               <option value="Ranchi seminar">Ranchi Seminar</option>
               <option value="mahakumbh">Mahakumbh</option>
               <option value="Trust Registration">Trust Registration</option>
               <option value="meeting">Meeting</option>
