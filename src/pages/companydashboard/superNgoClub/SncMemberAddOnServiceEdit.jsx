@@ -6,6 +6,8 @@ import {
   sncServiceViewOne,
 } from "../../../redux/slice/snc/sncserviceSlice";
 import { useParams } from "react-router-dom";
+import { viewEmployees } from "../../../redux/slice/employee/employeeCreateSlice";
+import { useNavigate } from "react-router-dom";
 
 /* ─────────────────────────── tiny helpers ─────────────────────────── */
 const fmt = (n) =>
@@ -14,9 +16,9 @@ const fmt = (n) =>
 /* ── Section Header ── */
 const SectionHeader = ({ icon, label, color }) => {
   const colorMap = {
-    blue:   { wrap: "bg-gray-50 border-gray-200", icon: "bg-blue-50 text-blue-600 ring-1 ring-blue-100" },
-    green:  { wrap: "bg-gray-50 border-gray-200", icon: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100" },
-    amber:  { wrap: "bg-gray-50 border-gray-200", icon: "bg-amber-50 text-amber-600 ring-1 ring-amber-100" },
+    blue: { wrap: "bg-gray-50 border-gray-200", icon: "bg-blue-50 text-blue-600 ring-1 ring-blue-100" },
+    green: { wrap: "bg-gray-50 border-gray-200", icon: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100" },
+    amber: { wrap: "bg-gray-50 border-gray-200", icon: "bg-amber-50 text-amber-600 ring-1 ring-amber-100" },
     purple: { wrap: "bg-gray-50 border-gray-200", icon: "bg-violet-50 text-violet-600 ring-1 ring-violet-100" },
   };
   const c = colorMap[color] || colorMap.blue;
@@ -112,10 +114,10 @@ const SelectInput = ({ children, ...props }) => {
 /* ── Summary Chip ── */
 const SummaryChip = ({ label, value, accent }) => {
   const accentMap = {
-    default: { val: "text-gray-900",    bg: "bg-white border-gray-200" },
-    green:   { val: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
-    red:     { val: "text-red-700",     bg: "bg-red-50 border-red-200" },
-    blue:    { val: "text-blue-700",    bg: "bg-blue-50 border-blue-200" },
+    default: { val: "text-gray-900", bg: "bg-white border-gray-200" },
+    green: { val: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
+    red: { val: "text-red-700", bg: "bg-red-50 border-red-200" },
+    blue: { val: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
   };
   const a = accentMap[accent] || accentMap.default;
   return (
@@ -171,22 +173,27 @@ const UploadZone = ({ onChange }) => {
 function SncMemberAddOnServiceEdit() {
   const dispatch = useDispatch();
   const { id } = useParams();
-
+const navigate = useNavigate();
   const [existingDocs, setExistingDocs] = useState([]);
-  const [newDocs, setNewDocs]           = useState([]);
-  const [saving, setSaving]             = useState(false);
+  const [newDocs, setNewDocs] = useState([]);
+  const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
-    serviceName:   "",
-    totalAmount:   "",
-    paidAmount:    "",
-    unpaidAmount:  "",
-    gstAmount:     "",
+    serviceName: "",
+    totalAmount: "",
+    paidAmount: "",
+    unpaidAmount: "",
+    gstAmount: "",
     otherExpanses: "",
-    status:        "",
+    status: "",
+    assigned: []
   });
 
+  const { employeeList, loading, error } = useSelector(
+    (state) => state.reducer.employee
+  );
   const { sncServiceOneDetail } = useSelector((state) => state.reducer.sncService);
+
 
   useEffect(() => { dispatch(sncServiceViewOne(id)); }, [id, dispatch]);
 
@@ -194,21 +201,32 @@ function SncMemberAddOnServiceEdit() {
     if (sncServiceOneDetail?.data) {
       const d = sncServiceOneDetail.data;
       setForm({
-        serviceName:   d.serviceName   || "",
-        totalAmount:   d.totalAmount   || "",
-        paidAmount:    d.paidAmount    || "",
-        unpaidAmount:  d.unpaidAmount  || "",
-        gstAmount:     d.gstAmount     || "",
+        serviceName: d.serviceName || "",
+        totalAmount: d.totalAmount || "",
+        paidAmount: d.paidAmount || "",
+        unpaidAmount: d.unpaidAmount || "",
+        gstAmount: d.gstAmount || "",
         otherExpanses: d.otherExpanses || "",
-        status:        d.status        || "",
+        status: d.status || "",
+        assigned: d.assigned || []
       });
       setExistingDocs(d.docs || []);
     }
   }, [sncServiceOneDetail]);
 
   useEffect(() => {
+    dispatch(viewEmployees())
+    // viewEmployees
+  }, []);
+  // console.log(employeeList, "list")
+  useEffect(() => {
     const due = Number(form.totalAmount || 0) - Number(form.paidAmount || 0);
-    setForm((prev) => ({ ...prev, unpaidAmount: due }));
+    if(due==0){
+  setForm((prev) => ({ ...prev, unpaidAmount: 0 }));
+    }else{
+        setForm((prev) => ({ ...prev, unpaidAmount: due }));
+    }
+  
   }, [form.totalAmount, form.paidAmount]);
 
   const handleChange = (e) => {
@@ -217,7 +235,7 @@ function SncMemberAddOnServiceEdit() {
   };
 
   const handleFileChange = (e) => {
-    const files  = Array.from(e.target.files);
+    const files = Array.from(e.target.files);
     const mapped = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
     setNewDocs((prev) => [...prev, ...mapped]);
   };
@@ -229,29 +247,80 @@ function SncMemberAddOnServiceEdit() {
     setNewDocs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const payload = new FormData();
-      Object.entries(form).forEach(([k, v]) => payload.append(k, v));
-      newDocs?.forEach((d) => payload.append("docs", d.file));
-      await dispatch(sncServiceUpdateOne({ id, data: payload })).unwrap();
-      alert("Service updated successfully");
-    } catch (err) {
-      console.error(err);
-      alert("Update failed");
-    } finally {
-      setSaving(false);
-    }
-  };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setSaving(true);
+  //   try {
+  //     // console.log(form)
+  //     const payload = new FormData();
+  //     Object.entries(form).forEach(([k, v]) => payload.append(k, v));
+  //     newDocs?.forEach((d) => payload.append("docs", d.file));
+  //     await dispatch(sncServiceUpdateOne({ id, data: payload })).unwrap();
+  //     alert("Service updated successfully");
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Update failed");
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // };
 
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSaving(true);
+
+  try {
+    const payload = new FormData();
+
+    payload.append("serviceName", form.serviceName);
+    payload.append("totalAmount", form.totalAmount);
+    payload.append("paidAmount", form.paidAmount);
+    payload.append("unpaidAmount", form.unpaidAmount);
+    payload.append("gstAmount", form.gstAmount);
+    payload.append("otherExpanses", form.otherExpanses);
+    payload.append("status", form.status);
+
+    // Array/Object must be stringified
+    payload.append("assigned", JSON.stringify(form.assigned));
+
+    newDocs?.forEach((d) => {
+      payload.append("docs", d.file);
+    });
+
+    await dispatch(
+      sncServiceUpdateOne({
+        id,
+        data: payload,
+      })
+    ).unwrap();
+
+    alert("Service updated successfully");
+    navigate(0);
+  } catch (err) {
+    console.error(err);
+    alert("Update failed");
+  } finally {
+    setSaving(false);
+  }
+};
   const total = Number(form.totalAmount || 0);
-  const paid  = Number(form.paidAmount  || 0);
-  const due   = total - paid;
-  const gst   = Number(form.gstAmount   || 0);
+  const paid = Number(form.paidAmount || 0);
+  const due = total - paid;
+  const gst = Number(form.gstAmount || 0);
 
   /* ── render ── */
+  // const updateAssignedStatus = (userId, status) => {
+  //   // setForm(prev => ({
+  //   //   ...prev,
+  //   //   assigned: prev.assigned.map(user =>
+  //   //     user.userId === userId
+  //   //       ? { ...user, status }
+  //   //       : user
+  //   //   )
+  //   // }));
+  // };
+
   return (
     <CompanyLayout pageTitle="Edit SNC Service">
       {/* Black outer background */}
@@ -280,10 +349,10 @@ function SncMemberAddOnServiceEdit() {
               {form.status && (
                 <span className={[
                   "px-3 py-1 rounded-full text-xs font-semibold tracking-wide border mt-1",
-                  form.status === "active"    ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                  form.status === "pending"   ? "bg-amber-50 text-amber-700 border-amber-200" :
-                  form.status === "completed" ? "bg-blue-50 text-blue-700 border-blue-200" :
-                                               "bg-red-50 text-red-700 border-red-200",
+                  form.status === "active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                    form.status === "pending" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                      form.status === "completed" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                        "bg-red-50 text-red-700 border-red-200",
                 ].join(" ")}>
                   {form.status.charAt(0).toUpperCase() + form.status.slice(1)}
                 </span>
@@ -294,9 +363,9 @@ function SncMemberAddOnServiceEdit() {
           {/* ── Summary Chips — white/tinted on black ── */}
           <div className="grid grid-cols-4 gap-3 mb-5">
             <SummaryChip label="Total" value={`₹${fmt(total)}`} accent="default" />
-            <SummaryChip label="Paid"  value={`₹${fmt(paid)}`}  accent="green" />
-            <SummaryChip label="Due"   value={`₹${fmt(due)}`}   accent={due > 0 ? "red" : "green"} />
-            <SummaryChip label="GST"   value={`₹${fmt(gst)}`}   accent="blue" />
+            <SummaryChip label="Paid" value={`₹${fmt(paid)}`} accent="green" />
+            <SummaryChip label="Due" value={`₹${fmt(due)}`} accent={due > 0 ? "red" : "green"} />
+            <SummaryChip label="GST" value={`₹${fmt(gst)}`} accent="blue" />
           </div>
 
           {/* ── Form — white cards stacked on black bg ── */}
@@ -306,6 +375,41 @@ function SncMemberAddOnServiceEdit() {
             <Card className="rounded-t-xl rounded-b-none">
               <SectionHeader icon="⚙" label="Service info" color="blue" />
               <div className="p-5">
+
+
+
+                <div className="flex">
+               
+                  <div>
+                    <select
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          assigned: [
+                            {
+                              userId: e.target.value,
+                              userName:
+                                employeeList.find(emp => emp._id === e.target.value)?.name || "",
+                              status: "Active"
+                            }
+                          ]
+                        })
+                      }
+                    >
+                      <option value="">Select Employee</option>
+
+                      {employeeList?.map((user, index) => (
+                        <option key={index} value={user._id}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+
+
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
                     <Label>Service name</Label>
@@ -326,7 +430,9 @@ function SncMemberAddOnServiceEdit() {
                       <option value="completed">Completed</option>
                       <option value="cancelled">Cancelled</option>
                     </SelectInput>
+
                   </div>
+
                 </div>
               </div>
             </Card>

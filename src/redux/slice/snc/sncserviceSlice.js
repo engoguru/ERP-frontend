@@ -68,31 +68,31 @@ export const sncUserDetail = createAsyncThunk(
   }
 );
 
-export const sncServiceViewOne=createAsyncThunk(
+export const sncServiceViewOne = createAsyncThunk(
   "sncService/viewOne",
-  async(id,{rejectWithValue})=>{
-    try{
-const response=await axios.get(`${base_URL}sncService/viewOne/${id}`,{
-  withCredentials:true
-})
-return response.data
-    }catch(error){
-      return rejectWithValue(
-        error.response?.data || error.message
-      );
-    }
-  }
-)
-
-export const sncServiceUpdateOne=createAsyncThunk(
-  "sncService/updateOne",
-  async({id,data},{rejectWithValue})=>{
-    try{
-      const response=await axios.put(`${base_URL}sncService/updateService/${id}`,data,{
-        withCredentials:true,
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${base_URL}sncService/viewOne/${id}`, {
+        withCredentials: true
       })
       return response.data
-    }catch(error){
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || error.message
+      );
+    }
+  }
+)
+
+export const sncServiceUpdateOne = createAsyncThunk(
+  "sncService/updateOne",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${base_URL}sncService/updateService/${id}`, data, {
+        withCredentials: true,
+      })
+      return response.data
+    } catch (error) {
       return rejectWithValue(
         error.response?.data || error.message
       );
@@ -101,6 +101,22 @@ export const sncServiceUpdateOne=createAsyncThunk(
   }
 )
 
+export const sncServiceViewAssigned = createAsyncThunk(
+  "sncService/viewAssigned",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${base_URL}sncService/services/assigned/${id}`, {
+        withCredentials: true
+      })
+      return response.data
+    }
+    catch (error) {
+      return rejectWithValue(
+        error.response?.data || error.message
+      );
+    }
+  }
+)
 
 
 const initialState = {
@@ -109,8 +125,9 @@ const initialState = {
   sncServiceCreateData: null,
   sncUserData: null,
   sncServiceOne: null,
-  sncServiceOneDetail:null,
-  sncServiceUpdateOneData:null
+  sncServiceOneDetail: null,
+  sncServiceUpdateOneData: null,
+  sncServiceAssignedData: null
 };
 
 const sncServiceSlice = createSlice({
@@ -161,36 +178,50 @@ const sncServiceSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
-      
-      .addCase(sncServiceViewOne.pending,(state)=>{
-        state.loading=true
-        state.error=null
+
+
+      .addCase(sncServiceViewOne.pending, (state) => {
+        state.loading = true
+        state.error = null
       })
-      .addCase(sncServiceViewOne.fulfilled,(state,action)=>{
-        state.loading=false;
-        state.sncServiceOneDetail=action.payload
+      .addCase(sncServiceViewOne.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sncServiceOneDetail = action.payload
       })
-      .addCase(sncServiceViewOne.rejected,(state,action)=>{
-        state.loading=false;
-        state.error=action.payload
+      .addCase(sncServiceViewOne.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload
       })
-      
-      
-      
-      .addCase(sncServiceUpdateOne.pending,(state)=>{
-        state.loading=true;
-        state.error=null
+
+
+
+      .addCase(sncServiceUpdateOne.pending, (state) => {
+        state.loading = true;
+        state.error = null
       })
-      .addCase(sncServiceUpdateOne.fulfilled,(state,action)=>{
-        state.loading=false;
-        state.sncServiceUpdateOneData=action.payload
+      .addCase(sncServiceUpdateOne.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sncServiceUpdateOneData = action.payload
       })
-      .addCase(sncServiceUpdateOne.rejected,(state,action)=>{
-        state.loading=false;
-        state.error=action.payload
+      .addCase(sncServiceUpdateOne.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload
       })
-      
+
+      // assigned
+      .addCase(sncServiceViewAssigned.pending, (state) => {
+        state.loading = true;
+        state.error = null
+      })
+      .addCase(sncServiceViewAssigned.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sncServiceAssignedData = action.payload
+      })
+      .addCase(sncServiceViewAssigned.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload
+      })
+
       ;
   },
 });
