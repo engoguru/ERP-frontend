@@ -60,7 +60,7 @@ import { registerCamp } from '../../../redux/slice/campslice'
 function RegisterCamp() {
     const dispatch = useDispatch()
     const location = useLocation()
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const query = new URLSearchParams(location.search)
     const id = query.get("id")
     const [waitforSubmit, setWaitforSubmit] = useState(true)
@@ -126,12 +126,18 @@ function RegisterCamp() {
         setForm(prev => ({ ...prev, [name]: value }))
     }
     // handle file
+    const [preview, setPreview] = useState(null)
     const handleFile = (e) => {
         const { name, files } = e.target;
 
         setForm((pre) => ({
             ...pre, [name]: Array.from(files)
         }))
+        const previewUrls = Array.from(files).map((file) =>
+            URL.createObjectURL(file)
+        );
+
+        setPreview(previewUrls);
     }
     // Auto unpaid calculation
     useEffect(() => {
@@ -183,8 +189,8 @@ function RegisterCamp() {
             const res = await dispatch(registerCamp(formData));
 
             if (res.payload?.success) {
-               alert("Registered Successfully !")
-               setForm()
+                alert("Registered Successfully !")
+                setForm()
                 setCustomService("")
                 navigate("/company/re-treat")
                 // Reset form or redirect if needed
@@ -197,6 +203,7 @@ function RegisterCamp() {
             console.error("Error submitting form:", error);
         }
     };
+  
     return (
         <CompanyLayout pageTitle={"Services Camp"}>
             <div className="min-h-screen bg-gray-300 flex items-center justify-center p-6">
@@ -317,6 +324,17 @@ function RegisterCamp() {
                                 required
                                 onChange={handleFile}
                             />
+                            <div className="mt-3 flex gap-3 flex-wrap">
+                                {preview &&
+                                    preview.map((url, index) => (
+                                        <img
+                                            key={index}
+                                            src={url}
+                                            alt="preview"
+                                            className="w-20 h-20 object-cover rounded border"
+                                        />
+                                    ))}
+                            </div>
                         </div>
 
                         <div>

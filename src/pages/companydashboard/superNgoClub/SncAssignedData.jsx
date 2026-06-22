@@ -115,7 +115,7 @@ function SncAssignedData() {
     const handleView = (item) => {
         console.log("View:", item);
     };
-
+    console.log(employeeData, "kkjo")
     return (
         <CompanyLayout>
             <div className="p-4">
@@ -152,7 +152,9 @@ function SncAssignedData() {
                         <thead className="bg-gray-100">
                             <tr>
                                 <th className="border p-2">#</th>
+                                <th className="border p-2">client Name</th>
                                 <th className="border p-2">Service Name</th>
+                                {employeeData?.role === "Admin" && (<th className="border p-2">assigned To</th>)}
                                 <th className="border p-2">Status</th>
                                 <th className="border p-2">Total</th>
                                 <th className="border p-2">Paid</th>
@@ -166,16 +168,23 @@ function SncAssignedData() {
                                 filteredData.map((item, index) => (
                                     <tr key={item._id} className="text-center">
                                         <td className="border p-2">{index + 1}</td>
-
+                                        <td className="border p-2">
+                                            {item?.sncId?.retreat_id?.name}
+                                        </td>
                                         <td className="border p-2">
                                             {item.serviceName}
                                         </td>
+                                        {employeeData?.role === "Admin" && (
+                                            <td className="border p-2">
+                                                {item?.assigned[0].userName}
+                                            </td>)
 
+                                        }
                                         <td className="border p-2">
                                             <span
                                                 className={`px-2 py-1 rounded text-white ${item.status === "active"
-                                                        ? "bg-green-500"
-                                                        : "bg-red-500"
+                                                    ? "bg-green-500"
+                                                    : "bg-red-500"
                                                     }`}
                                             >
                                                 {item.status}
@@ -197,10 +206,18 @@ function SncAssignedData() {
                                         <td className="border p-2">
                                             <Link
                                                 to={`/company/addon/service/view/${item._id}`}
-                                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 inline-block"
+                                                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 inline-block"
                                             >
                                                 View
                                             </Link>
+                                             {employeeData?.role === "Admin" && (
+                                            <Link
+                                                to={`/company/addon/service/edit/${item._id}`}
+                                                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 inline-block mx-2"
+                                            >
+                                                Edit
+                                            </Link>
+                                             )}
                                         </td>
                                     </tr>
                                 ))

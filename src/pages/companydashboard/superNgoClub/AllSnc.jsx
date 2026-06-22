@@ -103,15 +103,7 @@
 
 // export default AllSnc;
 
-
-
-
-
-
-
-
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -127,8 +119,18 @@ function AllSnc() {
     dispatch(allSncId());
   }, []);
 
-  const members = sncEligibleData?.data || [];
-  const sncIds  = sncIdData?.data       || [];
+  let members = sncEligibleData?.data || [];
+  const sncIds = sncIdData?.data || [];
+
+  //  FILTER LOGIC
+  const [search, setSearch] = useState("");
+  members = members.filter((item) => {
+    const matchSearch = item.name
+      ?.toLowerCase()
+      .includes(search.toLowerCase());
+
+    return matchSearch
+  });
 
   return (
     <CompanyLayout pageTitle="SNC">
@@ -153,7 +155,15 @@ function AllSnc() {
                   Manage and view all eligible SNC members
                 </p>
               </div>
-
+              <div className="w-[20%]">
+                <input
+                  type="text"
+                  placeholder="Search service..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="border px-2 rounded w-full "
+                />
+              </div>
               {/* Member count chip */}
               <div className="bg-white border border-gray-300 rounded-xl px-4 py-2.5 shadow-sm text-right">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Members</div>
