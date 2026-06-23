@@ -16,6 +16,10 @@ import serviceReducer from "../slice/serviceAddSlice"
 import sncReducer from "../slice/snc/sncregisterSlice"
 import sncServiceReducer from '../slice/snc/sncserviceSlice';
 
+import sncProposalReducer from '../slice/snc/sncproposalSlice'
+
+import paymentReducer from '../slice/snc/sncpaymentSlice'
+
 const rootReducer = combineReducers({
   company: companyReducer, 
   employee:employeeReducer,
@@ -34,7 +38,11 @@ const rootReducer = combineReducers({
 
   snc:sncReducer,
 
-  sncService:sncServiceReducer
+  sncService:sncServiceReducer,
+
+  sncProposal:sncProposalReducer,
+
+  payment:paymentReducer
 
 
 });

@@ -99,7 +99,7 @@ function SncUpdate() {
   console.log(newDocs)
   return (
     <CompanyLayout pageTitle={"SNC-Update"}>
-      
+
       <h1 className='text-xl font-bold text-center my-2'>
         Update Super NGO Club Member
       </h1>
@@ -162,12 +162,14 @@ function SncUpdate() {
 
 
               {existingDocs?.map((doc, index) => (
-                <img
-                  key={index}
-                  src={doc.url}
-                  alt={`doc-${index}`}
-                  className="w-25 h-27 object-cover mb-2 "
-                />
+                <a href={doc.url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    key={index}
+                    src={doc.url}
+                    alt={`doc-${index}`}
+                    className="w-25 h-27 object-cover mb-2 cursor-pointer"
+                  />
+                </a>
               ))}
             </div>
             {/* New Docs Preview */}

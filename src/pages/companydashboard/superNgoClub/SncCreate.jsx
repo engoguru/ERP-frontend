@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from "react";
 import CompanyLayout from "../../../components/layout/companydashboard/CompanyLayout";
 import { useDispatch } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { sncRegister } from "../../../redux/slice/snc/sncregisterSlice";
 
 function SncCreate() {
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate()
+    //  useNavigate
     const id = searchParams.get("id");
     console.log(id)
     const [formData, setFormData] = useState({
         joinStatus: "",
+        sncEdition: "",
         sncType: "",
         totalServiceAmount: "",
         paidAmount: "",
         unpaidAmount: "",
         gstAmount: "",
-        retreat_id:"",
+        retreat_id: "",
         docs: []
     });
 
@@ -34,7 +37,7 @@ function SncCreate() {
             const total = Number(updated.totalServiceAmount) || 0;
             const paid = Number(updated.paidAmount) || 0;
 
-            updated.unpaidAmount = total - paid ||"";
+            updated.unpaidAmount = total - paid || "";
 
             return updated;
         });
@@ -66,15 +69,17 @@ function SncCreate() {
             form.append("unpaidAmount", formData.unpaidAmount);
             form.append("gstAmount", formData.gstAmount);
             form.append("retreat_id", formData.retreat_id);
+            form.append("sncEdition", formData.sncEdition)
             // send files only (backend will convert to {url, public_id})
             formData.docs.forEach((file) => {
                 form.append("docs", file);
             });
 
             console.log(formData, "Submitting form...");
-            const res=dispatch(sncRegister(form))
+            const res = dispatch(sncRegister(form))
             // console.log(res)
             alert("Member Created !")
+            navigate(-1)
             setFormData()
         } catch (error) {
             console.log(error);
@@ -107,6 +112,25 @@ function SncCreate() {
                                 <option value="">Select Join Status</option>
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <div className="w-full px-3 pb-7 flex flex-col">
+                            <label className="text-gray-500 text-sm">
+                                Select SNC-Edition
+                            </label>
+                            <select
+                                name="sncEdition"
+                                onChange={handleChange}
+                                className="w-full border rounded px-3 py-2 text-sm"
+                            >
+                                <option value="">Select SNC-Edition</option>
+
+                                {Array.from({ length: 15 }, (_, index) => (
+                                    <option key={index + 1} value={`SNC-${index + 1}`}>
+                                        SNC-{index + 1}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
@@ -149,7 +173,7 @@ function SncCreate() {
                         <input
                             type="number"
                             name="unpaidAmount"
-                            value={formData.unpaidAmount}
+                            value={formData?.unpaidAmount}
                             placeholder="unpaid"
                             readOnly
                             className="w-full px-3 py-2 mb-3 border rounded-xl bg-gray-100"
