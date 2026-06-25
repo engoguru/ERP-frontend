@@ -3,6 +3,7 @@ import CompanyLayout from '../../../components/layout/companydashboard/CompanyLa
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { updateServices, viewOneService } from '../../../redux/slice/serviceAddSlice';
+import { viewEmployees } from '../../../redux/slice/employee/employeeCreateSlice';
 
 function AddonEdit() {
   const dispatch = useDispatch();
@@ -10,6 +11,9 @@ function AddonEdit() {
   const navigate=useNavigate()
 
   const { oneservice } = useSelector((state) => state.reducer.service);
+    const { employeeList, loading, error } = useSelector(
+      (state) => state.reducer.employee
+    );
 
   const [formData, setFormData] = useState({
     serviceName: '',
@@ -17,9 +21,13 @@ function AddonEdit() {
     paidAmount: '',
     unpaidAmount: 0,
     docs: [], // new uploads
-    existingDocs: [] // old docs
+    existingDocs: [], // old docs
+     assigned: []
   });
-
+  useEffect(() => {
+    dispatch(viewEmployees())
+  //  viewEmployees
+  }, []);
   // Fetch service data
   useEffect(() => {
     if (id) {
@@ -36,7 +44,8 @@ function AddonEdit() {
         paidAmount: oneservice.data.paidAmount || '',
         unpaidAmount: oneservice.data.unpaidAmount || 0,
         docs: [],
-        existingDocs: oneservice.data.docs || []
+        existingDocs: oneservice.data.docs || [],
+        assigned: oneservice.assigned || []
       });
     }
   }, [oneservice]);
@@ -83,6 +92,9 @@ function AddonEdit() {
     payload.append("paidAmount", formData.paidAmount);
     payload.append("unpaidAmount", formData.unpaidAmount);
 
+      // Array/Object must be stringified
+    payload.append("assigned", JSON.stringify(formData.assigned));
+
     // Append new files
     formData.docs.forEach((file) => payload.append("docs", file));
 
@@ -110,6 +122,36 @@ function AddonEdit() {
           className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 space-y-4"
         >
           <h2 className="text-2xl font-semibold text-gray-800">Edit Service</h2>
+
+             <div className="flex">
+               
+                  <div>
+                    <select
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          assigned: [
+                            {
+                              userId: e.target.value,
+                              userName:
+                                employeeList.find(emp => emp._id === e.target.value)?.name || "",
+                              status: "Active"
+                            }
+                          ]
+                        })
+                      }
+                    >
+                      <option value="">Select Employee For Assign</option>
+
+                      {employeeList?.map((user, index) => (
+                        <option key={index} value={user._id}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
 
           {/* Service Name */}
           <div>

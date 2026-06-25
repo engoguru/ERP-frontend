@@ -22,6 +22,7 @@ const ACCESS_OPTIONS = [
   { key: "leads", label: "Leads", actions: ["ldView", "ldCreate", "ldEdit", "ldDelete", "ldassign", "ldfollowUp", "ldconverter", "ldprocessor"] },
    { key: "seminar", label: "Seminar Data", actions: ["mumbai seminar", "delhi seminar","Kolkata Seminaar","Hyderabade Seminar","Ranchi Seminar", "other" ] },
    { key: "services", label: "services Data", actions: ["services list", "services add", "services edit","work" ] },
+   { key: "assigned", label: "assigned Data", actions: ["assigned work", "assigned services"] },
 ];
   
 /* Reusable Field Wrapper */

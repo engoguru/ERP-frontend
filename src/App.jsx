@@ -62,6 +62,7 @@ import SncMemberAddOnServiceView from './pages/companydashboard/superNgoClub/Snc
 import SncAssignedData from './pages/companydashboard/superNgoClub/SncAssignedData';
 import SncMemberAddOnPropsal from './pages/companydashboard/superNgoClub/SncMemberAddOnPropsal';
 import SncMemberAddOnPayment from './pages/companydashboard/superNgoClub/SncMemberAddOnPayment';
+import AddOnViewAssigned from './pages/companydashboard/re-treatCamp/AddOnViewAssigned';
 
 
 function App() {
@@ -119,6 +120,7 @@ function App() {
           <Route path="/company/service/addon/:id" element={<AddonTreat />} />
           <Route path="/company/service/addon/new/:id" element={<AddonNew />} />
           <Route path="/company/service/addon/edit/:id" element={<AddonEdit />} />
+           <Route path="/company/addon/assigned" element={<AddOnViewAssigned/>}/>
 
 
 
@@ -158,6 +160,8 @@ function App() {
            <Route path="/company/addon/service/create/:id" element={<SncMemberAddOnServiceCreate/>}/>
            <Route path="/company/addon/service/edit/:id" element={<SncMemberAddOnServiceEdit/>}/>
            <Route path="/company/addon/service/view/:id" element={<SncMemberAddOnServiceView/>}/>
+
+          
            {/* assigned */}
            <Route path="/assigned/services" element={<SncAssignedData/>}/>
            {/* Proposal */}

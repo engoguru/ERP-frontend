@@ -240,13 +240,16 @@ function Sidebar({ isMobile }) {
     ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "Services", path: "/company/re-treat", icon: Briefcase, group: "main" }]
       : []),
-       ...(isAdmin || permissionArray.includes("work")
-      ? [{ label: "Assigned Work", path: "/assigned/services", icon: Briefcase, group: "main" }]
+       ...(isAdmin || permissionArray.includes("assigned services")
+      ? [{ label: "Assigned-Services", path: "/company/addon/assigned", icon: Briefcase, group: "main" }]
       : []),
+
     ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" }]
       : []),
-
+   ...(isAdmin || permissionArray.includes("assigned-work")
+      ? [{ label: "Assigned-Work", path: "/assigned/services", icon: Briefcase, group: "main" }]
+      : []),
     { label: "Apply Leaves", path: "/company/applyLeave", icon: Briefcase, group: "personal" },
     { label: "Raised Issues", path: "/company/raised", icon: Briefcase, group: "personal" },
     // { label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" },

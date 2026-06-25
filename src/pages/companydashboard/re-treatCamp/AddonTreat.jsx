@@ -39,7 +39,7 @@ function AddonTreat() {
 
                 {/* ── USER DETAILS ── */}
                 <div className="bg-white border rounded-xl p-5">
-                    <h2 className="text-lg font-bold text-slate-800 mb-4">User Details</h2>
+                    <h2 className="text-lg font-bold text-slate-800 mb-4">User, Details</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
@@ -92,6 +92,7 @@ function AddonTreat() {
                             <tr>
                                 <th className="px-4 py-3 text-left">S.No.</th>
                                 <th className="px-4 py-3 text-left">Service Name</th>
+                                <th className="px-4 py-3 text-left">Assigned To</th>
                                 <th className="px-4 py-3 text-center">Total Amt (₹)</th>
                                 <th className="px-4 py-3 text-center">Paid Amt (₹)</th>
                                 <th className="px-4 py-3 text-center">Due Amt (₹)</th>
@@ -105,6 +106,7 @@ function AddonTreat() {
                                 <tr key={service.id} className="border-t hover:bg-slate-50 transition">
                                     <td className="px-4 py-3 font-medium">{index + 1}</td>
                                     <td className="px-4 py-3 font-medium">{service.serviceName}</td>
+                                    <td className="px-4 py-3 font-medium">{service.assigned[0].userName}</td>
 
                                     <td className="px-4 py-3 text-center">
                                         ₹{service.totalAmount}
