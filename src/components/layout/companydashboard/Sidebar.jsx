@@ -241,7 +241,7 @@ function Sidebar({ isMobile }) {
       ? [{ label: "Services", path: "/company/re-treat", icon: Briefcase, group: "main" }]
       : []),
        ...(isAdmin || permissionArray.includes("work")
-      ? [{ label: "Work", path: "/assigned/services", icon: Briefcase, group: "main" }]
+      ? [{ label: "Assigned Work", path: "/assigned/services", icon: Briefcase, group: "main" }]
       : []),
     ...(isAdmin || permissionArray.some(p => allowedSeminars.includes(p))
       ? [{ label: "SNC", path: "/company/allsnc", icon: Briefcase, group: "main" }]

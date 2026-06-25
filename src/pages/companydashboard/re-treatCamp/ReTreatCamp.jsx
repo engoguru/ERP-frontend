@@ -212,7 +212,7 @@ function ReTreatCamp() {
                     <td className="px-3 py-4">
                       <div className="flex items-center justify-end gap-1.5">
 
-                        {camp.service === !"Retreat Camp" &&
+                        {camp.service !=="Retreat Camp" &&
                           <Link
                             to={`/company/service/addon/${camp._id}`}
                             title="Add-On New Services"
