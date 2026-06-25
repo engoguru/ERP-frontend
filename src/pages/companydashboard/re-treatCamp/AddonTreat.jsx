@@ -106,7 +106,9 @@ function AddonTreat() {
                                 <tr key={service.id} className="border-t hover:bg-slate-50 transition">
                                     <td className="px-4 py-3 font-medium">{index + 1}</td>
                                     <td className="px-4 py-3 font-medium">{service.serviceName}</td>
-                                    <td className="px-4 py-3 font-medium">{service.assigned[0].userName}</td>
+                                    <td className="px-4 py-3 font-medium">
+                                        {service?.assigned?.[0]?.userName || "Not Assigned"}
+                                    </td>
 
                                     <td className="px-4 py-3 text-center">
                                         ₹{service.totalAmount}
