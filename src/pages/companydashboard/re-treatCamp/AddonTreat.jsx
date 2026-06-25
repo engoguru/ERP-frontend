@@ -31,7 +31,39 @@ function AddonTreat() {
         dispatch(getCampOne(id));
         dispatch(getAllService(id))
     }, [id, dispatch]);
-    console.log(AllService, "p")
+    console.log(AllService, "pddgzdfverfef")
+
+
+    const totalsServicesAmount =
+        AllService?.data?.reduce(
+            (acc, item) => {
+                acc.total += Number(item.totalAmount) || 0;
+                acc.paid += Number(item.paidAmount) || 0;
+
+                acc.unpaid += Number(item.unpaidAmount) || 0;
+
+
+                return acc;
+            },
+            {
+                total: 0,
+                paid: 0,
+
+                unpaid: 0,
+
+            }
+        ) || {
+            total: 0,
+            paid: 0,
+
+            unpaid: 0,
+
+        };
+    const totalBillAmountServices = totalsServicesAmount.total;
+    const totalPaidAmountServices = totalsServicesAmount.paid;
+
+    const totalDueAmountServices = totalsServicesAmount.unpaid;
+
 
     return (
         <CompanyLayout pageTitle={"All Services"}>
@@ -84,6 +116,34 @@ function AddonTreat() {
                         >
                             <Plus size={16} /> Add On
                         </button>
+                    </div>
+
+
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mt-4 mb-4 mx-2">
+
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-2 shadow-sm">
+                            <p className="text-sm font-medium text-blue-600">Total <a href="http://"></a>mount</p>
+                            <h3 className="text-xl font-bold text-blue-900">
+                                ₹{totalBillAmountServices.toLocaleString()}
+                            </h3>
+                        </div>
+
+                        <div className="bg-green-50 border border-green-100 rounded-xl p-2 shadow-sm">
+                            <p className="text-sm font-medium text-green-600">Total Paid</p>
+                            <h3 className="text-xl font-bold text-green-900">
+                                ₹{totalPaidAmountServices.toLocaleString()}
+                            </h3>
+                        </div>
+
+
+
+                        <div className="bg-red-50 border border-red-200 rounded-xl p-2 shadow-sm">
+                            <p className="text-sm font-medium text-red-600">Total Due</p>
+                            <h3 className="text-xl font-bold text-red-900">
+                                ₹{totalDueAmountServices.toLocaleString()}
+                            </h3>
+                        </div>
+
                     </div>
 
                     {/* Table */}
